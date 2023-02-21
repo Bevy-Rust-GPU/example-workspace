@@ -25,7 +25,7 @@ As such, the `NO_STORAGE_BUFFER_SUPPORT` feature is enabled by default, and the 
 
 #### shader-builder
 
-Empty library crate used to invoke build.rs as its own build target.
+Empty library crate used to invoke `build.rs` independently of the bevy crate.
 Encapsulates the nightly build process needed for `rust-gpu`.
 
 Contains the `rust_toolchain` file needed by `rust-gpu`, and invokes `spirv-builder` via build.rs.
@@ -34,8 +34,7 @@ Run via `cargo build -p shader-builder` to produce `target/spirv-builder/spirv-u
 
 #### viewer
 
-Main bevy project.
-Loads an example scene that renders a side-by-side comparison of WGSL and Rust PBR materials.
+Main bevy crate. Loads an example scene that renders a side-by-side comparison of WGSL and Rust PBR materials.
 
 Uses the workspace root as its asset folder, and hot-reloads `target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv` file via AssetServer.
 
