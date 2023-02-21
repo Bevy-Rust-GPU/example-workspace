@@ -89,8 +89,14 @@ pub fn get_light_id(cluster_light_index_lists: &ClusterLightIndexLists, index: u
     {
         // The index is correct but in cluster_light_index_lists we pack 4 u8s into a u32
         // This means the index into cluster_light_index_lists is index / 4
-        let indices = cluster_light_index_lists.data[(index >> 4) as usize]
-            [((index >> 2) & ((1 << 2) - 1)) as usize];
+        let v = cluster_light_index_lists.data[(index >> 4) as usize];
+        let indices = match ((index >> 2) & ((1 << 2) - 1)) as usize {
+            0 => v.x,
+            1 => v.y,
+            2 => v.z,
+            3 => v.w,
+            _ => panic!(),
+        };
         // And index % 4 gives the sub-index of the u8 within the u32 so we shift by 8 * sub-index
         return (indices >> (8 * (index & ((1 << 2) - 1)))) & ((1 << 8) - 1);
     }

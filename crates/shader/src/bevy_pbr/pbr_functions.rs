@@ -234,10 +234,15 @@ pub fn pbr(
     let offset_and_counts = unpack_offset_and_counts(cluster_offsets_and_counts, cluster_index);
 
     // point lights
-    /*
     for i in offset_and_counts.x as u32..(offset_and_counts.x + offset_and_counts.y) as u32 {
         let light_id = get_light_id(cluster_light_index_lists, i);
+
+        #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
+        let light = &point_lights.data[light_id as usize];
+
+        #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
         let light = unsafe { point_lights.data.index(light_id as usize) };
+
         let mut shadow: f32 = 1.0;
         if (mesh.flags & MESH_FLAGS_SHADOW_RECEIVER_BIT) != 0
             && (light.flags & POINT_LIGHT_FLAGS_SHADOWS_ENABLED_BIT) != 0
@@ -264,15 +269,19 @@ pub fn pbr(
         );
         light_accum = light_accum + light_contrib * shadow;
     }
-    */
 
     // spot lights
-    /*
     for i in (offset_and_counts.x + offset_and_counts.y) as u32
         ..(offset_and_counts.x + offset_and_counts.y + offset_and_counts.z) as u32
     {
         let light_id = get_light_id(cluster_light_index_lists, i);
+
+        #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
+        let light = &point_lights.data[light_id as usize];
+
+        #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
         let light = unsafe { point_lights.data.index(light_id as usize) };
+
         let mut shadow: f32 = 1.0;
         if (mesh.flags & MESH_FLAGS_SHADOW_RECEIVER_BIT) != 0
             && (light.flags & POINT_LIGHT_FLAGS_SHADOWS_ENABLED_BIT) != 0
@@ -300,7 +309,6 @@ pub fn pbr(
         );
         light_accum = light_accum + light_contrib * shadow;
     }
-    */
 
     let n_directional_lights = lights.n_directional_lights;
     for i in 0..n_directional_lights {
@@ -346,8 +354,6 @@ pub fn pbr(
         offset_and_counts,
         cluster_index,
     );
-
-    output_color = offset_and_counts.as_vec3().extend(1.0);
 
     return output_color;
 }

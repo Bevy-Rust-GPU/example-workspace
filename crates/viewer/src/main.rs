@@ -3,10 +3,9 @@ use std::borrow::Cow;
 use bevy::{
     pbr::StandardMaterialUniform,
     prelude::{
-        default, info, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle,
-        Commands, DefaultPlugins, Handle, Material, MaterialMeshBundle, MaterialPlugin, Mesh,
-        PluginGroup, PointLightBundle, Quat, Res, ResMut, Shader, StandardMaterial, Transform,
-        Vec3,
+        default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Commands,
+        DefaultPlugins, Handle, Material, MaterialMeshBundle, MaterialPlugin, Mesh, PluginGroup,
+        PointLightBundle, Quat, Res, ResMut, Shader, StandardMaterial, Transform, Vec3,
     },
     reflect::TypeUuid,
     render::{
@@ -27,7 +26,7 @@ fn main() {
     });
 
     app.add_plugins(DefaultPlugins.set(AssetPlugin {
-        asset_folder: "/mnt/projects/personal/rust/Projects/rust-gpu-test".into(),
+        asset_folder: "/mnt/projects/personal/rust/Projects/bevy-rust-gpu".into(),
         watch_for_changes: true,
         ..default()
     }))
@@ -142,18 +141,13 @@ impl Material for ShaderMaterial {
     }
 
     fn specialize(
-        pipeline: &bevy::pbr::MaterialPipeline<Self>,
+        _pipeline: &bevy::pbr::MaterialPipeline<Self>,
         descriptor: &mut bevy::render::render_resource::RenderPipelineDescriptor,
         _layout: &bevy::render::mesh::MeshVertexBufferLayout,
         key: bevy::pbr::MaterialPipelineKey<Self>,
     ) -> Result<(), bevy::render::render_resource::SpecializedMeshPipelineError> {
         if let Some(vertex_shader) = key.bind_group_data.vertex_shader {
             descriptor.vertex.shader = vertex_shader;
-            info!(
-                "Clearing vertex shader defs {:#?}",
-                descriptor.vertex.shader_defs
-            );
-            descriptor.vertex.shader_defs.clear();
         }
 
         if let Some(vertex_entry_point) = key.bind_group_data.vertex_entry_point {
@@ -163,11 +157,6 @@ impl Material for ShaderMaterial {
         if let Some(fragment_descriptor) = descriptor.fragment.as_mut() {
             if let Some(fragment_shader) = key.bind_group_data.fragment_shader {
                 fragment_descriptor.shader = fragment_shader;
-                info!(
-                    "Clearing fragment shader defs {:#?}",
-                    fragment_descriptor.shader_defs
-                );
-                fragment_descriptor.shader_defs.clear();
             }
 
             if let Some(fragment_entry_point) = key.bind_group_data.fragment_entry_point {
