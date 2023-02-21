@@ -1,5 +1,5 @@
 use crate::bevy_pbr::{
-    mesh_functions::{mesh_position_local_to_world, mesh_position_world_to_clip},
+    mesh_functions::mesh_position_local_to_world,
     mesh_types::Mesh,
     mesh_view_types::View,
 };
@@ -11,8 +11,6 @@ use spirv_std::{
 
 #[allow(unused_imports)]
 use spirv_std::num_traits::Float;
-
-use super::mesh_functions::mesh_normal_local_to_world;
 
 #[allow(unused_variables)]
 #[spirv(vertex)]
@@ -46,13 +44,13 @@ pub fn vertex(
 
     #[cfg(not(feature = "SKINNED"))]
     {
-        *out_world_normal = mesh_normal_local_to_world(mesh, in_normal);
+        *out_world_normal = mesh.mesh_normal_local_to_world(in_normal);
     }
 
     #[cfg(feature = "VERTEX_POSITIONS")]
     {
         *out_world_position = mesh_position_local_to_world(model, in_position.extend(1.0));
-        *out_clip_position = mesh_position_world_to_clip(view, *out_world_position);
+        *out_clip_position = view.mesh_position_world_to_clip(*out_world_position);
     }
 
     #[cfg(feature = "VERTEX_UVS")]

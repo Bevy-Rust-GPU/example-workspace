@@ -1,5 +1,4 @@
 use spirv_std::{
-    arch::kill,
     glam::{Vec2, Vec3, Vec4},
     Sampler,
 };
@@ -7,42 +6,16 @@ use spirv_std::{
 use crate::reflect::Reflect;
 
 use super::{
-    clustered_forward::{cluster_debug_visualization, fragment_cluster_index},
+    clustered_forward::cluster_debug_visualization,
     mesh_types::{Mesh, MESH_FLAGS_SHADOW_RECEIVER_BIT},
     mesh_view_types::{
         ClusterLightIndexLists, ClusterOffsetsAndCounts, Lights, PointLights, View,
         DIRECTIONAL_LIGHT_FLAGS_SHADOWS_ENABLED_BIT, POINT_LIGHT_FLAGS_SHADOWS_ENABLED_BIT,
     },
     pbr_lighting::{env_brdf_approx, perceptual_roughness_to_roughness},
-    pbr_types::{
-        StandardMaterial, STANDARD_MATERIAL_FLAGS_ALPHA_MODE_MASK,
-        STANDARD_MATERIAL_FLAGS_ALPHA_MODE_OPAQUE,
-    },
-    shadows::{
-        fetch_directional_shadow, fetch_point_shadow, fetch_spot_shadow, DirectionalShadowTextures,
-        PointShadowTextures,
-    },
+    pbr_types::StandardMaterial,
+    shadows::{DirectionalShadowTextures, PointShadowTextures},
 };
-
-pub fn alpha_discard(material: &StandardMaterial, output_color: Vec4) -> Vec4 {
-    let mut color = output_color;
-
-    if (material.flags & STANDARD_MATERIAL_FLAGS_ALPHA_MODE_OPAQUE) != 0 {
-        // NOTE: If rendering as opaque, alpha should be ignored so set to 1.0
-        color.w = 1.0;
-    } else if (material.flags & STANDARD_MATERIAL_FLAGS_ALPHA_MODE_MASK) != 0 {
-        if color.w >= material.alpha_cutoff {
-            // NOTE: If rendering as masked alpha and >= the cutoff, render as fully opaque
-            color.w = 1.0;
-        } else {
-            // NOTE: output_color.a < input.material.alpha_cutoff should not is not rendered
-            // NOTE: This and any other discards mean that early-z testing cannot be done!
-            kill();
-        }
-    }
-
-    color
-}
 
 pub fn prepare_world_normal(world_normal: Vec3, double_sided: bool, is_front: bool) -> Vec3 {
     let output: Vec3 = world_normal;
@@ -115,23 +88,6 @@ pub fn apply_normal_mapping(
     n.normalize()
 }
 
-// NOTE: Correctly calculates the view vector depending on whether
-// the projection is orthographic or perspective.
-pub fn calculate_view(view: &View, world_position: Vec4, is_orthographic: bool) -> Vec3 {
-    if is_orthographic {
-        // Orthographic view vector
-        Vec3::new(
-            view.view_proj.x_axis.z,
-            view.view_proj.y_axis.z,
-            view.view_proj.z_axis.z,
-        )
-        .normalize()
-    } else {
-        // Only valid for a perpective projection
-        (view.world_position - world_position.truncate()).normalize()
-    }
-}
-
 #[repr(C)]
 pub struct PbrInput {
     pub material: StandardMaterial,
@@ -167,179 +123,177 @@ impl Default for PbrInput {
     }
 }
 
-pub fn pbr(
-    view: &View,
-    mesh: &Mesh,
-    lights: &Lights,
-    point_lights: &PointLights,
-    cluster_light_index_lists: &ClusterLightIndexLists,
-    cluster_offsets_and_counts: &ClusterOffsetsAndCounts,
-    directional_shadow_textures: &DirectionalShadowTextures,
-    directional_shadow_textures_sampler: &Sampler,
-    point_shadow_textures: &PointShadowTextures,
-    point_shadow_textures_sampler: &Sampler,
-    input: PbrInput,
-) -> Vec4 {
-    let mut output_color = input.material.base_color;
+impl PbrInput {
+    pub fn pbr(
+        &self,
+        view: &View,
+        mesh: &Mesh,
+        lights: &Lights,
+        point_lights: &PointLights,
+        cluster_light_index_lists: &ClusterLightIndexLists,
+        cluster_offsets_and_counts: &ClusterOffsetsAndCounts,
+        directional_shadow_textures: &DirectionalShadowTextures,
+        directional_shadow_textures_sampler: &Sampler,
+        point_shadow_textures: &PointShadowTextures,
+        point_shadow_textures_sampler: &Sampler,
+    ) -> Vec4 {
+        let mut output_color = self.material.base_color;
 
-    // TODO use .a for exposure compensation in HDR
-    let emissive = input.material.emissive;
+        // TODO use .a for exposure compensation in HDR
+        let emissive = self.material.emissive;
 
-    // calculate non-linear roughness from linear perceptualRoughness
-    let metallic = input.material.metallic;
-    let perceptual_roughness = input.material.perceptual_roughness;
-    let roughness = perceptual_roughness_to_roughness(perceptual_roughness);
+        // calculate non-linear roughness from linear perceptualRoughness
+        let metallic = self.material.metallic;
+        let perceptual_roughness = self.material.perceptual_roughness;
+        let roughness = perceptual_roughness_to_roughness(perceptual_roughness);
 
-    let occlusion = input.occlusion;
+        let occlusion = self.occlusion;
 
-    output_color = alpha_discard(&input.material, output_color);
+        output_color = self.material.alpha_discard(output_color);
 
-    // Neubelt and Pettineo 2013, "Crafting a Next-gen Material Pipeline for The Order: 1886"
-    let n_dot_v = input.n.dot(input.v).max(0.0001);
+        // Neubelt and Pettineo 2013, "Crafting a Next-gen Material Pipeline for The Order: 1886"
+        let n_dot_v = self.n.dot(self.v).max(0.0001);
 
-    // Remapping [0,1] reflectance to F0
-    // See https://google.github.io/filament/Filament.html#materialsystem/parameterization/remapping
-    let reflectance = input.material.reflectance;
-    let f0 =
-        0.16 * reflectance * reflectance * (1.0 - metallic) + output_color.truncate() * metallic;
+        // Remapping [0,1] reflectance to F0
+        // See https://google.github.io/filament/Filament.html#materialsystem/parameterization/remapping
+        let reflectance = self.material.reflectance;
+        let f0 = 0.16 * reflectance * reflectance * (1.0 - metallic)
+            + output_color.truncate() * metallic;
 
-    // Diffuse strength inversely related to metallicity
-    let diffuse_color = output_color.truncate() * (1.0 - metallic);
+        // Diffuse strength inversely related to metallicity
+        let diffuse_color = output_color.truncate() * (1.0 - metallic);
 
-    let r = -input.v.reflect(input.n);
+        let r = -self.v.reflect(self.n);
 
-    // accumulate color
-    let mut light_accum: Vec3 = Vec3::ZERO;
+        // accumulate color
+        let mut light_accum: Vec3 = Vec3::ZERO;
 
-    let view_z = Vec4::new(
-        view.inverse_view.x_axis.z,
-        view.inverse_view.y_axis.z,
-        view.inverse_view.z_axis.z,
-        view.inverse_view.w_axis.z,
-    )
-    .dot(input.world_position);
-    let cluster_index = fragment_cluster_index(
-        view,
-        lights,
-        input.frag_coord.truncate().truncate(),
-        view_z,
-        input.is_orthographic,
-    );
-    let offset_and_counts = cluster_offsets_and_counts.unpack(cluster_index);
-
-    // point lights
-    for i in offset_and_counts.x as u32..(offset_and_counts.x + offset_and_counts.y) as u32 {
-        let light_id = cluster_light_index_lists.get_light_id(i);
-
-        #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
-        let light = &point_lights.data[light_id as usize];
-
-        #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
-        let light = unsafe { point_lights.data.index(light_id as usize) };
-
-        let mut shadow: f32 = 1.0;
-        if (mesh.flags & MESH_FLAGS_SHADOW_RECEIVER_BIT) != 0
-            && (light.flags & POINT_LIGHT_FLAGS_SHADOWS_ENABLED_BIT) != 0
-        {
-            shadow = fetch_point_shadow(
-                point_lights,
-                point_shadow_textures,
-                point_shadow_textures_sampler,
-                light_id,
-                input.world_position,
-                input.world_normal,
-            );
-        }
-        let light_contrib = light.point_light(
-            input.world_position.truncate(),
-            roughness,
-            n_dot_v,
-            input.n,
-            input.v,
-            r,
-            f0,
-            diffuse_color,
+        let view_z = Vec4::new(
+            view.inverse_view.x_axis.z,
+            view.inverse_view.y_axis.z,
+            view.inverse_view.z_axis.z,
+            view.inverse_view.w_axis.z,
+        )
+        .dot(self.world_position);
+        let cluster_index = lights.fragment_cluster_index(
+            view,
+            self.frag_coord.truncate().truncate(),
+            view_z,
+            self.is_orthographic,
         );
-        light_accum = light_accum + light_contrib * shadow;
-    }
+        let offset_and_counts = cluster_offsets_and_counts.unpack(cluster_index);
 
-    // spot lights
-    for i in (offset_and_counts.x + offset_and_counts.y) as u32
-        ..(offset_and_counts.x + offset_and_counts.y + offset_and_counts.z) as u32
-    {
-        let light_id = cluster_light_index_lists.get_light_id(i);
+        // point lights
+        for i in offset_and_counts.x as u32..(offset_and_counts.x + offset_and_counts.y) as u32 {
+            let light_id = cluster_light_index_lists.get_light_id(i);
 
-        #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
-        let light = &point_lights.data[light_id as usize];
+            #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
+            let light = &point_lights.data[light_id as usize];
 
-        #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
-        let light = unsafe { point_lights.data.index(light_id as usize) };
+            #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
+            let light = unsafe { point_lights.data.index(light_id as usize) };
 
-        let mut shadow: f32 = 1.0;
-        if (mesh.flags & MESH_FLAGS_SHADOW_RECEIVER_BIT) != 0
-            && (light.flags & POINT_LIGHT_FLAGS_SHADOWS_ENABLED_BIT) != 0
-        {
-            shadow = fetch_spot_shadow(
-                lights,
-                point_lights,
-                directional_shadow_textures,
-                directional_shadow_textures_sampler,
-                light_id,
-                input.world_position,
-                input.world_normal,
+            let mut shadow: f32 = 1.0;
+            if (mesh.flags & MESH_FLAGS_SHADOW_RECEIVER_BIT) != 0
+                && (light.flags & POINT_LIGHT_FLAGS_SHADOWS_ENABLED_BIT) != 0
+            {
+                shadow = point_lights.fetch_point_shadow(
+                    point_shadow_textures,
+                    point_shadow_textures_sampler,
+                    light_id,
+                    self.world_position,
+                    self.world_normal,
+                );
+            }
+            let light_contrib = light.point_light(
+                self.world_position.truncate(),
+                roughness,
+                n_dot_v,
+                self.n,
+                self.v,
+                r,
+                f0,
+                diffuse_color,
             );
+            light_accum = light_accum + light_contrib * shadow;
         }
-        let light_contrib = light.spot_light(
-            input.world_position.truncate(),
-            roughness,
-            n_dot_v,
-            input.n,
-            input.v,
-            r,
-            f0,
-            diffuse_color,
+
+        // spot lights
+        for i in (offset_and_counts.x + offset_and_counts.y) as u32
+            ..(offset_and_counts.x + offset_and_counts.y + offset_and_counts.z) as u32
+        {
+            let light_id = cluster_light_index_lists.get_light_id(i);
+
+            #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
+            let light = &point_lights.data[light_id as usize];
+
+            #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
+            let light = unsafe { point_lights.data.index(light_id as usize) };
+
+            let mut shadow: f32 = 1.0;
+            if (mesh.flags & MESH_FLAGS_SHADOW_RECEIVER_BIT) != 0
+                && (light.flags & POINT_LIGHT_FLAGS_SHADOWS_ENABLED_BIT) != 0
+            {
+                shadow = point_lights.fetch_spot_shadow(
+                    lights,
+                    directional_shadow_textures,
+                    directional_shadow_textures_sampler,
+                    light_id,
+                    self.world_position,
+                    self.world_normal,
+                );
+            }
+            let light_contrib = light.spot_light(
+                self.world_position.truncate(),
+                roughness,
+                n_dot_v,
+                self.n,
+                self.v,
+                r,
+                f0,
+                diffuse_color,
+            );
+            light_accum = light_accum + light_contrib * shadow;
+        }
+
+        let n_directional_lights = lights.n_directional_lights;
+        for i in 0..n_directional_lights {
+            let light = lights.directional_lights[i as usize];
+            let mut shadow: f32 = 1.0;
+            if (mesh.flags & MESH_FLAGS_SHADOW_RECEIVER_BIT) != 0
+                && (light.flags & DIRECTIONAL_LIGHT_FLAGS_SHADOWS_ENABLED_BIT) != 0
+            {
+                shadow = lights.fetch_directional_shadow(
+                    directional_shadow_textures,
+                    directional_shadow_textures_sampler,
+                    i,
+                    self.world_position,
+                    self.world_normal,
+                );
+            }
+            let light_contrib =
+                light.directional_light(roughness, n_dot_v, self.n, self.v, f0, diffuse_color);
+            light_accum = light_accum + light_contrib * shadow;
+        }
+
+        let diffuse_ambient = env_brdf_approx(diffuse_color, 1.0, n_dot_v);
+        let specular_ambient = env_brdf_approx(f0, perceptual_roughness, n_dot_v);
+
+        output_color = (light_accum
+            + (diffuse_ambient + specular_ambient) * lights.ambient_color.truncate() * occlusion
+            + emissive.truncate() * output_color.w)
+            .extend(output_color.w);
+
+        output_color = cluster_debug_visualization(
+            output_color,
+            view_z,
+            self.is_orthographic,
+            offset_and_counts,
+            cluster_index,
         );
-        light_accum = light_accum + light_contrib * shadow;
+
+        output_color
     }
-
-    let n_directional_lights = lights.n_directional_lights;
-    for i in 0..n_directional_lights {
-        let light = lights.directional_lights[i as usize];
-        let mut shadow: f32 = 1.0;
-        if (mesh.flags & MESH_FLAGS_SHADOW_RECEIVER_BIT) != 0
-            && (light.flags & DIRECTIONAL_LIGHT_FLAGS_SHADOWS_ENABLED_BIT) != 0
-        {
-            shadow = fetch_directional_shadow(
-                lights,
-                directional_shadow_textures,
-                directional_shadow_textures_sampler,
-                i,
-                input.world_position,
-                input.world_normal,
-            );
-        }
-        let light_contrib =
-            light.directional_light(roughness, n_dot_v, input.n, input.v, f0, diffuse_color);
-        light_accum = light_accum + light_contrib * shadow;
-    }
-
-    let diffuse_ambient = env_brdf_approx(diffuse_color, 1.0, n_dot_v);
-    let specular_ambient = env_brdf_approx(f0, perceptual_roughness, n_dot_v);
-
-    output_color = (light_accum
-        + (diffuse_ambient + specular_ambient) * lights.ambient_color.truncate() * occlusion
-        + emissive.truncate() * output_color.w)
-        .extend(output_color.w);
-
-    output_color = cluster_debug_visualization(
-        output_color,
-        view_z,
-        input.is_orthographic,
-        offset_and_counts,
-        cluster_index,
-    );
-
-    output_color
 }
 
 #[cfg(feature = "TONEMAP_IN_SHADER")]

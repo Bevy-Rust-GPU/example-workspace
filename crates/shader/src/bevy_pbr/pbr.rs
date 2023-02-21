@@ -13,10 +13,7 @@ use super::mesh_view_types::{
 use super::pbr_bindings::{
     BaseColorTexture, EmissiveTexture, MetallicRoughnessTexture, OcclusionTexture,
 };
-use super::pbr_functions::{
-    alpha_discard, apply_normal_mapping, calculate_view, pbr, prepare_world_normal, tone_mapping,
-    PbrInput,
-};
+use super::pbr_functions::{apply_normal_mapping, prepare_world_normal, tone_mapping, PbrInput};
 use super::pbr_types::{
     STANDARD_MATERIAL_FLAGS_BASE_COLOR_TEXTURE_BIT, STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT,
     STANDARD_MATERIAL_FLAGS_EMISSIVE_TEXTURE_BIT,
@@ -179,23 +176,22 @@ pub fn fragment(
             #[cfg(feature = "VERTEX_UVS")]
             in_uv,
         );
-        pbr_input.v = calculate_view(view, in_world_position, pbr_input.is_orthographic);
+        pbr_input.v = view.calculate_view(in_world_position, pbr_input.is_orthographic);
 
-        *output_color = pbr(
+        *output_color = pbr_input.pbr(
             view,
             mesh,
             lights,
             point_lights,
             cluster_light_index_lists,
-            &cluster_offsets_and_counts,
+            cluster_offsets_and_counts,
             directional_shadow_textures,
             directional_shadow_textures_sampler,
             point_shadow_textures,
             point_shadow_textures_sampler,
-            pbr_input,
         );
     } else {
-        *output_color = alpha_discard(&material.base, *output_color);
+        *output_color = material.base.alpha_discard(*output_color);
     }
 
     #[cfg(feature = "TONEMAP_IN_SHADER")]

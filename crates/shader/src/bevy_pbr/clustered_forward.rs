@@ -8,43 +8,6 @@ use spirv_std::num_traits::Float;
 
 use super::mesh_view_types::{Lights, View};
 
-const NATURAL_LOG_BASE: f32 = 2.718281828459;
-
-// NOTE: Keep in sync with bevy_pbr/src/light.rs
-pub fn view_z_to_z_slice(lights: &Lights, view_z: f32, is_orthographic: bool) -> u32 {
-    let z_slice = if is_orthographic {
-        // NOTE: view_z is correct in the orthographic case
-        ((view_z - lights.cluster_factors.z) * lights.cluster_factors.w).floor() as u32
-    } else {
-        // NOTE: had to use -view_z to make it positive else log(negative) is nan
-        ((-view_z).log(NATURAL_LOG_BASE) * lights.cluster_factors.z - lights.cluster_factors.w
-            + 1.0) as u32
-    };
-    // NOTE: We use min as we may limit the far z plane used for clustering to be closeer than
-    // the furthest thing being drawn. This means that we need to limit to the maximum cluster.
-    unsigned_min(z_slice, lights.cluster_dimensions.z - 1)
-}
-
-pub fn fragment_cluster_index(
-    view: &View,
-    lights: &Lights,
-    frag_coord: Vec2,
-    view_z: f32,
-    is_orthographic: bool,
-) -> u32 {
-    let xy = ((frag_coord - view.viewport.truncate().truncate())
-        * lights.cluster_factors.truncate().truncate())
-    .floor()
-    .as_uvec2();
-    let z_slice = view_z_to_z_slice(lights, view_z, is_orthographic);
-    // NOTE: Restricting cluster index to avoid undefined behavior when accessing uniform buffer
-    // arrays based on the cluster index.
-    unsigned_min(
-        (xy.y * lights.cluster_dimensions.x + xy.x) * lights.cluster_dimensions.z + z_slice,
-        lights.cluster_dimensions.w - 1,
-    )
-}
-
 // this must match CLUSTER_COUNT_SIZE in light.rs
 pub const CLUSTER_COUNT_SIZE: u32 = 9;
 

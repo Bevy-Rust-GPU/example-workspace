@@ -1,4 +1,4 @@
-use spirv_std::glam::Vec4;
+use spirv_std::{arch::kill, glam::Vec4};
 
 pub const STANDARD_MATERIAL_FLAGS_BASE_COLOR_TEXTURE_BIT: u32 = 1;
 pub const STANDARD_MATERIAL_FLAGS_EMISSIVE_TEXTURE_BIT: u32 = 2;
@@ -38,3 +38,24 @@ impl Default for StandardMaterial {
     }
 }
 
+impl StandardMaterial {
+    pub fn alpha_discard(&self, output_color: Vec4) -> Vec4 {
+        let mut color = output_color;
+
+        if (self.flags & STANDARD_MATERIAL_FLAGS_ALPHA_MODE_OPAQUE) != 0 {
+            // NOTE: If rendering as opaque, alpha should be ignored so set to 1.0
+            color.w = 1.0;
+        } else if (self.flags & STANDARD_MATERIAL_FLAGS_ALPHA_MODE_MASK) != 0 {
+            if color.w >= self.alpha_cutoff {
+                // NOTE: If rendering as masked alpha and >= the cutoff, render as fully opaque
+                color.w = 1.0;
+            } else {
+                // NOTE: output_color.a < input.material.alpha_cutoff should not is not rendered
+                // NOTE: This and any other discards mean that early-z testing cannot be done!
+                kill();
+            }
+        }
+
+        color
+    }
+}
