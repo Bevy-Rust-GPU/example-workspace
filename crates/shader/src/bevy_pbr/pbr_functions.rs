@@ -13,10 +13,7 @@ use super::{
         ClusterLightIndexLists, ClusterOffsetsAndCounts, Lights, PointLights, View,
         DIRECTIONAL_LIGHT_FLAGS_SHADOWS_ENABLED_BIT, POINT_LIGHT_FLAGS_SHADOWS_ENABLED_BIT,
     },
-    pbr_lighting::{
-        directional_light, env_brdf_approx, perceptual_roughness_to_roughness, point_light,
-        spot_light,
-    },
+    pbr_lighting::{env_brdf_approx, perceptual_roughness_to_roughness},
     pbr_types::{
         StandardMaterial, STANDARD_MATERIAL_FLAGS_ALPHA_MODE_MASK,
         STANDARD_MATERIAL_FLAGS_ALPHA_MODE_OPAQUE,
@@ -253,9 +250,8 @@ pub fn pbr(
                 input.world_normal,
             );
         }
-        let light_contrib = point_light(
+        let light_contrib = light.point_light(
             input.world_position.truncate(),
-            light,
             roughness,
             n_dot_v,
             input.n,
@@ -293,9 +289,8 @@ pub fn pbr(
                 input.world_normal,
             );
         }
-        let light_contrib = spot_light(
+        let light_contrib = light.spot_light(
             input.world_position.truncate(),
-            light,
             roughness,
             n_dot_v,
             input.n,
@@ -323,15 +318,8 @@ pub fn pbr(
                 input.world_normal,
             );
         }
-        let light_contrib = directional_light(
-            light,
-            roughness,
-            n_dot_v,
-            input.n,
-            input.v,
-            f0,
-            diffuse_color,
-        );
+        let light_contrib =
+            light.directional_light(roughness, n_dot_v, input.n, input.v, f0, diffuse_color);
         light_accum = light_accum + light_contrib * shadow;
     }
 
