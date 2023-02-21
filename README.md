@@ -7,28 +7,34 @@ An example workspace demonstrating the use of rust-gpu to compile shaders for be
 Cargo.toml contains the `rust-gpu`-recommended `[profile.*.build-override]` settings to ensure fast shader compiles,
 as well as custom `[profile.dev]` and `[profile.dev.package."*"]` sections for fast bevy app compiles.
 
+`rust-toolchain` contains the necessary toolchain specification for `rust-gpu`.
+
 ## Crates
 
 ### shader
 
-The rust-gpu shader crate.
-Contains a working reimplementation of `bevy_pbr`.
+The rust-gpu shader crate. Pulls in `bevy-pbr-rust`.
 
-Shader def conditionals are implemented as cargo features.
+Entrypoints are exported relative to their containing crate using crate-local rust module path syntax,
+i.e. `mesh::vertex`, `pbr::fragment`.
+
+### bevy-pbr-rust
+
+Contains a working reimplementation of `bevy_pbr`. Shader def conditionals are implemented as cargo features.
 
 At time of writing, `rust-gpu` only supports read-write access to storage buffers,
 which renders it incompatible with the read-only buffers bevy uses to store light and cluster data on supported platforms.
 
 As such, the `NO_STORAGE_BUFFER_SUPPORT` feature is enabled by default, and the bevy app is configured to match.
 
-Entrypoints are exported using rust module path syntax, i.e. `bevy_pbr::mesh::vertex`.
+### shader-util
+
+Contains utility traits for replicating common shading language functions.
 
 ### shader-builder
 
 Empty library crate used to invoke `build.rs` independently of the bevy app.
-Encapsulates the nightly rust toolchain needed for `rust-gpu` compilation.
-
-Contains the `rust_toolchain` file needed by `rust-gpu`, and invokes `spirv-builder` via build.rs.
+Encapsulates the nightly rust toolchain needed for `rust-gpu` compilation, and invokes `spirv-builder` via build.rs.
 
 Run via `cargo build -p shader-builder` to produce `target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv`.
 
@@ -42,6 +48,6 @@ The shader is loaded into a custom `ShaderMaterial` material, which composes `St
 
 `WgpuLimits::max_storage_buffers_per_shader_stage` is forced to 0 via `WgpuSettings` to ensure a `NO_STORAGE_BUFFER_SUPPORT` environment.
 
-### Custom Bevy
+## Custom Bevy
 
 `viewer` depends on [Shfty/bevy:remove-spv-defs](https://github.com/Shfty/bevy), which is the `v0.9.1` tag patched to prevent rejection of SPIR-V modules when shader defs are present.
