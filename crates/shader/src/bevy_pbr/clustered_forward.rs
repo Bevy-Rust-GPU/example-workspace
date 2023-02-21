@@ -1,12 +1,7 @@
-use spirv_std::{
-    arch::unsigned_min,
-    glam::{UVec3, Vec2, Vec4},
-};
+use spirv_std::glam::{UVec3, Vec4};
 
 #[allow(unused_imports)]
 use spirv_std::num_traits::Float;
-
-use super::mesh_view_types::{Lights, View};
 
 // this must match CLUSTER_COUNT_SIZE in light.rs
 pub const CLUSTER_COUNT_SIZE: u32 = 9;
