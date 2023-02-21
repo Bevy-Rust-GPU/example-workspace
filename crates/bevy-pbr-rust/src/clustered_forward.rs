@@ -15,7 +15,7 @@ pub fn cluster_debug_visualization(
     cluster_index: u32,
 ) -> Vec4 {
     // Cluster allocation debug (using 'over' alpha blending)
-    #[cfg(feature = "CLUSTERED_FORWARD_DEBUG_Z_SLICES")]
+    #[cfg(feature = "clustered_forward_debug_z_slices")]
     {
         // NOTE: This debug mode visualises the z-slices
         let cluster_overlay_alpha = 0.1;
@@ -35,7 +35,7 @@ pub fn cluster_debug_visualization(
         );
     }
 
-    #[cfg(feature = "CLUSTERED_FORWARD_DEBUG_CLUSTER_LIGHT_COMPLEXITY")]
+    #[cfg(feature = "clustered_forward_debug_cluster_light_complexity")]
     {
         // NOTE: This debug mode visualises the number of lights within the cluster that contains
         // the fragment. It shows a sort of lighting complexity measure.
@@ -58,7 +58,7 @@ pub fn cluster_debug_visualization(
                     ));
     }
 
-    #[cfg(feature = "CLUSTERED_FORWARD_DEBUG_CLUSTER_COHERENCY")]
+    #[cfg(feature = "clustered_forward_debug_cluster_coherency")]
     {
         // NOTE: Visualizes the cluster to which the fragment belongs
         let cluster_overlay_alpha = 0.1;

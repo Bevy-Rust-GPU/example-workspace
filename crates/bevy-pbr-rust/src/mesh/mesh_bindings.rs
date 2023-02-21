@@ -7,7 +7,7 @@ use super::mesh_types::Mesh;
 pub fn mesh_bindings(
     #[spirv(uniform, descriptor_set = 2, binding = 0)] mesh: &Mesh,
 
-    #[cfg(feature = "SKINNED")]
+    #[cfg(feature = "skinned")]
     #[spirv(uniform, descriptor_set = 2 binding = 1)]
     joint_matrices: SkinnedMesh,
 ) {

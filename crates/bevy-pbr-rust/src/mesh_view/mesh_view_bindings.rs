@@ -27,27 +27,27 @@ pub fn mesh_view_bindings(
 
     #[spirv(descriptor_set = 0, binding = 5)] directional_shadow_textures_sampler: &Sampler,
 
-    #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
+    #[cfg(feature = "no_storage_buffers_support")]
     #[spirv(uniform, descriptor_set = 0, binding = 6)]
     point_lights: &PointLights,
 
-    #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
+    #[cfg(not(feature = "no_storage_buffers_support"))]
     #[spirv(storage_buffer, descriptor_set = 0, binding = 6)]
     point_lights: &PointLights,
 
-    #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
+    #[cfg(feature = "no_storage_buffers_support")]
     #[spirv(uniform, descriptor_set = 0, binding = 7)]
     cluster_light_index_lists: &ClusterLightIndexLists,
 
-    #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
+    #[cfg(not(feature = "no_storage_buffers_support"))]
     #[spirv(storage_buffer, descriptor_set = 0, binding = 7)]
     cluster_light_index_lists: &ClusterLightIndexLists,
 
-    #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
+    #[cfg(feature = "no_storage_buffers_support")]
     #[spirv(uniform, descriptor_set = 0, binding = 8)]
     cluster_offsets_and_counts: &ClusterOffsetsAndCounts,
 
-    #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
+    #[cfg(not(feature = "no_storage_buffers_support"))]
     #[spirv(storage_buffer, descriptor_set = 0, binding = 8)]
     cluster_offsets_and_counts: &ClusterOffsetsAndCounts,
 

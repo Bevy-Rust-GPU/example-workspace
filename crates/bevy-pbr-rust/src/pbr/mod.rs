@@ -8,16 +8,11 @@ use spirv_std::glam::Vec4;
 use spirv_std::macros::spirv;
 use spirv_std::Sampler;
 
-use super::prelude::{apply_normal_mapping, prepare_world_normal, PbrInput};
-use super::prelude::{
-    BaseColorTexture, EmissiveTexture, MetallicRoughnessTexture, OcclusionTexture,
-};
-use super::prelude::{
-    ClusterLightIndexLists, ClusterOffsetsAndCounts, Lights, Mesh, PointLights, View,
-};
-use super::prelude::{DirectionalShadowTextures, PointShadowTextures};
-use super::prelude::{
-    StandardMaterial, STANDARD_MATERIAL_FLAGS_BASE_COLOR_TEXTURE_BIT,
+use crate::prelude::{
+    apply_normal_mapping, prepare_world_normal, BaseColorTexture, ClusterLightIndexLists,
+    ClusterOffsetsAndCounts, DirectionalShadowTextures, EmissiveTexture, Lights, Mesh,
+    MetallicRoughnessTexture, OcclusionTexture, PbrInput, PointLights, PointShadowTextures,
+    StandardMaterial, View, STANDARD_MATERIAL_FLAGS_BASE_COLOR_TEXTURE_BIT,
     STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT, STANDARD_MATERIAL_FLAGS_EMISSIVE_TEXTURE_BIT,
     STANDARD_MATERIAL_FLAGS_METALLIC_ROUGHNESS_TEXTURE_BIT,
     STANDARD_MATERIAL_FLAGS_OCCLUSION_TEXTURE_BIT, STANDARD_MATERIAL_FLAGS_UNLIT_BIT,
@@ -42,27 +37,27 @@ pub fn fragment(
 
     #[spirv(descriptor_set = 0, binding = 5)] directional_shadow_textures_sampler: &Sampler,
 
-    #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
+    #[cfg(feature = "no_storage_buffers_support")]
     #[spirv(uniform, descriptor_set = 0, binding = 6)]
     point_lights: &PointLights,
 
-    #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
+    #[cfg(not(feature = "no_storage_buffers_support"))]
     #[spirv(storage_buffer, descriptor_set = 0, binding = 6)]
     point_lights: &PointLights,
 
-    #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
+    #[cfg(feature = "no_storage_buffers_support")]
     #[spirv(uniform, descriptor_set = 0, binding = 7)]
     cluster_light_index_lists: &ClusterLightIndexLists,
 
-    #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
+    #[cfg(not(feature = "no_storage_buffers_support"))]
     #[spirv(storage_buffer, descriptor_set = 0, binding = 7)]
     cluster_light_index_lists: &ClusterLightIndexLists,
 
-    #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
+    #[cfg(feature = "no_storage_buffers_support")]
     #[spirv(uniform, descriptor_set = 0, binding = 8)]
     cluster_offsets_and_counts: &ClusterOffsetsAndCounts,
 
-    #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
+    #[cfg(not(feature = "no_storage_buffers_support"))]
     #[spirv(storage_buffer, descriptor_set = 0, binding = 8)]
     cluster_offsets_and_counts: &ClusterOffsetsAndCounts,
 
@@ -78,7 +73,7 @@ pub fn fragment(
 
     #[spirv(uniform, descriptor_set = 2, binding = 0)] mesh: &Mesh,
 
-    #[cfg(feature = "SKINNED")]
+    #[cfg(feature = "skinned")]
     #[spirv(uniform, descriptor_set = 2 binding = 1)]
     joint_matrices: SkinnedMesh,
 
@@ -86,20 +81,20 @@ pub fn fragment(
     #[spirv(position)] in_frag_coord: Vec4,
     in_world_position: Vec4,
     in_world_normal: Vec3,
-    #[cfg(feature = "VERTEX_UVS")] in_uv: spirv_std::glam::Vec2,
-    #[cfg(feature = "VERTEX_TANGENTS")] in_tangent: spirv_std::glam::Vec2,
-    #[cfg(feature = "VERTEX_COLORS")] in_color: spirv_std::glam::Vec2,
+    #[cfg(feature = "vertex_uvs")] in_uv: spirv_std::glam::Vec2,
+    #[cfg(feature = "vertex_tangents")] in_tangent: spirv_std::glam::Vec2,
+    #[cfg(feature = "vertex_colors")] in_color: spirv_std::glam::Vec2,
 
     output_color: &mut Vec4,
 ) {
     *output_color = material.base.base_color;
 
-    #[cfg(feature = "VERTEX_COLORS")]
+    #[cfg(feature = "vertex_colors")]
     {
         *output_color = *output_color * in_color;
     }
 
-    #[cfg(feature = "VERTEX_UVS")]
+    #[cfg(feature = "vertex_uvs")]
     {
         if (material.base.flags & STANDARD_MATERIAL_FLAGS_BASE_COLOR_TEXTURE_BIT) != 0 {
             *output_color =
@@ -121,7 +116,7 @@ pub fn fragment(
         // TODO use .a for exposure compensation in HDR
         let mut emissive = material.base.emissive;
 
-        #[cfg(feature = "VERTEX_UVS")]
+        #[cfg(feature = "vertex_uvs")]
         {
             if (material.base.flags & STANDARD_MATERIAL_FLAGS_EMISSIVE_TEXTURE_BIT) != 0 {
                 emissive = (emissive.truncate()
@@ -137,7 +132,7 @@ pub fn fragment(
         let mut metallic = material.base.metallic;
         let mut perceptual_roughness = material.base.perceptual_roughness;
 
-        #[cfg(feature = "VERTEX_UVS")]
+        #[cfg(feature = "vertex_uvs")]
         {
             if (material.base.flags & STANDARD_MATERIAL_FLAGS_METALLIC_ROUGHNESS_TEXTURE_BIT) != 0 {
                 let metallic_roughness = metallic_roughness_texture
@@ -153,7 +148,7 @@ pub fn fragment(
 
         let mut occlusion: f32 = 1.0;
 
-        #[cfg(feature = "VERTEX_UVS")]
+        #[cfg(feature = "vertex_uvs")]
         {
             if (material.base.flags & STANDARD_MATERIAL_FLAGS_OCCLUSION_TEXTURE_BIT) != 0 {
                 occlusion = occlusion_texture
@@ -177,9 +172,9 @@ pub fn fragment(
         pbr_input.n = apply_normal_mapping(
             material.base.flags,
             pbr_input.world_normal,
-            #[cfg(all(feature = "VERTEX_TANGENTS", feature = "STANDARDMATERIAL_NORMAL_MAP"))]
+            #[cfg(all(feature = "vertex_tangents", feature = "standardmaterial_normal_map"))]
             in_world_tangent,
-            #[cfg(feature = "VERTEX_UVS")]
+            #[cfg(feature = "vertex_uvs")]
             in_uv,
         );
         pbr_input.v = view.calculate_view(in_world_position, pbr_input.is_orthographic);
@@ -200,16 +195,17 @@ pub fn fragment(
         *output_color = material.base.alpha_discard(*output_color);
     }
 
-    #[cfg(feature = "TONEMAP_IN_SHADER")]
+    #[cfg(feature = "tonemap_in_shader")]
     {
         *output_color = super::prelude::tone_mapping(*output_color);
     }
 
-    #[cfg(feature = "DEBAND_DITHER")]
+    #[cfg(feature = "deband_dither")]
     {
         let mut output_rgb = output_color.truncate();
         output_rgb = output_rgb.powf(1.0 / 2.2);
-        output_rgb = output_rgb + crate::prelude::screen_space_dither(in_frag_coord.truncate().truncate());
+        output_rgb =
+            output_rgb + crate::prelude::screen_space_dither(in_frag_coord.truncate().truncate());
         // This conversion back to linear space is required because our output texture format is
         // SRGB; the GPU will assume our output is linear and will apply an SRGB conversion.
         output_rgb = output_rgb.powf(2.2);

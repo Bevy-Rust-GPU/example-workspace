@@ -59,7 +59,7 @@ impl Mesh {
     }
 }
 
-#[cfg(feature = "SKINNED")]
+#[cfg(feature = "skinned")]
 #[repr(C)]
 pub struct SkinnedMesh {
     pub data: [Mat4; 256u],

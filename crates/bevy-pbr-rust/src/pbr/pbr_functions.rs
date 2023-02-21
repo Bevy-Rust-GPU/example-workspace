@@ -5,12 +5,12 @@ use spirv_std::{
 
 use shader_util::prelude::Reflect;
 
-use super::super::prelude::{
+use crate::prelude::{
+    Lights,
     cluster_debug_visualization, env_brdf_approx, perceptual_roughness_to_roughness,
-    ClusterLightIndexLists, ClusterOffsetsAndCounts, DirectionalShadowTextures, Lights, Mesh,
-    PointLights, PointShadowTextures, StandardMaterial, View,
-    DIRECTIONAL_LIGHT_FLAGS_SHADOWS_ENABLED_BIT, MESH_FLAGS_SHADOW_RECEIVER_BIT,
-    POINT_LIGHT_FLAGS_SHADOWS_ENABLED_BIT,
+    ClusterLightIndexLists, ClusterOffsetsAndCounts, DirectionalShadowTextures, Mesh, PointLights,
+    PointShadowTextures, StandardMaterial, View, DIRECTIONAL_LIGHT_FLAGS_SHADOWS_ENABLED_BIT,
+    MESH_FLAGS_SHADOW_RECEIVER_BIT, POINT_LIGHT_FLAGS_SHADOWS_ENABLED_BIT,
 };
 
 pub fn prepare_world_normal(world_normal: Vec3, double_sided: bool, is_front: bool) -> Vec3 {
@@ -19,8 +19,8 @@ pub fn prepare_world_normal(world_normal: Vec3, double_sided: bool, is_front: bo
     // NOTE: When NOT using normal-mapping, if looking at the back face of a double-sided
     // material, the normal needs to be inverted. This is a branchless version of that.
     #[cfg(all(
-        not(feature = "VERTEX_TANGENTS"),
-        not(feature = "STANDARDMATERIAL_NORMAL_MAP")
+        not(feature = "vertex_tangents"),
+        not(feature = "standardmaterial_normal_map")
     ))]
     let output = (if !double_sided || is_front { 1.0 } else { 0.0 } * 2.0 - 1.0) * output;
 
@@ -31,10 +31,10 @@ pub fn apply_normal_mapping(
     _standard_material_flags: u32,
     world_normal: Vec3,
 
-    #[cfg(all(feature = "VERTEX_TANGENTS", feature = "STANDARDMATERIAL_NORMAL_MAP"))]
+    #[cfg(all(feature = "vertex_tangents", feature = "standardmaterial_normal_map"))]
     world_tangent: Vec4,
 
-    #[cfg(feature = "VERTEX_UVS")] _uv: Vec2,
+    #[cfg(feature = "vertex_uvs")] _uv: Vec2,
 ) -> Vec3 {
     // NOTE: The mikktspace method of normal mapping explicitly requires that the world normal NOT
     // be re-normalized in the fragment shader. This is primarily to match the way mikktspace
@@ -44,7 +44,7 @@ pub fn apply_normal_mapping(
     // http://www.mikktspace.com/
     let n = world_normal;
 
-    #[cfg(all(feature = "VERTEX_TANGENTS", feature = "STANDARDMATERIAL_NORMAL_MAP"))]
+    #[cfg(all(feature = "vertex_tangents", feature = "standardmaterial_normal_map"))]
     {
         // NOTE: The mikktspace method of normal mapping explicitly requires that these NOT be
         // normalized nor any Gram-Schmidt applied to ensure the vertex normal is orthogonal to the
@@ -55,9 +55,9 @@ pub fn apply_normal_mapping(
     }
 
     #[cfg(all(
-        feature = "VERTEX_TANGENTS",
-        feature = "VERTEX_UVS",
-        feaure = "STANDARDMATERIAL_NORMAL_MAP"
+        feature = "vertex_tangents",
+        feature = "vertex_uvs",
+        feaure = "standardmaterial_normal_map"
     ))]
     {
         // Nt is the tangent-space normal.
@@ -183,10 +183,10 @@ impl PbrInput {
         for i in offset_and_counts.x as u32..(offset_and_counts.x + offset_and_counts.y) as u32 {
             let light_id = cluster_light_index_lists.get_light_id(i);
 
-            #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
+            #[cfg(feature = "no_storage_buffers_support")]
             let light = &point_lights.data[light_id as usize];
 
-            #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
+            #[cfg(not(feature = "no_storage_buffers_support"))]
             let light = unsafe { point_lights.data.index(light_id as usize) };
 
             let mut shadow: f32 = 1.0;
@@ -220,10 +220,10 @@ impl PbrInput {
         {
             let light_id = cluster_light_index_lists.get_light_id(i);
 
-            #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
+            #[cfg(feature = "no_storage_buffers_support")]
             let light = &point_lights.data[light_id as usize];
 
-            #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
+            #[cfg(not(feature = "no_storage_buffers_support"))]
             let light = unsafe { point_lights.data.index(light_id as usize) };
 
             let mut shadow: f32 = 1.0;
@@ -292,7 +292,7 @@ impl PbrInput {
     }
 }
 
-#[cfg(feature = "TONEMAP_IN_SHADER")]
+#[cfg(feature = "tonemap_in_shader")]
 pub fn tone_mapping(input: Vec4) -> Vec4 {
     // tone_mapping
     super::super::prelude::reinhard_luminance(input.truncate()).extend(input.w)
@@ -302,7 +302,7 @@ pub fn tone_mapping(input: Vec4) -> Vec4 {
     // output_color.rgb = pow(output_color.rgb, vec3(1.0 / 2.2));
 }
 
-#[cfg(feature = "DEBAND_DITHER")]
+#[cfg(feature = "deband_dither")]
 pub fn dither(color: Vec4, pos: Vec2) -> Vec4 {
     (color.truncate() + super::super::prelude::screen_space_dither(pos)).extend(color.w)
 }
