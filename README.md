@@ -44,4 +44,4 @@ The shader is loaded into a custom `ShaderMaterial` material, which composes Sta
 
 ### Custom Bevy
 
-`viewer` depends on [Shfty/bevy:remove-spv-defs](https://github.com/Shfty/bevy), which is patched to prevent the rejection of SPIR-V modules when shader defs are present.
+`viewer` depends on [Shfty/bevy:remove-spv-defs](https://github.com/Shfty/bevy), which is the `v0.9.1` tag patched to prevent the rejection of SPIR-V modules when shader defs are present.
