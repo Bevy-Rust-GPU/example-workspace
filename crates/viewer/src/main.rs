@@ -7,7 +7,7 @@ use bevy::{
         default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Commands,
         DefaultPlugins, DirectionalLight, DirectionalLightBundle, MaterialMeshBundle,
         MaterialPlugin, Mesh, PluginGroup, PointLightBundle, Quat, Res, ResMut, Shader,
-        StandardMaterial, Transform, Vec3,
+        StandardMaterial, Transform, Vec3, PointLight, Color,
     },
     render::settings::{WgpuLimits, WgpuSettings},
 };
@@ -60,13 +60,19 @@ fn setup(
     // Spawn lights
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
-            illuminance: 1000.0,
+            illuminance: 5000.0,
             ..default()
         },
+        transform: Transform::IDENTITY.looking_at(Vec3::new(1.0, -1.0, -1.0), Vec3::Y),
         ..default()
     });
 
     commands.spawn(PointLightBundle {
+        point_light: PointLight {
+            intensity: 800.0,
+            color: Color::BLUE,
+            ..default()
+        },
         transform: Transform::from_xyz(0.0, 0.0, -6.0),
         ..default()
     });
