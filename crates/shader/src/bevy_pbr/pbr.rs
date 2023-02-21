@@ -3,8 +3,8 @@ use spirv_std::glam::{Vec2, Vec3};
 use spirv_std::macros::spirv;
 use spirv_std::Sampler;
 
-use crate::BaseMaterial;
 use crate::bevy_core_pipeline::tonemapping_shared::screen_space_dither;
+use crate::BaseMaterial;
 
 use super::mesh_types::Mesh;
 use super::mesh_view_types::{
@@ -30,8 +30,7 @@ pub fn fragment(
     #[spirv(uniform, descriptor_set = 0, binding = 0)] view: &View,
     #[spirv(uniform, descriptor_set = 0, binding = 1)] lights: &Lights,
 
-    #[spirv(descriptor_set = 0, binding = 2)]
-    point_shadow_textures: &PointShadowTextures,
+    #[spirv(descriptor_set = 0, binding = 2)] point_shadow_textures: &PointShadowTextures,
 
     #[spirv(descriptor_set = 0, binding = 3)] point_shadow_textures_sampler: &Sampler,
 
@@ -65,7 +64,6 @@ pub fn fragment(
     cluster_offsets_and_counts: &ClusterOffsetsAndCounts,
 
     #[spirv(uniform, descriptor_set = 1, binding = 0)] material: &BaseMaterial,
-    /*
     #[spirv(descriptor_set = 1, binding = 1)] base_color_texture: &BaseColorTexture,
     #[spirv(descriptor_set = 1, binding = 2)] base_color_sampler: &Sampler,
     #[spirv(descriptor_set = 1, binding = 3)] emissive_texture: &EmissiveTexture,
@@ -74,7 +72,6 @@ pub fn fragment(
     #[spirv(descriptor_set = 1, binding = 6)] metallic_roughness_sampler: &Sampler,
     #[spirv(descriptor_set = 1, binding = 7)] occlusion_texture: &OcclusionTexture,
     #[spirv(descriptor_set = 1, binding = 8)] occlusion_sampler: &Sampler,
-    */
 
     #[spirv(uniform, descriptor_set = 2, binding = 0)] mesh: &Mesh,
 
@@ -99,15 +96,13 @@ pub fn fragment(
         *output_color = *output_color * in_color;
     }
 
-    /*
     #[cfg(feature = "VERTEX_UVS")]
     {
-        if (material.flags & STANDARD_MATERIAL_FLAGS_BASE_COLOR_TEXTURE_BIT) != 0 {
+        if (material.base.flags & STANDARD_MATERIAL_FLAGS_BASE_COLOR_TEXTURE_BIT) != 0 {
             *output_color =
                 *output_color * base_color_texture.sample::<f32, Vec4>(*base_color_sampler, in_uv);
         }
     }
-    */
 
     // NOTE: Unlit bit not set means == 0 is true, so the true case is if lit
     if material.base.flags & STANDARD_MATERIAL_FLAGS_UNLIT_BIT == 0 {
@@ -123,10 +118,9 @@ pub fn fragment(
         // TODO use .a for exposure compensation in HDR
         let mut emissive = material.base.emissive;
 
-        /*
         #[cfg(feature = "VERTEX_UVS")]
         {
-            if (material.flags & STANDARD_MATERIAL_FLAGS_EMISSIVE_TEXTURE_BIT) != 0 {
+            if (material.base.flags & STANDARD_MATERIAL_FLAGS_EMISSIVE_TEXTURE_BIT) != 0 {
                 emissive = (emissive.truncate()
                     * emissive_texture
                         .sample::<f32, Vec4>(*emissive_sampler, in_uv)
@@ -134,17 +128,15 @@ pub fn fragment(
                 .extend(1.0);
             }
         }
-        */
 
         pbr_input.material.emissive = emissive;
 
         let mut metallic = material.base.metallic;
         let mut perceptual_roughness = material.base.perceptual_roughness;
 
-        /*
         #[cfg(feature = "VERTEX_UVS")]
         {
-            if (material.flags & STANDARD_MATERIAL_FLAGS_METALLIC_ROUGHNESS_TEXTURE_BIT) != 0 {
+            if (material.base.flags & STANDARD_MATERIAL_FLAGS_METALLIC_ROUGHNESS_TEXTURE_BIT) != 0 {
                 let metallic_roughness = metallic_roughness_texture
                     .sample::<f32, Vec4>(*metallic_roughness_sampler, in_uv);
                 // Sampling from GLTF standard channels for now
@@ -152,23 +144,20 @@ pub fn fragment(
                 perceptual_roughness = perceptual_roughness * metallic_roughness.y;
             }
         }
-        */
 
         pbr_input.material.metallic = metallic;
         pbr_input.material.perceptual_roughness = perceptual_roughness;
 
         let mut occlusion: f32 = 1.0;
 
-        /*
         #[cfg(feature = "VERTEX_UVS")]
         {
-            if (material.flags & STANDARD_MATERIAL_FLAGS_OCCLUSION_TEXTURE_BIT) != 0 {
+            if (material.base.flags & STANDARD_MATERIAL_FLAGS_OCCLUSION_TEXTURE_BIT) != 0 {
                 occlusion = occlusion_texture
                     .sample::<f32, Vec4>(*occlusion_sampler, in_uv)
                     .x;
             }
         }
-        */
 
         pbr_input.occlusion = occlusion;
 

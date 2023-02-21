@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use bevy::{
     pbr::StandardMaterialUniform,
-    prelude::{Handle, Material, Shader, StandardMaterial},
+    prelude::{Handle, Image, Material, Shader, StandardMaterial},
     reflect::TypeUuid,
     render::render_resource::{AsBindGroup, AsBindGroupShaderType, Face, ShaderType},
 };
@@ -38,11 +38,28 @@ impl From<&ShaderMaterial> for ShaderMaterialKey {
 #[bind_group_data(ShaderMaterialKey)]
 #[uniform(0, BaseMaterial)]
 pub struct ShaderMaterial {
+    pub base: StandardMaterial,
+
     pub vertex_shader: Option<Handle<Shader>>,
     pub vertex_entry_point: Option<Cow<'static, str>>,
     pub fragment_shader: Option<Handle<Shader>>,
     pub fragment_entry_point: Option<Cow<'static, str>>,
-    pub base: StandardMaterial,
+
+    #[texture(1)]
+    #[sampler(2)]
+    pub base_color_texture: Option<Handle<Image>>,
+
+    #[texture(3)]
+    #[sampler(4)]
+    pub emissive_texture: Option<Handle<Image>>,
+
+    #[texture(5)]
+    #[sampler(6)]
+    pub metallic_roughness_texture: Option<Handle<Image>>,
+
+    #[texture(7)]
+    #[sampler(8)]
+    pub occlusion_texture: Option<Handle<Image>>,
 }
 
 impl AsBindGroupShaderType<BaseMaterial> for ShaderMaterial {
