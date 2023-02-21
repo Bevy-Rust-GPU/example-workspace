@@ -15,7 +15,7 @@ as well as custom `[profile.dev]` and `[profile.dev.package."*"]` sections for f
 
 Project-level `rust-gpu` shader crate. Pulls in `bevy-pbr-rust`.
 
-Entrypoints are exported relative to their containing crate using crate-local rust module path syntax,
+Entrypoints are exported relative to their containing crate using rust module path syntax,
 i.e. `mesh::vertex`, `pbr::fragment`.
 
 ### bevy-pbr-rust
