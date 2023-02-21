@@ -53,7 +53,7 @@ pub fn get_distance_attenuation(distance_square: f32, inverse_range_squared: f32
     let factor = distance_square * inverse_range_squared;
     let smooth_factor = (1.0 - factor * factor).saturate();
     let attenuation = smooth_factor * smooth_factor;
-    return attenuation * 1.0 / distance_square.max(0.0001);
+    attenuation * 1.0 / distance_square.max(0.0001)
 }
 
 // Normal distribution function (specular D)
@@ -67,8 +67,7 @@ pub fn d_ggx(roughness: f32, noh: f32, _h: Vec3) -> f32 {
     let one_minus_noh_squared = 1.0 - noh * noh;
     let a = noh * roughness;
     let k = roughness / (one_minus_noh_squared + a * a);
-    let d = k * k * (1.0 / <f32 as FloatConst>::PI());
-    return d;
+    k * k * (1.0 / <f32 as FloatConst>::PI())
 }
 
 // Visibility function (Specular G)
@@ -82,8 +81,7 @@ pub fn v_smith_ggx_correlated(roughness: f32, nov: f32, nol: f32) -> f32 {
     let a2 = roughness * roughness;
     let lambda_v = nol * ((nov - a2 * nov) * nov + a2).sqrt();
     let lambda_l = nov * ((nol - a2 * nol) * nol + a2).sqrt();
-    let v = 0.5 / (lambda_v + lambda_l);
-    return v;
+    0.5 / (lambda_v + lambda_l)
 }
 
 // Fresnel function
@@ -91,19 +89,19 @@ pub fn v_smith_ggx_correlated(roughness: f32, nov: f32, nol: f32) -> f32 {
 // F_Schlick(v,h,f_0,f_90) = f_0 + (f_90 − f_0) (1 − v⋅h)^5
 pub fn f_shlick_vec(f0: Vec3, f90: f32, voh: f32) -> Vec3 {
     // not using mix to keep the vec3 and float versions identical
-    return f0 + (f90 - f0) * (1.0 - voh).powf(5.0);
+    f0 + (f90 - f0) * (1.0 - voh).powf(5.0)
 }
 
 pub fn f_schlick(f0: f32, f90: f32, voh: f32) -> f32 {
     // not using mix to keep the vec3 and float versions identical
-    return f0 + (f90 - f0) * (1.0 - voh).powf(5.0);
+    f0 + (f90 - f0) * (1.0 - voh).powf(5.0)
 }
 
 pub fn fresnel(f0: Vec3, loh: f32) -> Vec3 {
     // f_90 suitable for ambient occlusion
     // see https://google.github.io/filament/Filament.html#lighting/occlusion
     let f90 = (f0.dot(Vec3::splat(50.0 * 0.33))).saturate();
-    return f_shlick_vec(f0, f90, loh);
+    f_shlick_vec(f0, f90, loh)
 }
 
 // Specular BRDF
@@ -125,7 +123,7 @@ pub fn specular(
     let v = v_smith_ggx_correlated(roughness, nov, nol);
     let f = fresnel(f0, loh);
 
-    return (specular_intensity * d * v) * f;
+    (specular_intensity * d * v) * f
 }
 
 // Diffuse BRDF
@@ -133,11 +131,11 @@ pub fn specular(
 // fd(v,l) = σ/π * 1 / { |n⋅v||n⋅l| } ∫Ω D(m,α) G(v,l,m) (v⋅m) (l⋅m) dm
 //
 // simplest approximation
-// float Fd_Lambert() {
-//     return 1.0 / PI;
+// fn fd_lambert() -> f32 {
+//     1.0 / PI
 // }
 //
-// vec3 Fd = diffuseColor * Fd_Lambert();
+// let fd = diffuse_color * fd_lambert();
 //
 // Disney approximation
 // See https://google.github.io/filament/Filament.html#citation-burley12
@@ -146,7 +144,7 @@ pub fn fd_burley(roughness: f32, nov: f32, nol: f32, loh: f32) -> f32 {
     let f90 = 0.5 + 2.0 * roughness * loh * loh;
     let light_scatter = f_schlick(1.0, f90, nol);
     let view_scatter = f_schlick(1.0, f90, nov);
-    return light_scatter * view_scatter * (1.0 / <f32 as FloatConst>::PI());
+    light_scatter * view_scatter * (1.0 / <f32 as FloatConst>::PI())
 }
 
 // From https://www.unrealengine.com/en-US/blog/physically-based-shading-on-mobile
@@ -156,7 +154,7 @@ pub fn env_brdf_approx(f0: Vec3, perceptual_roughness: f32, nov: f32) -> Vec3 {
     let r = perceptual_roughness * c0 + c1;
     let a004 = (r.x * r.x).min((-9.28 * nov).exp2()) * r.x + r.y;
     let ab = Vec2::new(-1.04, 1.04) * a004 + Vec2::new(r.z, r.w);
-    return f0 * ab.x + ab.y;
+    f0 * ab.x + ab.y
 }
 
 pub fn perceptual_roughness_to_roughness(perceptual_roughness: f32) -> f32 {
@@ -164,7 +162,7 @@ pub fn perceptual_roughness_to_roughness(perceptual_roughness: f32) -> f32 {
     // According to Filament design 0.089 is recommended for mobile
     // Filament uses 0.045 for non-mobile
     let clamped_perceptual_roughness = perceptual_roughness.clamp(0.089, 1.0);
-    return clamped_perceptual_roughness * clamped_perceptual_roughness;
+    clamped_perceptual_roughness * clamped_perceptual_roughness
 }
 
 pub fn point_light(
@@ -230,8 +228,9 @@ pub fn point_light(
 
     // TODO compensate for energy loss https://google.github.io/filament/Filament.html#materialsystem/improvingthebrdfs/energylossinspecularreflectance
 
-    return ((diffuse + specular_light) * light.color_inverse_square_range.truncate())
-        * (range_attenuation * nol);
+    (diffuse + specular_light)
+        * light.color_inverse_square_range.truncate()
+        * (range_attenuation * nol)
 }
 
 pub fn spot_light(
@@ -273,7 +272,7 @@ pub fn spot_light(
     let attenuation = (cd * light.light_custom_data.z + light.light_custom_data.w).saturate();
     let spot_attenuation = attenuation * attenuation;
 
-    return point_light * spot_attenuation;
+    point_light * spot_attenuation
 }
 
 pub fn directional_light(
@@ -282,7 +281,6 @@ pub fn directional_light(
     n_dot_v: f32,
     normal: Vec3,
     view: Vec3,
-    r: Vec3,
     f0: Vec3,
     diffuse_color: Vec3,
 ) -> Vec3 {
@@ -306,5 +304,5 @@ pub fn directional_light(
         specular_intensity,
     );
 
-    return (specular_light + diffuse) * light.color.truncate() * nol;
+    (specular_light + diffuse) * light.color.truncate() * nol
 }

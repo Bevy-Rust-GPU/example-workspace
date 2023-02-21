@@ -155,12 +155,12 @@ pub fn fetch_spot_shadow(
 
     #[cfg(feature = "NO_ARRAY_TEXTURES_SUPPORT")]
     {
-        return textureSampleCompare(
+        textureSampleCompare(
             directional_shadow_textures,
             directional_shadow_textures_sampler,
             shadow_uv,
             depth,
-        );
+        )
     }
 
     #[cfg(not(feature = "NO_ARRAY_TEXTURES_SUPPORT"))]

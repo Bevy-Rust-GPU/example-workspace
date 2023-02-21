@@ -1,4 +1,6 @@
-use spirv_std::{glam::{Mat4, UVec4, Vec3, Vec4}, RuntimeArray};
+use spirv_std::glam::{Mat4, UVec3, UVec4, Vec3, Vec4};
+
+use super::clustered_forward::CLUSTER_COUNT_SIZE;
 
 #[derive(Default, Copy, Clone, PartialEq)]
 #[repr(C)]
@@ -84,6 +86,31 @@ pub struct ClusterLightIndexLists {
     pub data: [UVec4; 1024],
 }
 
+impl ClusterLightIndexLists {
+    pub fn get_light_id(&self, index: u32) -> u32 {
+        #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
+        {
+            // The index is correct but in cluster_light_index_lists we pack 4 u8s into a u32
+            // This means the index into cluster_light_index_lists is index / 4
+            let v = self.data[(index >> 4) as usize];
+            let indices = match ((index >> 2) & ((1 << 2) - 1)) as usize {
+                0 => v.x,
+                1 => v.y,
+                2 => v.z,
+                3 => v.w,
+                _ => panic!(),
+            };
+            // And index % 4 gives the sub-index of the u8 within the u32 so we shift by 8 * sub-index
+            (indices >> (8 * (index & ((1 << 2) - 1)))) & ((1 << 8) - 1)
+        }
+
+        #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
+        {
+            unsafe { *self.data.index(index as usize) }
+        }
+    }
+}
+
 #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
 #[derive(Clone, PartialEq)]
 #[repr(C)]
@@ -93,10 +120,40 @@ pub struct ClusterOffsetsAndCounts {
     pub data: [UVec4; 1024],
 }
 
+impl ClusterOffsetsAndCounts {
+    pub fn unpack(&self, cluster_index: u32) -> UVec3 {
+        #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
+        {
+            let v = self.data[(cluster_index >> 2) as usize];
+            let i = cluster_index & ((1 << 2) - 1);
+            let offset_and_counts = match i {
+                0 => v.x,
+                1 => v.y,
+                2 => v.z,
+                3 => v.w,
+                _ => panic!(),
+            };
+            //  [ 31     ..     18 | 17      ..      9 | 8       ..     0 ]
+            //  [      offset      | point light count | spot light count ]
+            UVec3::new(
+                (offset_and_counts >> (CLUSTER_COUNT_SIZE * 2))
+                    & ((1 << (32 - (CLUSTER_COUNT_SIZE * 2))) - 1),
+                (offset_and_counts >> CLUSTER_COUNT_SIZE) & ((1 << CLUSTER_COUNT_SIZE) - 1),
+                offset_and_counts & ((1 << CLUSTER_COUNT_SIZE) - 1),
+            )
+        }
+
+        #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
+        {
+            unsafe { self.data.index(cluster_index as usize) }.truncate()
+        }
+    }
+}
+
 #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
 #[repr(C)]
 pub struct PointLights {
-    pub data: RuntimeArray<PointLight>,
+    pub data: spirv_std::RuntimeArray<PointLight>,
 }
 
 #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]

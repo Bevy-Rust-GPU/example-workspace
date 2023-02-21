@@ -6,7 +6,7 @@ use spirv_std::{
 #[allow(unused_imports)]
 use spirv_std::num_traits::Float;
 
-use super::mesh_view_types::{ClusterLightIndexLists, ClusterOffsetsAndCounts, Lights, View};
+use super::mesh_view_types::{Lights, View};
 
 const NATURAL_LOG_BASE: f32 = 2.718281828459;
 
@@ -39,74 +39,14 @@ pub fn fragment_cluster_index(
     let z_slice = view_z_to_z_slice(lights, view_z, is_orthographic);
     // NOTE: Restricting cluster index to avoid undefined behavior when accessing uniform buffer
     // arrays based on the cluster index.
-    return unsigned_min(
+    unsigned_min(
         (xy.y * lights.cluster_dimensions.x + xy.x) * lights.cluster_dimensions.z + z_slice,
         lights.cluster_dimensions.w - 1,
-    );
+    )
 }
 
 // this must match CLUSTER_COUNT_SIZE in light.rs
 pub const CLUSTER_COUNT_SIZE: u32 = 9;
-
-pub fn unpack_offset_and_counts(
-    cluster_offsets_and_counts: &ClusterOffsetsAndCounts,
-    cluster_index: u32,
-) -> UVec3 {
-    #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
-    {
-        let v = cluster_offsets_and_counts.data[(cluster_index >> 2) as usize];
-        let i = cluster_index & ((1 << 2) - 1);
-        let offset_and_counts = match i {
-            0 => v.x,
-            1 => v.y,
-            2 => v.z,
-            3 => v.w,
-            _ => panic!(),
-        };
-        //  [ 31     ..     18 | 17      ..      9 | 8       ..     0 ]
-        //  [      offset      | point light count | spot light count ]
-        UVec3::new(
-            (offset_and_counts >> (CLUSTER_COUNT_SIZE * 2))
-                & ((1 << (32 - (CLUSTER_COUNT_SIZE * 2))) - 1),
-            (offset_and_counts >> CLUSTER_COUNT_SIZE) & ((1 << CLUSTER_COUNT_SIZE) - 1),
-            offset_and_counts & ((1 << CLUSTER_COUNT_SIZE) - 1),
-        )
-    }
-
-    #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
-    {
-        unsafe {
-            cluster_offsets_and_counts
-                .data
-                .index(cluster_index as usize)
-        }
-        .truncate()
-    }
-}
-
-pub fn get_light_id(cluster_light_index_lists: &ClusterLightIndexLists, index: u32) -> u32 {
-    #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
-    {
-        // The index is correct but in cluster_light_index_lists we pack 4 u8s into a u32
-        // This means the index into cluster_light_index_lists is index / 4
-        let v = cluster_light_index_lists.data[(index >> 4) as usize];
-        let indices = match ((index >> 2) & ((1 << 2) - 1)) as usize {
-            0 => v.x,
-            1 => v.y,
-            2 => v.z,
-            3 => v.w,
-            _ => panic!(),
-        };
-        // And index % 4 gives the sub-index of the u8 within the u32 so we shift by 8 * sub-index
-        return (indices >> (8 * (index & ((1 << 2) - 1)))) & ((1 << 8) - 1);
-    }
-
-    #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
-    {
-        return unsafe { *cluster_light_index_lists.data.index(index as usize) };
-        //return cluster_light_index_lists.data[index as usize];
-    }
-}
 
 #[allow(unused_variables)]
 pub fn cluster_debug_visualization(
@@ -172,5 +112,5 @@ pub fn cluster_debug_visualization(
         );
     }
 
-    return output_color;
+    output_color
 }

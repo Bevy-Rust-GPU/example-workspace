@@ -1,14 +1,13 @@
 use spirv_std::{
+    arch::kill,
     glam::{Vec2, Vec3, Vec4},
-    Sampler, arch::kill,
+    Sampler,
 };
 
 use crate::reflect::Reflect;
 
 use super::{
-    clustered_forward::{
-        cluster_debug_visualization, fragment_cluster_index, get_light_id, unpack_offset_and_counts,
-    },
+    clustered_forward::{cluster_debug_visualization, fragment_cluster_index},
     mesh_types::{Mesh, MESH_FLAGS_SHADOW_RECEIVER_BIT},
     mesh_view_types::{
         ClusterLightIndexLists, ClusterOffsetsAndCounts, Lights, PointLights, View,
@@ -45,7 +44,7 @@ pub fn alpha_discard(material: &StandardMaterial, output_color: Vec4) -> Vec4 {
         }
     }
 
-    return color;
+    color
 }
 
 pub fn prepare_world_normal(world_normal: Vec3, double_sided: bool, is_front: bool) -> Vec3 {
@@ -59,7 +58,7 @@ pub fn prepare_world_normal(world_normal: Vec3, double_sided: bool, is_front: bo
     ))]
     let output = (if !double_sided || is_front { 1.0 } else { 0.0 } * 2.0 - 1.0) * output;
 
-    return output;
+    output
 }
 
 pub fn apply_normal_mapping(
@@ -116,7 +115,7 @@ pub fn apply_normal_mapping(
         N = Nt.x * T + Nt.y * B + Nt.z * N;
     }
 
-    return n.normalize();
+    n.normalize()
 }
 
 // NOTE: Correctly calculates the view vector depending on whether
@@ -229,11 +228,11 @@ pub fn pbr(
         view_z,
         input.is_orthographic,
     );
-    let offset_and_counts = unpack_offset_and_counts(cluster_offsets_and_counts, cluster_index);
+    let offset_and_counts = cluster_offsets_and_counts.unpack(cluster_index);
 
     // point lights
     for i in offset_and_counts.x as u32..(offset_and_counts.x + offset_and_counts.y) as u32 {
-        let light_id = get_light_id(cluster_light_index_lists, i);
+        let light_id = cluster_light_index_lists.get_light_id(i);
 
         #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
         let light = &point_lights.data[light_id as usize];
@@ -272,7 +271,7 @@ pub fn pbr(
     for i in (offset_and_counts.x + offset_and_counts.y) as u32
         ..(offset_and_counts.x + offset_and_counts.y + offset_and_counts.z) as u32
     {
-        let light_id = get_light_id(cluster_light_index_lists, i);
+        let light_id = cluster_light_index_lists.get_light_id(i);
 
         #[cfg(feature = "NO_STORAGE_BUFFERS_SUPPORT")]
         let light = &point_lights.data[light_id as usize];
@@ -330,7 +329,6 @@ pub fn pbr(
             n_dot_v,
             input.n,
             input.v,
-            r,
             f0,
             diffuse_color,
         );
@@ -353,7 +351,7 @@ pub fn pbr(
         cluster_index,
     );
 
-    return output_color;
+    output_color
 }
 
 #[cfg(feature = "TONEMAP_IN_SHADER")]
@@ -361,7 +359,7 @@ pub fn tone_mapping(input: Vec4) -> Vec4 {
     use crate::bevy_core_pipeline::tonemapping_shared::reinhard_luminance;
 
     // tone_mapping
-    return reinhard_luminance(input.truncate()).extend(input.w);
+    reinhard_luminance(input.truncate()).extend(input.w)
 
     // Gamma correction.
     // Not needed with sRGB buffer
