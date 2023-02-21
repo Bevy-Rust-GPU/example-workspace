@@ -1,6 +1,6 @@
 use spirv_std::{
     arch::unsigned_min,
-    glam::{UVec3, Vec2, Vec3, Vec4},
+    glam::{UVec3, Vec2, Vec4},
 };
 
 #[allow(unused_imports)]

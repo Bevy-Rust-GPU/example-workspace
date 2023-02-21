@@ -1,8 +1,6 @@
-use core::arch::asm;
-
 use spirv_std::{
     glam::{Vec2, Vec3, Vec4},
-    Sampler,
+    Sampler, arch::kill,
 };
 
 use crate::reflect::Reflect;
@@ -43,7 +41,7 @@ pub fn alpha_discard(material: &StandardMaterial, output_color: Vec4) -> Vec4 {
         } else {
             // NOTE: output_color.a < input.material.alpha_cutoff should not is not rendered
             // NOTE: This and any other discards mean that early-z testing cannot be done!
-            unsafe { asm!("OpKill", options(noreturn),) };
+            kill();
         }
     }
 
