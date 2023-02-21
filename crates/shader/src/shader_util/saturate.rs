@@ -1,5 +1,6 @@
 use spirv_std::glam::{Vec2, Vec3, Vec4};
 
+/// Rust implementation of WGSL saturate()
 pub trait Saturate {
     fn saturate(self) -> Self;
 }

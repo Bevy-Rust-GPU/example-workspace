@@ -1,26 +1,34 @@
+pub mod pbr_bindings;
+pub mod pbr_functions;
+pub mod pbr_lighting;
+pub mod pbr_types;
+
 use spirv_std::glam::Vec4;
 use spirv_std::glam::{Vec2, Vec3};
 use spirv_std::macros::spirv;
 use spirv_std::Sampler;
 
-use crate::bevy_core_pipeline::tonemapping_shared::screen_space_dither;
-use crate::BaseMaterial;
+use super::tonemapping_shared::screen_space_dither;
 
-use super::mesh_types::Mesh;
-use super::mesh_view_types::{
-    ClusterLightIndexLists, ClusterOffsetsAndCounts, Lights, PointLights, View,
-};
-use super::pbr_bindings::{
+use super::prelude::{apply_normal_mapping, prepare_world_normal, tone_mapping, PbrInput};
+use super::prelude::{
     BaseColorTexture, EmissiveTexture, MetallicRoughnessTexture, OcclusionTexture,
 };
-use super::pbr_functions::{apply_normal_mapping, prepare_world_normal, tone_mapping, PbrInput};
-use super::pbr_types::{
-    STANDARD_MATERIAL_FLAGS_BASE_COLOR_TEXTURE_BIT, STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT,
-    STANDARD_MATERIAL_FLAGS_EMISSIVE_TEXTURE_BIT,
+use super::prelude::{
+    ClusterLightIndexLists, ClusterOffsetsAndCounts, Lights, Mesh, PointLights, View,
+};
+use super::prelude::{DirectionalShadowTextures, PointShadowTextures};
+use super::prelude::{
+    StandardMaterial, STANDARD_MATERIAL_FLAGS_BASE_COLOR_TEXTURE_BIT,
+    STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT, STANDARD_MATERIAL_FLAGS_EMISSIVE_TEXTURE_BIT,
     STANDARD_MATERIAL_FLAGS_METALLIC_ROUGHNESS_TEXTURE_BIT,
     STANDARD_MATERIAL_FLAGS_OCCLUSION_TEXTURE_BIT, STANDARD_MATERIAL_FLAGS_UNLIT_BIT,
 };
-use super::shadows::{DirectionalShadowTextures, PointShadowTextures};
+
+#[repr(C)]
+pub struct BaseMaterial {
+    base: StandardMaterial,
+}
 
 #[spirv(fragment)]
 pub fn fragment(

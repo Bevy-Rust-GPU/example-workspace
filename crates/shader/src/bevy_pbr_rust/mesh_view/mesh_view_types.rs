@@ -7,13 +7,11 @@ use spirv_std::{
 #[allow(unused_imports)]
 use spirv_std::num_traits::Float;
 
-use crate::saturate::Saturate;
+use crate::shader_util::saturate::Saturate;
 
-use super::{
-    clustered_forward::CLUSTER_COUNT_SIZE,
-    mesh_functions::mesh_position_local_to_world,
-    pbr_lighting::{fd_burley, get_distance_attenuation, specular},
-    shadows::{DirectionalShadowTextures, PointShadowTextures},
+use super::super::prelude::{
+    fd_burley, get_distance_attenuation, mesh_position_local_to_world, specular,
+    DirectionalShadowTextures, PointShadowTextures, CLUSTER_COUNT_SIZE,
 };
 
 const NATURAL_LOG_BASE: f32 = 2.718281828459;

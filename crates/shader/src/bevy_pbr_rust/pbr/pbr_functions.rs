@@ -3,18 +3,14 @@ use spirv_std::{
     Sampler,
 };
 
-use crate::reflect::Reflect;
+use crate::shader_util::prelude::Reflect;
 
-use super::{
-    clustered_forward::cluster_debug_visualization,
-    mesh_types::{Mesh, MESH_FLAGS_SHADOW_RECEIVER_BIT},
-    mesh_view_types::{
-        ClusterLightIndexLists, ClusterOffsetsAndCounts, Lights, PointLights, View,
-        DIRECTIONAL_LIGHT_FLAGS_SHADOWS_ENABLED_BIT, POINT_LIGHT_FLAGS_SHADOWS_ENABLED_BIT,
-    },
-    pbr_lighting::{env_brdf_approx, perceptual_roughness_to_roughness},
-    pbr_types::StandardMaterial,
-    shadows::{DirectionalShadowTextures, PointShadowTextures},
+use super::super::prelude::{
+    cluster_debug_visualization, env_brdf_approx, perceptual_roughness_to_roughness,
+    ClusterLightIndexLists, ClusterOffsetsAndCounts, DirectionalShadowTextures, Lights, Mesh,
+    PointLights, PointShadowTextures, StandardMaterial, View,
+    DIRECTIONAL_LIGHT_FLAGS_SHADOWS_ENABLED_BIT, MESH_FLAGS_SHADOW_RECEIVER_BIT,
+    POINT_LIGHT_FLAGS_SHADOWS_ENABLED_BIT,
 };
 
 pub fn prepare_world_normal(world_normal: Vec3, double_sided: bool, is_front: bool) -> Vec3 {
@@ -298,10 +294,8 @@ impl PbrInput {
 
 #[cfg(feature = "TONEMAP_IN_SHADER")]
 pub fn tone_mapping(input: Vec4) -> Vec4 {
-    use crate::bevy_core_pipeline::tonemapping_shared::reinhard_luminance;
-
     // tone_mapping
-    reinhard_luminance(input.truncate()).extend(input.w)
+    super::super::prelude::reinhard_luminance(input.truncate()).extend(input.w)
 
     // Gamma correction.
     // Not needed with sRGB buffer
@@ -310,7 +304,5 @@ pub fn tone_mapping(input: Vec4) -> Vec4 {
 
 #[cfg(feature = "DEBAND_DITHER")]
 pub fn dither(color: Vec4, pos: Vec2) -> Vec4 {
-    use crate::bevy_core_pipeline::tonemapping_shared::screen_space_dither;
-
-    (color.truncate() + screen_space_dither(pos)).extend(color.w)
+    (color.truncate() + super::super::prelude::screen_space_dither(pos)).extend(color.w)
 }

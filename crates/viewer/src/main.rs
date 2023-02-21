@@ -87,9 +87,9 @@ fn setup(
 
     let shader_material = shader_materials.add(ShaderMaterial {
         vertex_shader: Some(shader.clone()),
-        vertex_entry_point: Some("bevy_pbr::mesh::vertex".into()),
+        vertex_entry_point: Some("bevy_pbr_rust::mesh::vertex".into()),
         fragment_shader: Some(shader),
-        fragment_entry_point: Some("bevy_pbr::pbr::fragment".into()),
+        fragment_entry_point: Some("bevy_pbr_rust::pbr::fragment".into()),
         ..default()
     });
 

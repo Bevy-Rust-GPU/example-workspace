@@ -1,8 +1,8 @@
-use crate::bevy_pbr::{
-    mesh_functions::mesh_position_local_to_world,
-    mesh_types::Mesh,
-    mesh_view_types::View,
-};
+pub mod mesh_bindings;
+pub mod mesh_functions;
+pub mod mesh_types;
+
+use super::prelude::{mesh_position_local_to_world, Mesh, View};
 
 use spirv_std::{
     glam::{Vec2, Vec3, Vec4},
