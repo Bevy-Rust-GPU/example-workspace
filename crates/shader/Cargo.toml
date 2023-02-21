@@ -6,27 +6,6 @@ edition = "2021"
 [lib]
 crate-type = ["dylib"]
 
-[features]
-default = [
-    "NO_STORAGE_BUFFERS_SUPPORT",
-    "VERTEX_POSITIONS",
-    "VERTEX_NORMALS",
-    "VERTEX_UVS",
-    "TONEMAP_IN_SHADER",
-    "DEBAND_DITHER"
-]
-
-NO_STORAGE_BUFFERS_SUPPORT = []
-NO_ARRAY_TEXTURES_SUPPORT = []
-VERTEX_POSITIONS = []
-VERTEX_NORMALS = []
-VERTEX_UVS = []
-VERTEX_TANGENTS = []
-VERTEX_COLORS = []
-SIXTEEN_BYTE_ALIGNMENT = []
-SKINNED = []
-TONEMAP_IN_SHADER = []
-DEBAND_DITHER = []
-
 [dependencies]
 spirv-std = { version = "0.5.0", features = ["glam"] }
+bevy-pbr-rust = { path = "../bevy-pbr-rust" }

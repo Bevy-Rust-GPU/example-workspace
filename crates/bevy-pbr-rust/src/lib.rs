@@ -1,3 +1,5 @@
+#![no_std]
+
 pub mod clustered_forward;
 pub mod mesh;
 pub mod mesh_view;

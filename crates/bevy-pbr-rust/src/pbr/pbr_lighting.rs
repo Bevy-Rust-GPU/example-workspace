@@ -4,7 +4,7 @@ use spirv_std::{
     num_traits::{Float, FloatConst},
 };
 
-use crate::shader_util::prelude::Saturate;
+use shader_util::prelude::Saturate;
 
 // From the Filament design doc
 // https://google.github.io/filament/Filament.html#table_symbols

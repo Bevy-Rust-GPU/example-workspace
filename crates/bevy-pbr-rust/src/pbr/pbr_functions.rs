@@ -3,7 +3,7 @@ use spirv_std::{
     Sampler,
 };
 
-use crate::shader_util::prelude::Reflect;
+use shader_util::prelude::Reflect;
 
 use super::super::prelude::{
     cluster_debug_visualization, env_brdf_approx, perceptual_roughness_to_roughness,

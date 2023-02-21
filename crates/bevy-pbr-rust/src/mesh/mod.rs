@@ -42,7 +42,7 @@ pub fn vertex(
         out_world_normal = skin_normals(model, vertex.normal);
     }
 
-    #[cfg(not(feature = "SKINNED"))]
+    #[cfg(all(feature = "VERTEX_NORMALS", not(feature = "SKINNED")))]
     {
         *out_world_normal = mesh.mesh_normal_local_to_world(in_normal);
     }
@@ -80,10 +80,12 @@ pub fn fragment(
     #[cfg(feature = "VERTEX_COLORS")] in_color: Vec4,
     out_color: &mut Vec4,
 ) {
-    *out_color = in_clip_position
-        + in_world_position
-        + in_world_normal.extend(0.0)
-        + in_uv.extend(0.0).extend(0.0);
+    *out_color = in_clip_position + in_world_position + in_world_normal.extend(0.0);
+
+    #[cfg(feature = "VERTEX_UVS")]
+    {
+        *out_color = *out_color + in_uv.extend(0.0).extend(0.0);
+    }
 
     #[cfg(feature = "VERTEX_COLORS")]
     {

@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
+    "crates/bevy-pbr-rust",
     "crates/shader",
     "crates/shader-builder",
     "crates/viewer",

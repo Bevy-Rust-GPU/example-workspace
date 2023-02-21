@@ -1,13 +1,13 @@
 use spirv_std::{
     arch::unsigned_min,
     glam::{Mat3, Mat4, UVec3, UVec4, Vec2, Vec3, Vec4},
-    Sampler,
+    Sampler, 
 };
 
 #[allow(unused_imports)]
 use spirv_std::num_traits::Float;
 
-use crate::shader_util::saturate::Saturate;
+use shader_util::saturate::Saturate;
 
 use super::super::prelude::{
     fd_burley, get_distance_attenuation, mesh_position_local_to_world, specular,
@@ -602,13 +602,13 @@ pub struct PointLights {
 #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
 #[repr(C)]
 pub struct ClusterLightIndexLists {
-    pub data: RuntimeArray<u32>,
+    pub data: spirv_std::RuntimeArray<u32>,
 }
 
 #[cfg(not(feature = "NO_STORAGE_BUFFERS_SUPPORT"))]
 #[repr(C)]
 pub struct ClusterOffsetsAndCounts {
-    pub data: RuntimeArray<UVec4>,
+    pub data: spirv_std::RuntimeArray<UVec4>,
 }
 
 #[repr(C)]

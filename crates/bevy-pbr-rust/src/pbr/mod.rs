@@ -3,14 +3,12 @@ pub mod pbr_functions;
 pub mod pbr_lighting;
 pub mod pbr_types;
 
+use spirv_std::glam::Vec3;
 use spirv_std::glam::Vec4;
-use spirv_std::glam::{Vec2, Vec3};
 use spirv_std::macros::spirv;
 use spirv_std::Sampler;
 
-use super::tonemapping_shared::screen_space_dither;
-
-use super::prelude::{apply_normal_mapping, prepare_world_normal, tone_mapping, PbrInput};
+use super::prelude::{apply_normal_mapping, prepare_world_normal, PbrInput};
 use super::prelude::{
     BaseColorTexture, EmissiveTexture, MetallicRoughnessTexture, OcclusionTexture,
 };
@@ -88,9 +86,9 @@ pub fn fragment(
     #[spirv(position)] in_frag_coord: Vec4,
     in_world_position: Vec4,
     in_world_normal: Vec3,
-    #[cfg(feature = "VERTEX_UVS")] in_uv: Vec2,
-    #[cfg(feature = "VERTEX_TANGENTS")] in_tangent: Vec2,
-    #[cfg(feature = "VERTEX_COLORS")] in_color: Vec2,
+    #[cfg(feature = "VERTEX_UVS")] in_uv: spirv_std::glam::Vec2,
+    #[cfg(feature = "VERTEX_TANGENTS")] in_tangent: spirv_std::glam::Vec2,
+    #[cfg(feature = "VERTEX_COLORS")] in_color: spirv_std::glam::Vec2,
 
     output_color: &mut Vec4,
 ) {
@@ -204,14 +202,14 @@ pub fn fragment(
 
     #[cfg(feature = "TONEMAP_IN_SHADER")]
     {
-        *output_color = tone_mapping(*output_color);
+        *output_color = super::prelude::tone_mapping(*output_color);
     }
 
     #[cfg(feature = "DEBAND_DITHER")]
     {
         let mut output_rgb = output_color.truncate();
         output_rgb = output_rgb.powf(1.0 / 2.2);
-        output_rgb = output_rgb + screen_space_dither(in_frag_coord.truncate().truncate());
+        output_rgb = output_rgb + crate::prelude::screen_space_dither(in_frag_coord.truncate().truncate());
         // This conversion back to linear space is required because our output texture format is
         // SRGB; the GPU will assume our output is linear and will apply an SRGB conversion.
         output_rgb = output_rgb.powf(2.2);
