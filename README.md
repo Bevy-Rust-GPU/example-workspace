@@ -13,7 +13,7 @@ as well as custom `[profile.dev]` and `[profile.dev.package."*"]` sections for f
 
 ### shader
 
-The rust-gpu shader crate. Pulls in `bevy-pbr-rust`.
+Project-level `rust-gpu` shader crate. Pulls in `bevy-pbr-rust`.
 
 Entrypoints are exported relative to their containing crate using crate-local rust module path syntax,
 i.e. `mesh::vertex`, `pbr::fragment`.
@@ -33,8 +33,7 @@ Contains utility traits for replicating common shading language functions.
 
 ### shader-builder
 
-Empty library crate used to invoke `build.rs` independently of the bevy app.
-Encapsulates the nightly rust toolchain needed for `rust-gpu` compilation, and invokes `spirv-builder` via build.rs.
+Empty library crate used to invoke `spirv-builder` via `build.rs` independently of the bevy app.
 
 Run via `cargo build -p shader-builder` to produce `target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv`.
 
