@@ -21,12 +21,12 @@ which renders it incompatible with the read-only buffers bevy uses to store ligh
 
 As such, the `NO_STORAGE_BUFFER_SUPPORT` feature is enabled by default, and the bevy app is configured to match.
 
-Entrypoints are exported using rust module path syntax, i.e. `bevy_pbr::mesh::vertex`
+Entrypoints are exported using rust module path syntax, i.e. `bevy_pbr::mesh::vertex`.
 
 ### shader-builder
 
-Empty library crate used to invoke `build.rs` independently of the bevy crate.
-Encapsulates the nightly build process needed for `rust-gpu`.
+Empty library crate used to invoke `build.rs` independently of the bevy app.
+Encapsulates the nightly rust toolchain needed for `rust-gpu` compilation.
 
 Contains the `rust_toolchain` file needed by `rust-gpu`, and invokes `spirv-builder` via build.rs.
 
