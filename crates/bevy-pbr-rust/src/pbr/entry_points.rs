@@ -1,16 +1,18 @@
-use spirv_std::glam::Vec2;
-use spirv_std::glam::Vec3;
-use spirv_std::glam::Vec4;
-use spirv_std::macros::spirv;
-use spirv_std::Sampler;
+use spirv_std::{
+    glam::{Vec2, Vec3, Vec4},
+    macros::spirv,
+    Sampler,
+};
 
 use crate::prelude::{
     BaseColorTexture, BaseMaterialNormalMap, ClusterDebugVisualization, ClusterLightIndexLists,
-    ClusterOffsetsAndCounts, DebandDither, DirectionalShadowTextures, Dither, EmissiveTexture,
-    Lights, Mesh, MetallicRoughnessTexture, NormalMapTexture, OcclusionTexture, PbrInput,
-    PointLights, PointShadowTextures, Skinning, TonemapInShader, Tonemapper, VertexColor,
-    VertexNormal, VertexPosition, VertexTangent, VertexUv, View,
-    STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT, STANDARD_MATERIAL_FLAGS_UNLIT_BIT,
+    ClusterLightIndexListsUniform, ClusterOffsetsAndCounts, ClusterOffsetsAndCountsUniform,
+    DebandDither, DirectionalShadowTextureArray, DirectionalShadowTextures, Dither,
+    EmissiveTexture, Lights, Mesh, MetallicRoughnessTexture, NormalMapTexture, OcclusionTexture,
+    PbrInput, PointLights, PointLightsUniform, PointShadowTextureArray, PointShadowTextures,
+    Skinning, TonemapInShader, Tonemapper, VertexColor, VertexNormal, VertexPosition,
+    VertexTangent, VertexUv, View, STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT,
+    STANDARD_MATERIAL_FLAGS_UNLIT_BIT,
 };
 
 use super::BaseMaterial;
@@ -25,8 +27,8 @@ pub fn fragment_impl<
     VN: VertexNormal,
     VU: VertexUv,
     VT: VertexTangent,
-    N: BaseMaterialNormalMap,
     VC: VertexColor,
+    N: BaseMaterialNormalMap,
     SM: Skinning,
     TM: Tonemapper,
     DT: Dither,
@@ -174,17 +176,17 @@ pub fn fragment(
     #[spirv(uniform, descriptor_set = 0, binding = 1)] lights: &Lights,
 
     /*
-        #[spirv(descriptor_set = 0, binding = 2)] point_shadow_textures: &crate::prelude::PointShadowTexture,
-        */
+    #[spirv(descriptor_set = 0, binding = 2)] point_shadow_textures: &crate::prelude::PointShadowTexture,
+    */
     #[spirv(descriptor_set = 0, binding = 2)]
     point_shadow_textures: &crate::prelude::PointShadowTextureArray,
 
     #[spirv(descriptor_set = 0, binding = 3)] point_shadow_textures_sampler: &Sampler,
 
     /*
-        #[spirv(descriptor_set = 0, binding = 4)]
-        directional_shadow_textures: &crate::prelude::DirectionalShadowTexture,
-        */
+    #[spirv(descriptor_set = 0, binding = 4)]
+    directional_shadow_textures: &crate::prelude::DirectionalShadowTexture,
+    */
     #[spirv(descriptor_set = 0, binding = 4)]
     directional_shadow_textures: &crate::prelude::DirectionalShadowTextureArray,
 
@@ -194,30 +196,29 @@ pub fn fragment(
     point_lights: &crate::prelude::PointLightsUniform,
 
     /*
-        #[spirv(storage_buffer, descriptor_set = 0, binding = 6)]
-        point_lights: &crate::prelude::PointLightsStorage,
-        */
+    #[spirv(storage_buffer, descriptor_set = 0, binding = 6)]
+    point_lights: &crate::prelude::PointLightsStorage,
+    */
     #[spirv(uniform, descriptor_set = 0, binding = 7)]
     cluster_light_index_lists: &crate::prelude::ClusterLightIndexListsUniform,
 
     /*
-        #[spirv(storage_buffer, descriptor_set = 0, binding = 7)]
-        cluster_light_index_lists: &crate::prelude::ClusterLightIndexListsStorage,
-        */
+    #[spirv(storage_buffer, descriptor_set = 0, binding = 7)]
+    cluster_light_index_lists: &crate::prelude::ClusterLightIndexListsStorage,
+    */
     #[spirv(uniform, descriptor_set = 0, binding = 8)]
     cluster_offsets_and_counts: &crate::prelude::ClusterOffsetsAndCountsUniform,
 
     /*
-        #[spirv(storage_buffer, descriptor_set = 0, binding = 8)]
-        cluster_offsets_and_counts: &crate::prelude::ClusterOffsetsAndCountsStorage,
-        */
+    #[spirv(storage_buffer, descriptor_set = 0, binding = 8)]
+    cluster_offsets_and_counts: &crate::prelude::ClusterOffsetsAndCountsStorage,
+    */
     #[spirv(uniform, descriptor_set = 1, binding = 0)] material: &BaseMaterial,
     #[spirv(descriptor_set = 1, binding = 1)] base_color_texture: &BaseColorTexture,
     #[spirv(descriptor_set = 1, binding = 2)] base_color_sampler: &Sampler,
     #[spirv(descriptor_set = 1, binding = 3)] emissive_texture: &EmissiveTexture,
     #[spirv(descriptor_set = 1, binding = 4)] emissive_sampler: &Sampler,
-    #[spirv(descriptor_set = 1, binding = 5)]
-    metallic_roughness_texture: &MetallicRoughnessTexture,
+    #[spirv(descriptor_set = 1, binding = 5)] metallic_roughness_texture: &MetallicRoughnessTexture,
     #[spirv(descriptor_set = 1, binding = 6)] metallic_roughness_sampler: &Sampler,
     #[spirv(descriptor_set = 1, binding = 7)] occlusion_texture: &OcclusionTexture,
     #[spirv(descriptor_set = 1, binding = 8)] occlusion_sampler: &Sampler,
@@ -236,11 +237,11 @@ pub fn fragment(
     output_color: &mut Vec4,
 ) {
     fragment_impl::<
-        crate::prelude::PointShadowTextureArray,
-        crate::prelude::DirectionalShadowTextureArray,
-        crate::prelude::PointLightsUniform,
-        crate::prelude::ClusterLightIndexListsUniform,
-        crate::prelude::ClusterOffsetsAndCountsUniform,
+        PointShadowTextureArray,
+        DirectionalShadowTextureArray,
+        PointLightsUniform,
+        ClusterLightIndexListsUniform,
+        ClusterOffsetsAndCountsUniform,
         Vec4,
         Vec3,
         Vec2,
@@ -278,9 +279,8 @@ pub fn fragment(
         &in_world_position,
         &in_world_normal,
         &in_uv,
-        &(), //in_tangent,
-        &(), //in_color,
+        &(),
+        &(),
         output_color,
     )
 }
-
