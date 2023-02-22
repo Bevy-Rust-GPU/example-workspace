@@ -1,5 +1,5 @@
 use shader_util::{hsv2rgb, random_1d, smooth_step::SmoothStep};
-use spirv_std::glam::{UVec3, Vec4};
+use crate::glam::{UVec3, Vec4};
 
 #[allow(unused_imports)]
 use spirv_std::num_traits::Float;

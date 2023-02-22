@@ -1,6 +1,8 @@
 #![no_std]
 
-use spirv_std::glam::Vec3;
+use shader_util::glam;
+
+use self::glam::Vec3;
 
 pub mod clustered_forward;
 pub mod mesh;

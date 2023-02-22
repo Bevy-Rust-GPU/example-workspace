@@ -1,6 +1,8 @@
 [workspace]
 resolver = "2"
 members = [
+    "crates/shader-glam",
+    "crates/shader-util",
     "crates/bevy-pbr-rust",
     "crates/shader",
     "crates/shader-builder",

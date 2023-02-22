@@ -1,13 +1,16 @@
 #![no_std]
 
+pub use shader_glam::glam;
+
 pub mod reflect;
 pub mod saturate;
 pub mod smooth_step;
 
 pub mod prelude;
 
-use spirv_std::glam::Vec3;
+use glam::Vec3;
 
+#[cfg(feature = "spirv-std")]
 #[allow(unused_imports)]
 use spirv_std::num_traits::Float;
 

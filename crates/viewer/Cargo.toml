@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 #bevy = "0.9.1"
 bevy = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
+shader-util = { path = "../shader-util" }

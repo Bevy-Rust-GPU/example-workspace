@@ -3,5 +3,11 @@ name = "shader-util"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+default = ["glam"]
+glam = ["shader-glam/glam"]
+spirv-std = ["dep:spirv-std", "shader-glam/spirv-std"]
+
 [dependencies]
-spirv-std = "0.5.0"
+spirv-std = { version = "0.5", optional = true }
+shader-glam = { path = "../shader-glam", default-features = false }

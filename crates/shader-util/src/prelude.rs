@@ -1,2 +1,2 @@
-pub use super::{reflect::*, saturate::*, *};
+pub use super::{reflect::*, saturate::*, smooth_step::*, *};
 

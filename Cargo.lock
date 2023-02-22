@@ -507,7 +507,7 @@ name = "bevy_math"
 version = "0.9.1"
 source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
 dependencies = [
- "glam",
+ "glam 0.22.0",
  "serde",
 ]
 
@@ -516,7 +516,7 @@ name = "bevy_mikktspace"
 version = "0.9.1"
 source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
 dependencies = [
- "glam",
+ "glam 0.22.0",
 ]
 
 [[package]]
@@ -556,7 +556,7 @@ dependencies = [
  "bevy_utils",
  "downcast-rs",
  "erased-serde",
- "glam",
+ "glam 0.22.0",
  "once_cell",
  "parking_lot",
  "serde",
@@ -1244,7 +1244,7 @@ checksum = "48ec50086547d597b5c871a78399ec04a14828a6a5c445a61ed4687c540edec6"
 dependencies = [
  "const_panic",
  "encase_derive",
- "glam",
+ "glam 0.22.0",
  "thiserror",
 ]
 
@@ -1463,6 +1463,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "glam"
+version = "0.23.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8e4afd9ad95555081e109fe1d21f2a30c691b5f0919c67dfa690a2e1eb6bd51c"
+
+[[package]]
 name = "glob"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1627,7 +1633,7 @@ version = "8.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "619ce654558681d7d0a7809e1b20249c7032ff13ee6baa7bb7ff64f7f28a906a"
 dependencies = [
- "glam",
+ "glam 0.22.0",
  "once_cell",
 ]
 
@@ -2672,9 +2678,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "shader-glam"
+version = "0.1.0"
+dependencies = [
+ "glam 0.23.0",
+ "spirv-std",
+]
+
+[[package]]
 name = "shader-util"
 version = "0.1.0"
 dependencies = [
+ "shader-glam",
  "spirv-std",
 ]
 
@@ -2769,7 +2784,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "210182f2a5ac041abed607fe1e8f9b09d10fa8761c14c81d499fca62698a19dc"
 dependencies = [
  "bitflags",
- "glam",
+ "glam 0.22.0",
  "num-traits",
  "spirv-std-macros",
  "spirv-std-types",
@@ -3130,6 +3145,7 @@ name = "viewer"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "shader-util",
 ]
 
 [[package]]
