@@ -20,7 +20,9 @@ i.e. `mesh::vertex`, `pbr::fragment`.
 
 ### bevy-pbr-rust
 
-Contains a working reimplementation of `bevy_pbr`. Shader def conditionals are implemented as cargo features.
+Contains a working reimplementation of `bevy_pbr`.
+
+Shader def conditionals are implemented using compile-time trait generics, which opens the door to programmatic permutation generation.
 
 At time of writing, `rust-gpu` only supports read-write access to storage buffers,
 which renders it incompatible with the read-only buffers bevy uses to store light and cluster data on supported platforms.
