@@ -200,6 +200,7 @@ dependencies = [
 name = "bevy-pbr-rust"
 version = "0.1.0"
 dependencies = [
+ "bitflags",
  "shader-util",
  "spirv-std",
 ]

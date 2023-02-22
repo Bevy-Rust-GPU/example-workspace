@@ -4,10 +4,10 @@ use std::path::Path;
 
 use bevy::{
     prelude::{
-        default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Commands,
-        DefaultPlugins, DirectionalLight, DirectionalLightBundle, MaterialMeshBundle,
-        MaterialPlugin, Mesh, PluginGroup, PointLightBundle, Quat, Res, ResMut, Shader,
-        StandardMaterial, Transform, Vec3, PointLight, Color,
+        default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Color,
+        Commands, DefaultPlugins, DirectionalLight, DirectionalLightBundle, MaterialMeshBundle,
+        MaterialPlugin, Mesh, PluginGroup, PointLight, PointLightBundle, Quat, Res, ResMut, Shader,
+        StandardMaterial, Transform, Vec3,
     },
     render::settings::{WgpuLimits, WgpuSettings},
 };
@@ -87,9 +87,9 @@ fn setup(
 
     let shader_material = shader_materials.add(ShaderMaterial {
         vertex_shader: Some(shader.clone()),
-        vertex_entry_point: Some("mesh::vertex".into()),
+        vertex_entry_point: Some("mesh::entry_points::vertex".into()),
         fragment_shader: Some(shader),
-        fragment_entry_point: Some("pbr::fragment".into()),
+        fragment_entry_point: Some("pbr::entry_points::fragment".into()),
         ..default()
     });
 

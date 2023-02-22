@@ -1,74 +1,116 @@
+use shader_util::{hsv2rgb, random_1d, smooth_step::SmoothStep};
 use spirv_std::glam::{UVec3, Vec4};
 
 #[allow(unused_imports)]
 use spirv_std::num_traits::Float;
 
+use crate::prelude::Lights;
+
 // this must match CLUSTER_COUNT_SIZE in light.rs
 pub const CLUSTER_COUNT_SIZE: u32 = 9;
 
-#[allow(unused_variables)]
-pub fn cluster_debug_visualization(
-    output_color: Vec4,
-    view_z: f32,
-    is_orthographic: bool,
-    offset_and_counts: UVec3,
-    cluster_index: u32,
-) -> Vec4 {
-    // Cluster allocation debug (using 'over' alpha blending)
-    #[cfg(feature = "clustered_forward_debug_z_slices")]
-    {
+// Cluster allocation debug (using 'over' alpha blending)
+pub trait ClusterDebugVisualization {
+    fn cluster_debug_visualization(
+        lights: &Lights,
+        output_color: Vec4,
+        view_z: f32,
+        is_orthographic: bool,
+        offset_and_counts: UVec3,
+        cluster_index: u32,
+    ) -> Vec4;
+}
+
+impl ClusterDebugVisualization for () {
+    fn cluster_debug_visualization(
+        _: &Lights,
+        output_color: Vec4,
+        _: f32,
+        _: bool,
+        _: UVec3,
+        _: u32,
+    ) -> Vec4 {
+        output_color
+    }
+}
+
+pub enum DebugZSlices {}
+
+impl ClusterDebugVisualization for DebugZSlices {
+    fn cluster_debug_visualization(
+        lights: &Lights,
+        output_color: Vec4,
+        view_z: f32,
+        is_orthographic: bool,
+        _: UVec3,
+        _: u32,
+    ) -> Vec4 {
         // NOTE: This debug mode visualises the z-slices
         let cluster_overlay_alpha = 0.1;
-        let mut z_slice: u32 = view_z_to_z_slice(view_z, is_orthographic);
+        let mut z_slice: u32 = lights.view_z_to_z_slice(view_z, is_orthographic);
         // A hack to make the colors alternate a bit more
-        if ((z_slice & 1u) == 1u) {
-            z_slice = z_slice + lights.cluster_dimensions.z / 2u;
+        if (z_slice & 1) == 1 {
+            z_slice = z_slice + lights.cluster_dimensions.z / 2;
         }
         let slice_color = hsv2rgb(
-            f32(z_slice) / f32(lights.cluster_dimensions.z + 1u),
+            z_slice as f32 / (lights.cluster_dimensions.z + 1) as f32,
             1.0,
             0.5,
         );
-        output_color = Vec4(
-            (1.0 - cluster_overlay_alpha) * output_color.rgb + cluster_overlay_alpha * slice_color,
-            output_color.a,
-        );
-    }
 
-    #[cfg(feature = "clustered_forward_debug_cluster_light_complexity")]
-    {
+        ((1.0 - cluster_overlay_alpha) * output_color.truncate()
+            + cluster_overlay_alpha * slice_color)
+            .extend(output_color.w)
+    }
+}
+
+pub enum DebugClusterLightComplexity {}
+
+impl ClusterDebugVisualization for DebugClusterLightComplexity {
+    fn cluster_debug_visualization(
+        _: &Lights,
+        mut output_color: Vec4,
+        _: f32,
+        _: bool,
+        offset_and_counts: UVec3,
+        _: u32,
+    ) -> Vec4 {
         // NOTE: This debug mode visualises the number of lights within the cluster that contains
         // the fragment. It shows a sort of lighting complexity measure.
         let cluster_overlay_alpha = 0.1;
         let max_light_complexity_per_cluster = 64.0;
-        output_color.r = (1.0 - cluster_overlay_alpha) * output_color.r
+
+        output_color.x = (1.0 - cluster_overlay_alpha) * output_color.x
             + cluster_overlay_alpha
-                * smoothStep(
-                    0.0,
-                    max_light_complexity_per_cluster,
-                    f32(offset_and_counts[1] + offset_and_counts[2]),
-                );
-        output_color.g = (1.0 - cluster_overlay_alpha) * output_color.g
+                * ((offset_and_counts[1] + offset_and_counts[2]) as f32)
+                    .smooth_step(0.0, max_light_complexity_per_cluster);
+
+        output_color.y = (1.0 - cluster_overlay_alpha) * output_color.y
             + cluster_overlay_alpha
                 * (1.0
-                    - smoothStep(
-                        0.0,
-                        max_light_complexity_per_cluster,
-                        f32(offset_and_counts[1] + offset_and_counts[2]),
-                    ));
-    }
+                    - ((offset_and_counts[1] + offset_and_counts[2]) as f32)
+                        .smooth_step(0.0, max_light_complexity_per_cluster));
 
-    #[cfg(feature = "clustered_forward_debug_cluster_coherency")]
-    {
+        output_color
+    }
+}
+
+pub enum DebugClusterCoherency {}
+
+impl ClusterDebugVisualization for DebugClusterCoherency {
+    fn cluster_debug_visualization(
+        _: &Lights,
+        output_color: Vec4,
+        _: f32,
+        _: bool,
+        _: UVec3,
+        cluster_index: u32,
+    ) -> Vec4 {
         // NOTE: Visualizes the cluster to which the fragment belongs
         let cluster_overlay_alpha = 0.1;
-        let cluster_color = hsv2rgb(random1D(f32(cluster_index)), 1.0, 0.5);
-        output_color = Vec4(
-            (1.0 - cluster_overlay_alpha) * output_color.rgb
-                + cluster_overlay_alpha * cluster_color,
-            output_color.a,
-        );
+        let cluster_color = hsv2rgb(random_1d(cluster_index as f32), 1.0, 0.5);
+        ((1.0 - cluster_overlay_alpha) * output_color.truncate()
+            + cluster_overlay_alpha * cluster_color)
+            .extend(output_color.w)
     }
-
-    output_color
 }

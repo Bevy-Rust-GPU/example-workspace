@@ -35,9 +35,9 @@ pub struct Lights {
 }
 
 impl Lights {
-    pub fn fetch_directional_shadow(
+    pub fn fetch_directional_shadow<DS: DirectionalShadowTextures>(
         &self,
-        directional_shadow_textures: &DirectionalShadowTextures,
+        directional_shadow_textures: &DS,
         directional_shadow_textures_sampler: &Sampler,
         light_id: u32,
         frag_position: Vec4,
@@ -75,24 +75,13 @@ impl Lights {
         // do the lookup, using HW PCF and comparison
         // NOTE: Due to non-uniform control flow above, we must use the level variant of the texture
         // sampler to avoid use of implicit derivatives causing possible undefined behavior.
-        #[cfg(feature = "no_array_textures_support")]
-        {
-            directional_shadow_textures.sample_depth_reference(
-                *directional_shadow_textures_sampler,
-                light_local.extend(0.0),
-                depth,
-            )
-        }
-
-        #[cfg(not(feature = "no_array_textures_support"))]
-        {
-            directional_shadow_textures.sample_depth_reference_by_lod(
-                *directional_shadow_textures_sampler,
-                light_local.extend(0.0),
-                depth,
-                light_id as f32,
-            )
-        }
+        directional_shadow_textures.sample_depth_reference(
+            directional_shadow_textures_sampler,
+            light_local,
+            depth,
+            light_id,
+            0,
+        )
     }
 
     // NOTE: Keep in sync with bevy_pbr/src/light.rs

@@ -1,12 +1,14 @@
 pub use super::{
     clustered_forward::*,
-    mesh::{mesh_bindings::*, mesh_functions::*, mesh_types::*, *},
-    mesh_view::{
-        cluster_light_index_lists::*, cluster_offsets_and_counts::*, directional_light::*,
-        globals::*, lights::*, mesh_view_bindings::*, point_light::*,
-        point_lights::*, view::*, *,
+    mesh::{
+        base_material_normal_map::*, bindings::*, skinned_mesh::*, skinning::*, vertex_color::*,
+        vertex_normal::*, vertex_position::*, vertex_tangent::*, vertex_uv::*, *,
     },
-    pbr::{pbr_bindings::*, pbr_functions::*, pbr_lighting::*, pbr_types::*, *},
+    mesh_view::{
+        bindings::*, cluster_light_index_lists::*, cluster_offsets_and_counts::*,
+        directional_light::*, globals::*, lights::*, point_light::*, point_lights::*, view::*, *,
+    },
+    pbr::{bindings::*, dither::*, lighting::*, standard_material::*, tonemapper::*, *},
     shadows::*,
     tonemapping_shared::*,
     *,

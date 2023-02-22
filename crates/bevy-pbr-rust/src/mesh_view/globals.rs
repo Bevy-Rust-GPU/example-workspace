@@ -1,5 +1,13 @@
+pub trait WasmPadding {}
+
+/// No WASM padding
+impl WasmPadding for () {}
+
+/// Single float WASM padding
+impl WasmPadding for f32 {}
+
 #[repr(C)]
-pub struct Globals {
+pub struct Globals<P: WasmPadding> {
     // The time since startup in seconds
     // Wraps to 0 after 1 hour.
     pub time: f32,
@@ -9,8 +17,6 @@ pub struct Globals {
     // It wraps to zero when it reaches the maximum value of a u32.
     pub frame_count: u32,
 
-    #[cfg(feature = "sixteen_byte_alignment")]
     // WebGL2 structs must be 16 byte aligned.
-    _wasm_padding: f32,
+    _wasm_padding: P,
 }
-

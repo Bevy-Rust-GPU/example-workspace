@@ -1,99 +1,79 @@
-pub mod mesh_bindings;
-pub mod mesh_functions;
-pub mod mesh_types;
+pub mod base_material_normal_map;
+pub mod bindings;
+pub mod entry_points;
+pub mod skinned_mesh;
+pub mod skinning;
+pub mod vertex_color;
+pub mod vertex_normal;
+pub mod vertex_position;
+pub mod vertex_tangent;
+pub mod vertex_uv;
 
-use super::prelude::{mesh_position_local_to_world, Mesh, View};
+use spirv_std::glam::{Mat3, Mat4, Vec3, Vec4};
 
-use spirv_std::{
-    glam::{Vec2, Vec3, Vec4},
-    spirv,
-};
+pub const MESH_FLAGS_SHADOW_RECEIVER_BIT: u32 = 1;
+// 2^31 - if the flag is set, the sign is positive, else it is negative
+pub const MESH_FLAGS_SIGN_DETERMINANT_MODEL_3X3_BIT: u32 = 2147483648;
 
-#[allow(unused_imports)]
-use spirv_std::num_traits::Float;
-
-#[allow(unused_variables)]
-#[spirv(vertex)]
-pub fn vertex(
-    #[spirv(uniform, descriptor_set = 0, binding = 0)] view: &View,
-    #[spirv(uniform, descriptor_set = 2, binding = 0)] mesh: &Mesh,
-    #[cfg(feature = "vertex_positions")] in_position: Vec3,
-    #[cfg(feature = "vertex_normals")] in_normal: Vec3,
-    #[cfg(feature = "vertex_uvs")] in_uv: Vec2,
-    #[cfg(feature = "vertex_tangents")] in_tangent: Vec4,
-    #[cfg(feature = "vertex_colors")] in_color: Vec4,
-    #[cfg(feature = "skinned")] in_joint_indices: Vec4,
-    #[cfg(feature = "skinned")] in_joint_weights: Vec4,
-    #[spirv(position)] out_clip_position: &mut Vec4,
-    out_world_position: &mut Vec4,
-    out_world_normal: &mut Vec3,
-    #[cfg(feature = "vertex_uvs")] out_uv: &mut Vec2,
-    #[cfg(feature = "vertex_tangents")] out_tangent: &mut Vec2,
-    #[cfg(feature = "vertex_colors")] out_color: &mut Vec2,
-) {
-    #[cfg(feature = "skinned")]
-    let mut model = skin_model(vertex.joint_indices, vertex.joint_weights);
-
-    #[cfg(not(feature = "skinned"))]
-    let model = mesh.model;
-
-    #[cfg(feature = "skinned")]
-    {
-        out_world_normal = skin_normals(model, vertex.normal);
-    }
-
-    #[cfg(all(feature = "vertex_normals", not(feature = "skinned")))]
-    {
-        *out_world_normal = mesh.mesh_normal_local_to_world(in_normal);
-    }
-
-    #[cfg(feature = "vertex_positions")]
-    {
-        *out_world_position = mesh_position_local_to_world(model, in_position.extend(1.0));
-        *out_clip_position = view.mesh_position_world_to_clip(*out_world_position);
-    }
-
-    #[cfg(feature = "vertex_uvs")]
-    {
-        *out_uv = in_uv;
-    }
-
-    #[cfg(feature = "vertex_tangents")]
-    {
-        out.world_tangent = mesh_tangent_local_to_world(model, vertex.tangent);
-    }
-
-    #[cfg(feature = "vertex_colors")]
-    {
-        out.color = vertex.color;
-    }
+pub fn mesh_position_local_to_world(model: Mat4, vertex_position: Vec4) -> Vec4 {
+    model * vertex_position
 }
 
-#[allow(unused_variables)]
-#[spirv(fragment)]
-pub fn fragment(
-    #[spirv(position)] in_clip_position: Vec4,
-    in_world_position: Vec4,
-    in_world_normal: Vec3,
-    #[cfg(feature = "vertex_uvs")] in_uv: Vec2,
-    #[cfg(feature = "vertex_tangents")] in_tangent: Vec2,
-    #[cfg(feature = "vertex_colors")] in_color: Vec4,
-    out_color: &mut Vec4,
-) {
-    *out_color = in_clip_position + in_world_position + in_world_normal.extend(0.0);
+#[repr(C)]
+pub struct Mesh {
+    pub model: Mat4,
+    pub inverse_transpose_model: Mat4,
+    // 'flags' is a bit field indicating various options. u32 is 32 bits so we have up to 32 options.
+    pub flags: u32,
+}
 
-    #[cfg(feature = "vertex_uvs")]
-    {
-        *out_color = *out_color + in_uv.extend(0.0).extend(0.0);
+impl Mesh {
+    pub fn mesh_normal_local_to_world(&self, vertex_normal: Vec3) -> Vec3 {
+        // NOTE: The mikktspace method of normal mapping requires that the world normal is
+        // re-normalized in the vertex shader to match the way mikktspace bakes vertex tangents
+        // and normal maps so that the exact inverse process is applied when shading. Blender, Unity,
+        // Unreal Engine, Godot, and more all use the mikktspace method. Do not change this code
+        // unless you really know what you are doing.
+        // http://www.mikktspace.com/
+        (Mat3 {
+            x_axis: self.inverse_transpose_model.x_axis.truncate(),
+            y_axis: self.inverse_transpose_model.y_axis.truncate(),
+            z_axis: self.inverse_transpose_model.z_axis.truncate(),
+        } * vertex_normal)
+            .normalize()
     }
 
-    #[cfg(feature = "vertex_colors")]
-    {
-        *out_color = input.color;
+    // Calculates the sign of the determinant of the 3x3 model matrix based on a
+    // mesh flag
+    pub fn sign_determinant_model_3x3(&self) -> f32 {
+        // bool(u32) is false if 0u else true
+        // f32(bool) is 1.0 if true else 0.0
+        // * 2.0 - 1.0 remaps 0.0 or 1.0 to -1.0 or 1.0 respectively
+        (if self.flags & MESH_FLAGS_SIGN_DETERMINANT_MODEL_3X3_BIT != 0 {
+            1.0
+        } else {
+            2.0
+        } * 2.0
+            - 1.0)
     }
 
-    #[cfg(not(feature = "vertex_colors"))]
-    {
-        *out_color = Vec4::new(1.0, 0.0, 1.0, 1.0);
+    pub fn mesh_tangent_local_to_world(&self, model: Mat4, vertex_tangent: Vec4) -> Vec4 {
+        // NOTE: The mikktspace method of normal mapping requires that the world tangent is
+        // re-normalized in the vertex shader to match the way mikktspace bakes vertex tangents
+        // and normal maps so that the exact inverse process is applied when shading. Blender, Unity,
+        // Unreal Engine, Godot, and more all use the mikktspace method. Do not change this code
+        // unless you really know what you are doing.
+        // http://www.mikktspace.com/
+        (Mat3 {
+            x_axis: model.x_axis.truncate(),
+            y_axis: model.y_axis.truncate(),
+            z_axis: model.z_axis.truncate(),
+        } * vertex_tangent.truncate())
+        .normalize()
+        .extend(
+            // NOTE: Multiplying by the sign of the determinant of the 3x3 model matrix accounts for
+            // situations such as negative scaling.
+            vertex_tangent.w * self.sign_determinant_model_3x3(),
+        )
     }
 }

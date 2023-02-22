@@ -1,6 +1,6 @@
 use spirv_std::{spirv, Image, Sampler};
 
-use super::pbr_types::StandardMaterial;
+use crate::prelude::StandardMaterial;
 
 pub type BaseColorTexture = Image!(2D, type = f32);
 pub type EmissiveTexture = Image!(2D, type = f32);

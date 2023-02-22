@@ -11,33 +11,18 @@ use crate::prelude::{
 #[allow(unused_imports)]
 use spirv_std::num_traits::Float;
 
-#[cfg(feature = "no_storage_buffers_support")]
-#[derive(Copy, Clone, PartialEq)]
-#[repr(C)]
-pub struct PointLights {
-    pub data: [PointLight; 256],
-}
+pub trait PointLights {
+    fn get_point_light(&self, light_id: u32) -> &PointLight;
 
-#[cfg(not(feature = "no_storage_buffers_support"))]
-#[repr(C)]
-pub struct PointLights {
-    pub data: spirv_std::RuntimeArray<PointLight>,
-}
-
-impl PointLights {
-    pub fn fetch_point_shadow(
+    fn fetch_point_shadow<PS: PointShadowTextures>(
         &self,
-        point_shadow_textures: &PointShadowTextures,
+        point_shadow_textures: &PS,
         point_shadow_textures_sampler: &Sampler,
         light_id: u32,
         frag_position: Vec4,
         surface_normal: Vec3,
     ) -> f32 {
-        #[cfg(feature = "no_storage_buffers_support")]
-        let light = &self.data[light_id as usize];
-
-        #[cfg(not(feature = "no_storage_buffers_support"))]
-        let light = unsafe { self.data.index(light_id as usize) };
+        let light = self.get_point_light(light_id);
 
         // because the shadow maps align with the axes and the frustum planes are at 45 degrees
         // we can get the worldspace depth by taking the largest absolute axis
@@ -75,40 +60,24 @@ impl PointLights {
         // a quad (2x2 fragments) being processed not being sampled, and this messing with
         // mip-mapping functionality. The shadow maps have no mipmaps so Level just samples
         // from LOD 0.
-        #[cfg(feature = "no_array_textures_support")]
-        {
-            point_shadow_textures.sample_depth_reference(
-                *point_shadow_textures_sampler,
-                frag_ls.extend(1.0),
-                depth,
-            )
-        }
-
-        #[cfg(not(feature = "no_array_textures_support"))]
-        {
-            point_shadow_textures.sample_depth_reference_by_lod(
-                *point_shadow_textures_sampler,
-                frag_ls.extend(1.0),
-                depth,
-                light_id as f32,
-            )
-        }
+        point_shadow_textures.sample_depth_reference(
+            point_shadow_textures_sampler,
+            frag_ls,
+            depth,
+            light_id,
+        )
     }
 
-    pub fn fetch_spot_shadow(
+    fn fetch_spot_shadow<DS: DirectionalShadowTextures>(
         &self,
         lights: &Lights,
-        directional_shadow_textures: &DirectionalShadowTextures,
+        directional_shadow_textures: &DS,
         directional_shadow_textures_sampler: &Sampler,
         light_id: u32,
         frag_position: Vec4,
         surface_normal: Vec3,
     ) -> f32 {
-        #[cfg(feature = "no_storage_buffers_support")]
-        let light = &self.data[light_id as usize];
-
-        #[cfg(not(feature = "no_storage_buffers_support"))]
-        let light = unsafe { self.data.index(light_id as usize) };
+        let light = self.get_point_light(light_id);
 
         let surface_to_light = light.position_radius.truncate() - frag_position.truncate();
 
@@ -158,24 +127,35 @@ impl PointLights {
         // 0.1 must match POINT_LIGHT_NEAR_Z
         let depth = 0.1 / -projected_position.z;
 
-        #[cfg(feature = "no_array_textures_support")]
-        {
-            textureSampleCompare(
-                directional_shadow_textures,
-                directional_shadow_textures_sampler,
-                shadow_uv,
-                depth,
-            )
-        }
+        directional_shadow_textures.sample_depth_reference(
+            directional_shadow_textures_sampler,
+            shadow_uv,
+            depth,
+            light_id,
+            lights.spot_light_shadowmap_offset,
+        )
+    }
+}
 
-        #[cfg(not(feature = "no_array_textures_support"))]
-        {
-            directional_shadow_textures.sample_depth_reference_by_lod(
-                *directional_shadow_textures_sampler,
-                shadow_uv.extend(0.0),
-                depth,
-                light_id as f32 + lights.spot_light_shadowmap_offset as f32,
-            )
-        }
+#[derive(Copy, Clone, PartialEq)]
+#[repr(C)]
+pub struct PointLightsUniform {
+    pub data: [PointLight; 256],
+}
+
+impl PointLights for PointLightsUniform {
+    fn get_point_light(&self, light_id: u32) -> &PointLight {
+        &self.data[light_id as usize]
+    }
+}
+
+#[repr(C)]
+pub struct PointLightsStorage {
+    pub data: spirv_std::RuntimeArray<PointLight>,
+}
+
+impl PointLights for PointLightsStorage {
+    fn get_point_light(&self, light_id: u32) -> &PointLight {
+        unsafe { self.data.index(light_id as usize) }
     }
 }
