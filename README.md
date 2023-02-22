@@ -4,7 +4,7 @@ An example workspace demonstrating the use of rust-gpu to compile shaders for be
 
 ## Workspace
 
-Cargo.toml contains the `rust-gpu`-recommended `[profile.*.build-override]` settings to ensure fast shader compiles,
+`Cargo.toml` contains the `rust-gpu`-recommended `[profile.*.build-override]` settings to ensure fast shader compiles,
 as well as custom `[profile.dev]` and `[profile.dev.package."*"]` sections for fast bevy app compiles.
 
 `rust-toolchain` contains the necessary toolchain specification for `rust-gpu`.
