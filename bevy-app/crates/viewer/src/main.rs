@@ -1,4 +1,6 @@
-pub mod shader_material;
+pub mod rust_gpu_entry_point;
+pub mod rust_gpu_material;
+pub mod rust_gpu_shaders;
 
 use bevy::{
     prelude::{
@@ -9,7 +11,9 @@ use bevy::{
     },
     render::settings::{WgpuLimits, WgpuSettings},
 };
-use shader_material::ShaderMaterial;
+use rust_gpu_entry_point::rust_gpu_shader_defs;
+use rust_gpu_material::RustGpuMaterial;
+use rust_gpu_shaders::{MeshVertex, PbrFragment};
 
 fn main() {
     let mut app = App::default();
@@ -31,7 +35,7 @@ fn main() {
     }));
 
     // Setup ShaderMaterial
-    app.add_plugin(MaterialPlugin::<ShaderMaterial>::default());
+    app.add_plugin(MaterialPlugin::<RustGpuMaterial<MeshVertex, PbrFragment>>::default());
 
     // Setup scene
     app.add_startup_system(setup);
@@ -44,7 +48,7 @@ fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut shader_materials: ResMut<Assets<ShaderMaterial>>,
+    mut shader_materials: ResMut<Assets<RustGpuMaterial<MeshVertex, PbrFragment>>>,
     mut standard_materials: ResMut<Assets<StandardMaterial>>,
 ) {
     // Spawn camera
@@ -75,14 +79,16 @@ fn setup(
 
     let mesh = meshes.add(Cube { size: 1.0 }.into());
 
-    let shader = asset_server
-        .load::<Shader, _>("rust-gpu/target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv");
+    let shader = asset_server.load::<Shader, _>(
+        "rust-gpu/target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv",
+    );
 
-    let shader_material = shader_materials.add(ShaderMaterial {
+    let extra_defs = rust_gpu_shader_defs();
+    let shader_material = shader_materials.add(RustGpuMaterial {
         vertex_shader: Some(shader.clone()),
-        vertex_entry_point: Some("mesh::entry_points::vertex".into()),
+        vertex_defs: extra_defs.clone(),
         fragment_shader: Some(shader),
-        fragment_entry_point: Some("pbr::entry_points::fragment".into()),
+        fragment_defs: extra_defs,
         ..default()
     });
 

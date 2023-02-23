@@ -170,8 +170,24 @@ pub fn fragment_impl<
     *output_color = DT::dither(in_frag_coord, *output_color);
 }
 
+// Entrypoint naming format:
+// {name}
+// __{texture|array}
+// __{uniform|storage}
+// __{position|none}
+// __{normal|none}
+// __{uv|none}
+// __{tangent|none}
+// __{color|none}
+// __{normal_map|none}
+// __{skinning|none}
+// __{tonemap|none}
+// __{deband|none}
+// __{debug_z_slices|debug_cluster_light_complexity|debug_cluster_coherence}
+
 #[spirv(fragment)]
-pub fn fragment(
+#[allow(non_snake_case)]
+pub fn fragment__array__uniform__position__normal__uv__none__none__none__none__tonemap__deband__none(
     #[spirv(uniform, descriptor_set = 0, binding = 0)] view: &View,
     #[spirv(uniform, descriptor_set = 0, binding = 1)] lights: &Lights,
 

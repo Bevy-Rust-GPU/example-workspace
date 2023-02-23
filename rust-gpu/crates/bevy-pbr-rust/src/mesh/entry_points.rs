@@ -5,13 +5,13 @@ use spirv_std::{
 
 use crate::prelude::{Mesh, Skinning, VertexNormal, VertexPosition, VertexTangent, View};
 
-pub fn vertex_impl<SM: Skinning, P: VertexPosition, N: VertexNormal, T: VertexTangent>(
+pub fn vertex_impl<P: VertexPosition, N: VertexNormal, T: VertexTangent, SM: Skinning>(
     view: &View,
     mesh: &Mesh,
-    joint_matrices: &SM,
     vertex_position: &mut P,
     vertex_normal: &mut N,
     vertex_tangent: &mut T,
+    joint_matrices: &SM,
     in_joint_indices: SM::JointIndices,
     in_joint_weights: SM::JointWeights,
     out_clip_position: &mut Vec4,
@@ -23,15 +23,15 @@ pub fn vertex_impl<SM: Skinning, P: VertexPosition, N: VertexNormal, T: VertexTa
     vertex_tangent.transform_tangent(mesh, model);
 }
 
-#[allow(unused_variables)]
 #[spirv(vertex)]
-pub fn vertex(
+#[allow(non_snake_case)]
+pub fn vertex__position__normal__none__none(
     #[spirv(uniform, descriptor_set = 0, binding = 0)] view: &View,
     #[spirv(uniform, descriptor_set = 2, binding = 0)] mesh: &Mesh,
     /* skinning
-        #[spirv(uniform, descriptor_set = 2, binding = 1)]
-        joint_matrices: &SkinnedMesh,
-        */
+    #[spirv(uniform, descriptor_set = 2, binding = 1)]
+    joint_matrices: &SkinnedMesh,
+    */
     in_position: Vec3,
     in_normal: Vec3,
     in_uv: Vec2,
@@ -48,9 +48,9 @@ pub fn vertex(
     out_world_normal: &mut Vec3,
     out_uv: &mut Vec2,
     /* out vertex attributes
-        out_tangent: &mut Vec2,
-        out_color: &mut Vec2,
-        */
+    out_tangent: &mut Vec2,
+    out_color: &mut Vec2,
+    */
 ) {
     let mut in_position = in_position.extend(1.0);
     let mut in_normal = in_normal;
@@ -58,10 +58,10 @@ pub fn vertex(
     vertex_impl(
         view,
         mesh,
-        &(), //joint_matrices,
         &mut in_position,
         &mut in_normal,
         &mut (), //in_tangent,
+        &(),     //joint_matrices,
         (),      //in_joint_indices,
         (),      //in_joint_weights,
         out_clip_position,
@@ -83,4 +83,3 @@ pub fn fragment(
 ) {
     *out_color = Vec4::new(1.0, 0.0, 1.0, 1.0);
 }
-
