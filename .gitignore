@@ -1,1 +1,2 @@
-/target
+rust-gpu/target
+bevy-app/target

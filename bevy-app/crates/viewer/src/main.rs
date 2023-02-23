@@ -1,7 +1,5 @@
 pub mod shader_material;
 
-use std::path::Path;
-
 use bevy::{
     prelude::{
         default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Color,
@@ -25,14 +23,9 @@ fn main() {
         ..default()
     });
 
-    // Fetch the workspace path, assuming that we're inside workspace/crates
-    let target_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
-    let path = Path::new(&target_dir);
-    let path = path.parent().unwrap().parent().unwrap();
-
     // Configure the asset plugin to watch the workspace path for changes
     app.add_plugins(DefaultPlugins.set(AssetPlugin {
-        asset_folder: path.to_str().unwrap().to_string(),
+        asset_folder: "../../../".into(),
         watch_for_changes: true,
         ..default()
     }));
@@ -83,7 +76,7 @@ fn setup(
     let mesh = meshes.add(Cube { size: 1.0 }.into());
 
     let shader = asset_server
-        .load::<Shader, _>("target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv");
+        .load::<Shader, _>("rust-gpu/target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv");
 
     let shader_material = shader_materials.add(ShaderMaterial {
         vertex_shader: Some(shader.clone()),

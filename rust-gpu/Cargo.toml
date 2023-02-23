@@ -1,0 +1,17 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/bevy-pbr-rust",
+    "crates/shader",
+    "crates/shader-builder",
+]
+default-members = ["crates/shader-builder"]
+
+# Compile build-dependencies in release mode with
+# the same settings as regular dependencies.
+[profile.dev.build-override]
+opt-level = 3
+
+[profile.release.build-override]
+opt-level = 3
+codegen-units = 16
