@@ -1,6 +1,6 @@
 # bevy-rust-gpu
 
-An example workspace demonstrating the use of rust-gpu to compile shaders for bevy projects.
+An example project demonstrating the use of rust-gpu to compile shaders for bevy projects.
 
 ## `bevy-app` Workspace
 
