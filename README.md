@@ -8,11 +8,13 @@ Stable rust workspace housing our `bevy` app.
 
 `Cargo.toml` contains custom `[profile.dev]` and `[profile.dev.package."*"]` sections for fast compiles.
 
+`cargo build` to produce `target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv`.
+
 ### `viewer` Crate
 
 Main bevy crate. Loads an example scene that renders a side-by-side comparison of WGSL and Rust PBR materials.
 
-Uses the workspace root as its asset folder, and hot-reloads `target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv` via AssetServer.
+Uses the workspace root as its asset folder, and hot-reloads `rust-gpu/target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv` via AssetServer.
 
 The shader is loaded into a custom `ShaderMaterial` material, which composes `StandardMaterial` with overrides for vertex / fragment shaders and their entrypoints.
 
@@ -51,8 +53,6 @@ i.e. `mesh::vertex`, `pbr::fragment`.
 ### `shader-builder` Crate
 
 Empty library crate used to invoke `spirv-builder` via `build.rs` independently of the bevy app.
-
-Run via `cargo build -p shader-builder` to produce `target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv`.
 
 ## `shared` Directory
 
