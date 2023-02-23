@@ -8,7 +8,7 @@ Stable rust workspace housing our `bevy` app.
 
 `Cargo.toml` contains custom `[profile.dev]` and `[profile.dev.package."*"]` sections for fast compiles.
 
-`cargo build` to produce `target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv`.
+`cargo run` after building the `rust-gpu` workspace to preview the generated shader.
 
 ### `viewer` Crate
 
@@ -31,6 +31,8 @@ Nightly rust workspace housing `rust-gpu` crates.
 `Cargo.toml` contains the `rust-gpu`-recommended `[profile.*.build-override]` settings to ensure fast shader compiles,
 
 `rust-toolchain` contains the necessary toolchain specification for `rust-gpu`.
+
+`cargo build` to produce `target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv`.
 
 ### `bevy-pbr-rust` Crate
 
