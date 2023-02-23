@@ -63,6 +63,7 @@ Houses dependencies shared by the `shader` and `bevy-app` workspaces
 ### `shader-glam` Crate
 
 Wrapper crate gating `glam` and `spirv-std::glam` behind cargo features.
+
 Used for writing crates that can be shared between `rust-gpu` and regular `rust`.
 
 ### `shader-util` Crate
