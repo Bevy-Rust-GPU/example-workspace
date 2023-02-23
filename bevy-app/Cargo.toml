@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
+    "crates/bevy-rust-gpu",
     "crates/viewer",
 ]
 default-members = ["crates/viewer"]

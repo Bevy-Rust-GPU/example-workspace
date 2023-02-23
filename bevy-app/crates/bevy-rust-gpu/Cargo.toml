@@ -1,14 +1,8 @@
 [package]
-name = "viewer"
+name = "bevy-rust-gpu"
 version = "0.1.0"
 edition = "2021"
-
-[features]
-default = []
-webgl = []
 
 [dependencies]
 #bevy = "0.9.1"
 bevy = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
-bevy-rust-gpu = { path = "../bevy-rust-gpu" }
-shader-util = { path = "../../../shared/shader-util" }

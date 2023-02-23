@@ -191,6 +191,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy-rust-gpu"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "bevy_animation"
 version = "0.9.1"
 source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
@@ -2914,6 +2921,7 @@ name = "viewer"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "bevy-rust-gpu",
  "shader-util",
 ]
 

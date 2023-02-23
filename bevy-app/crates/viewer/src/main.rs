@@ -1,5 +1,3 @@
-pub mod rust_gpu_entry_point;
-pub mod rust_gpu_material;
 pub mod rust_gpu_shaders;
 
 use bevy::{
@@ -11,8 +9,7 @@ use bevy::{
     },
     render::settings::{WgpuLimits, WgpuSettings},
 };
-use rust_gpu_entry_point::rust_gpu_shader_defs;
-use rust_gpu_material::RustGpuMaterial;
+use bevy_rust_gpu::prelude::{rust_gpu_shader_defs, RustGpuMaterial};
 use rust_gpu_shaders::{MeshVertex, PbrFragment};
 
 fn main() {

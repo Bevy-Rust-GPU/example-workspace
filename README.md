@@ -1,6 +1,6 @@
 # bevy-rust-gpu
 
-An example project demonstrating the use of rust-gpu to compile shaders for use with bevy.
+Support code for compiling and using `rust-gpu` shaders for `bevy`.
 
 ## `bevy-app` Workspace
 
@@ -10,9 +10,13 @@ Stable rust workspace housing our `bevy` app.
 
 `cargo run` after building the `rust-gpu` workspace to preview the generated shader.
 
+### `bevy-rust-gpu` Crate
+
+Bevy library crate, houses support code for defining interfaces to `rust-gpu` entrypoints and using them via material.
+
 ### `viewer` Crate
 
-Main bevy crate. Loads an example scene that renders a side-by-side comparison of WGSL and Rust PBR materials.
+Bevy binary crate, loads an example scene that renders a side-by-side comparison of WGSL and Rust PBR materials.
 
 Uses the workspace root as its asset folder, and hot-reloads `rust-gpu/target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv` via AssetServer.
 

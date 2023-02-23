@@ -1,6 +1,4 @@
-use crate::rust_gpu_entry_point::{
-    RustGpuEntryPoint, RustGpuEntryPointMappings, RustGpuEntryPointName,
-};
+use bevy_rust_gpu::prelude::{RustGpuEntryPoint, RustGpuEntryPointMappings, RustGpuEntryPointName};
 
 pub enum MeshVertex {}
 
@@ -53,4 +51,3 @@ impl RustGpuEntryPoint for PbrFragment {
         ),
     ];
 }
-
