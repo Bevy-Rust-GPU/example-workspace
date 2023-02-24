@@ -1,0 +1,11 @@
+[package]
+name = "bevy-rust-gpu-macros"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "1.0.108", features = ["full"] }
+quote = "1.0.23"

@@ -1,3 +1,4 @@
+use bevy_rust_gpu_macros::permutate;
 use spirv_std::{
     glam::{Vec2, Vec3, Vec4},
     macros::spirv,
@@ -6,16 +7,254 @@ use spirv_std::{
 
 use crate::prelude::{
     BaseColorTexture, BaseMaterialNormalMap, ClusterDebugVisualization, ClusterLightIndexLists,
-    ClusterLightIndexListsUniform, ClusterOffsetsAndCounts, ClusterOffsetsAndCountsUniform,
-    DebandDither, DirectionalShadowTextureArray, DirectionalShadowTextures, Dither,
+    ClusterLightIndexListsStorage, ClusterLightIndexListsUniform, ClusterOffsetsAndCounts,
+    ClusterOffsetsAndCountsStorage, ClusterOffsetsAndCountsUniform, DebandDither, DebugZSlices,
+    DirectionalShadowTexture, DirectionalShadowTextureArray, DirectionalShadowTextures, Dither,
     EmissiveTexture, Lights, Mesh, MetallicRoughnessTexture, NormalMapTexture, OcclusionTexture,
-    PbrInput, PointLights, PointLightsUniform, PointShadowTextureArray, PointShadowTextures,
-    Skinning, TonemapInShader, Tonemapper, VertexColor, VertexNormal, VertexPosition,
-    VertexTangent, VertexUv, View, STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT,
-    STANDARD_MATERIAL_FLAGS_UNLIT_BIT,
+    PbrInput, PointLights, PointLightsStorage, PointLightsUniform, PointShadowTexture,
+    PointShadowTextureArray, PointShadowTextures, SkinnedMesh, Skinning, StandardMaterialNormalMap,
+    TonemapInShader, Tonemapper, VertexColor, VertexNormal, VertexPosition, VertexTangent,
+    VertexUv, View, STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT, STANDARD_MATERIAL_FLAGS_UNLIT_BIT,
 };
 
 use super::BaseMaterial;
+
+#[permutate(
+    mappings = {
+        texture: texture | array,
+        buffer: uniform | storage,
+        position: position | none,
+        normal: normal | none,
+        uv: uv | none,
+        tangent: tangent | none,
+        color: color | none,
+        normal_map: normal_map | none,
+        skinned: skinned | none,
+        tonemap: tonemap | none,
+        deband: deband | none,
+        cluster_debug: debug_z_slices | debug_cluster_light_complexity | debug_cluster_coherence | none,
+    },
+    permutations = [
+        (array, uniform, position, normal, uv, none, none, none, none, tonemap, deband, none),
+        (array, uniform, position, normal, uv, tangent, none, none, none, tonemap, deband, none),
+        (array, uniform, position, normal, uv, tangent, color, none, none, tonemap, deband, none),
+    ]
+)]
+#[spirv(fragment)]
+#[allow(non_snake_case)]
+pub fn fragment(
+    #[spirv(uniform, descriptor_set = 0, binding = 0)] view: &View,
+    #[spirv(uniform, descriptor_set = 0, binding = 1)] lights: &Lights,
+
+    #[permutate(texture = texture)]
+    #[spirv(descriptor_set = 0, binding = 2)]
+    point_shadow_textures: &PointShadowTexture,
+
+    #[permutate(texture = array)]
+    #[spirv(descriptor_set = 0, binding = 2)]
+    point_shadow_textures: &PointShadowTextureArray,
+
+    #[spirv(descriptor_set = 0, binding = 3)] point_shadow_textures_sampler: &Sampler,
+
+    #[permutate(texture = texture)]
+    #[spirv(descriptor_set = 0, binding = 4)]
+    directional_shadow_textures: &DirectionalShadowTexture,
+
+    #[permutate(texture = array)]
+    #[spirv(descriptor_set = 0, binding = 4)]
+    directional_shadow_textures: &DirectionalShadowTextureArray,
+
+    #[spirv(descriptor_set = 0, binding = 5)] directional_shadow_textures_sampler: &Sampler,
+
+    #[permutate(buffer = uniform)]
+    #[spirv(uniform, descriptor_set = 0, binding = 6)]
+    point_lights: &PointLightsUniform,
+
+    #[permutate(buffer = storage)]
+    #[spirv(storage_buffer, descriptor_set = 0, binding = 6)]
+    point_lights: &PointLightsStorage,
+
+    #[permutate(buffer = uniform)]
+    #[spirv(uniform, descriptor_set = 0, binding = 7)]
+    cluster_light_index_lists: &ClusterLightIndexListsUniform,
+
+    #[permutate(buffer = storage)]
+    #[spirv(storage_buffer, descriptor_set = 0, binding = 7)]
+    cluster_light_index_lists: &ClusterLightIndexListsStorage,
+
+    #[permutate(buffer = uniform)]
+    #[spirv(uniform, descriptor_set = 0, binding = 8)]
+    cluster_offsets_and_counts: &ClusterOffsetsAndCountsUniform,
+
+    #[permutate(buffer = storage)]
+    #[spirv(storage_buffer, descriptor_set = 0, binding = 8)]
+    cluster_offsets_and_counts: &ClusterOffsetsAndCountsStorage,
+
+    #[spirv(uniform, descriptor_set = 1, binding = 0)] material: &BaseMaterial,
+    #[spirv(descriptor_set = 1, binding = 1)] base_color_texture: &BaseColorTexture,
+    #[spirv(descriptor_set = 1, binding = 2)] base_color_sampler: &Sampler,
+    #[spirv(descriptor_set = 1, binding = 3)] emissive_texture: &EmissiveTexture,
+    #[spirv(descriptor_set = 1, binding = 4)] emissive_sampler: &Sampler,
+    #[spirv(descriptor_set = 1, binding = 5)] metallic_roughness_texture: &MetallicRoughnessTexture,
+    #[spirv(descriptor_set = 1, binding = 6)] metallic_roughness_sampler: &Sampler,
+    #[spirv(descriptor_set = 1, binding = 7)] occlusion_texture: &OcclusionTexture,
+    #[spirv(descriptor_set = 1, binding = 8)] occlusion_sampler: &Sampler,
+    #[spirv(descriptor_set = 1, binding = 9)] normal_map_texture: &NormalMapTexture,
+    #[spirv(descriptor_set = 1, binding = 10)] normal_map_sampler: &Sampler,
+
+    #[spirv(uniform, descriptor_set = 2, binding = 0)] mesh: &Mesh,
+
+    #[spirv(front_facing)] in_is_front: bool,
+    #[spirv(position)] in_frag_coord: Vec4,
+    in_world_position: Vec4,
+    in_world_normal: Vec3,
+    in_uv: Vec2,
+    #[permutate(tangent = tangent)] in_tangent: Vec4,
+    #[permutate(color = color)] in_color: Vec4,
+    output_color: &mut Vec4,
+) {
+    #[permutate(texture = texture)]
+    type _PointShadow = PointShadowTexture;
+    #[permutate(texture = array)]
+    type _PointShadow = PointShadowTextureArray;
+
+    #[permutate(texture = texture)]
+    type _DirectionalShadow = DirectionalShadowTexture;
+    #[permutate(texture = array)]
+    type _DirectionalShadow = DirectionalShadowTextureArray;
+
+    #[permutate(buffer = uniform)]
+    type _PointLights = PointLightsUniform;
+    #[permutate(buffer = storage)]
+    type _PointLights = PointLightsStorage;
+
+    #[permutate(buffer = uniform)]
+    type _ClusterLightIndexLists = ClusterLightIndexListsUniform;
+    #[permutate(buffer = storage)]
+    type _ClusterLightIndexLists = ClusterLightIndexListsStorage;
+
+    #[permutate(buffer = uniform)]
+    type _ClusterOffsetsAndCounts = ClusterOffsetsAndCountsUniform;
+    #[permutate(buffer = storage)]
+    type _ClusterOffsetsAndCounts = ClusterOffsetsAndCountsStorage;
+
+    #[permutate(position = position)]
+    type _Position = Vec4;
+    #[permutate(position = none)]
+    type _Position = ();
+
+    #[permutate(normal = normal)]
+    type _Normal = Vec3;
+    #[permutate(normal = none)]
+    type _Normal = ();
+
+    #[permutate(uv = uv)]
+    type _Uv = Vec2;
+    #[permutate(uv = none)]
+    type _Uv = ();
+
+    #[permutate(tangent = tangent)]
+    type _Tangent = Vec4;
+    #[permutate(tangent = none)]
+    type _Tangent = ();
+
+    #[permutate(color = color)]
+    type _Color = Vec4;
+    #[permutate(color = none)]
+    type _Color = ();
+
+    #[permutate(normal_map = normal_map)]
+    type _NormalMap = StandardMaterialNormalMap;
+    #[permutate(normal_map = none)]
+    type _NormalMap = ();
+
+    #[permutate(skinned = skinned)]
+    type _Skinned = SkinnedMesh;
+    #[permutate(skinned = none)]
+    type _Skinned = ();
+
+    #[permutate(tonemap = tonemap)]
+    type _Tonemap = TonemapInShader;
+    #[permutate(tonemap = none)]
+    type _Tonemap = ();
+
+    #[permutate(deband = deband)]
+    type _Deband = DebandDither;
+    #[permutate(deband = none)]
+    type _Deband = ();
+
+    #[permutate(cluster_debug = debug_z_slices)]
+    type _ClusterDebug = DebugZSlices;
+    #[permutate(cluster_debug = debug_cluster_light_complexity)]
+    type _ClusterDebug = DebugClusterLightComplexity;
+    #[permutate(cluster_debug = debug_cluster_coherence)]
+    type _ClusterDebug = DebugClusterCoherence;
+    #[permutate(cluster_debug = none)]
+    type _ClusterDebug = ();
+
+    fragment_impl::<
+        _PointShadow,
+        _DirectionalShadow,
+        _PointLights,
+        _ClusterLightIndexLists,
+        _ClusterOffsetsAndCounts,
+        _Position,
+        _Normal,
+        _Uv,
+        _Tangent,
+        _Color,
+        _NormalMap,
+        _Skinned,
+        _Tonemap,
+        _Deband,
+        _ClusterDebug,
+    >(
+        view,
+        lights,
+        point_shadow_textures,
+        point_shadow_textures_sampler,
+        directional_shadow_textures,
+        directional_shadow_textures_sampler,
+        point_lights,
+        cluster_light_index_lists,
+        cluster_offsets_and_counts,
+        material,
+        base_color_texture,
+        base_color_sampler,
+        emissive_texture,
+        emissive_sampler,
+        metallic_roughness_texture,
+        metallic_roughness_sampler,
+        occlusion_texture,
+        occlusion_sampler,
+        normal_map_texture,
+        normal_map_sampler,
+        mesh,
+        in_is_front,
+        in_frag_coord,
+        #[permutate(position = position)]
+        &in_world_position,
+        #[permutate(position = none)]
+        &(),
+        #[permutate(normal = normal)]
+        &in_world_normal,
+        #[permutate(normal = none)]
+        &(),
+        #[permutate(uv = uv)]
+        &in_uv,
+        #[permutate(uv = none)]
+        &(),
+        #[permutate(tangent = tangent)]
+        &in_tangent,
+        #[permutate(tangent = none)]
+        &(),
+        #[permutate(color = color)]
+        &in_color,
+        #[permutate(color = none)]
+        &(),
+        output_color,
+    )
+}
 
 pub fn fragment_impl<
     PS: PointShadowTextures,
@@ -168,135 +407,4 @@ pub fn fragment_impl<
 
     *output_color = TM::tonemap(*output_color);
     *output_color = DT::dither(in_frag_coord, *output_color);
-}
-
-// Entrypoint naming format:
-// {name}
-// __{texture|array}
-// __{uniform|storage}
-// __{position|none}
-// __{normal|none}
-// __{uv|none}
-// __{tangent|none}
-// __{color|none}
-// __{normal_map|none}
-// __{skinning|none}
-// __{tonemap|none}
-// __{deband|none}
-// __{debug_z_slices|debug_cluster_light_complexity|debug_cluster_coherence}
-
-#[spirv(fragment)]
-#[allow(non_snake_case)]
-pub fn fragment__array__uniform__position__normal__uv__none__none__none__none__tonemap__deband__none(
-    #[spirv(uniform, descriptor_set = 0, binding = 0)] view: &View,
-    #[spirv(uniform, descriptor_set = 0, binding = 1)] lights: &Lights,
-
-    /*
-    #[spirv(descriptor_set = 0, binding = 2)] point_shadow_textures: &crate::prelude::PointShadowTexture,
-    */
-    #[spirv(descriptor_set = 0, binding = 2)]
-    point_shadow_textures: &crate::prelude::PointShadowTextureArray,
-
-    #[spirv(descriptor_set = 0, binding = 3)] point_shadow_textures_sampler: &Sampler,
-
-    /*
-    #[spirv(descriptor_set = 0, binding = 4)]
-    directional_shadow_textures: &crate::prelude::DirectionalShadowTexture,
-    */
-    #[spirv(descriptor_set = 0, binding = 4)]
-    directional_shadow_textures: &crate::prelude::DirectionalShadowTextureArray,
-
-    #[spirv(descriptor_set = 0, binding = 5)] directional_shadow_textures_sampler: &Sampler,
-
-    #[spirv(uniform, descriptor_set = 0, binding = 6)]
-    point_lights: &crate::prelude::PointLightsUniform,
-
-    /*
-    #[spirv(storage_buffer, descriptor_set = 0, binding = 6)]
-    point_lights: &crate::prelude::PointLightsStorage,
-    */
-    #[spirv(uniform, descriptor_set = 0, binding = 7)]
-    cluster_light_index_lists: &crate::prelude::ClusterLightIndexListsUniform,
-
-    /*
-    #[spirv(storage_buffer, descriptor_set = 0, binding = 7)]
-    cluster_light_index_lists: &crate::prelude::ClusterLightIndexListsStorage,
-    */
-    #[spirv(uniform, descriptor_set = 0, binding = 8)]
-    cluster_offsets_and_counts: &crate::prelude::ClusterOffsetsAndCountsUniform,
-
-    /*
-    #[spirv(storage_buffer, descriptor_set = 0, binding = 8)]
-    cluster_offsets_and_counts: &crate::prelude::ClusterOffsetsAndCountsStorage,
-    */
-    #[spirv(uniform, descriptor_set = 1, binding = 0)] material: &BaseMaterial,
-    #[spirv(descriptor_set = 1, binding = 1)] base_color_texture: &BaseColorTexture,
-    #[spirv(descriptor_set = 1, binding = 2)] base_color_sampler: &Sampler,
-    #[spirv(descriptor_set = 1, binding = 3)] emissive_texture: &EmissiveTexture,
-    #[spirv(descriptor_set = 1, binding = 4)] emissive_sampler: &Sampler,
-    #[spirv(descriptor_set = 1, binding = 5)] metallic_roughness_texture: &MetallicRoughnessTexture,
-    #[spirv(descriptor_set = 1, binding = 6)] metallic_roughness_sampler: &Sampler,
-    #[spirv(descriptor_set = 1, binding = 7)] occlusion_texture: &OcclusionTexture,
-    #[spirv(descriptor_set = 1, binding = 8)] occlusion_sampler: &Sampler,
-    #[spirv(descriptor_set = 1, binding = 9)] normal_map_texture: &NormalMapTexture,
-    #[spirv(descriptor_set = 1, binding = 10)] normal_map_sampler: &Sampler,
-
-    #[spirv(uniform, descriptor_set = 2, binding = 0)] mesh: &Mesh,
-
-    #[spirv(front_facing)] in_is_front: bool,
-    #[spirv(position)] in_frag_coord: Vec4,
-    in_world_position: Vec4,
-    in_world_normal: Vec3,
-    in_uv: Vec2,
-    //in_tangent: Vec4,
-    //in_color: Vec4,
-    output_color: &mut Vec4,
-) {
-    fragment_impl::<
-        PointShadowTextureArray,
-        DirectionalShadowTextureArray,
-        PointLightsUniform,
-        ClusterLightIndexListsUniform,
-        ClusterOffsetsAndCountsUniform,
-        Vec4,
-        Vec3,
-        Vec2,
-        (),
-        (),
-        (),
-        (),
-        TonemapInShader,
-        DebandDither,
-        (),
-    >(
-        view,
-        lights,
-        point_shadow_textures,
-        point_shadow_textures_sampler,
-        directional_shadow_textures,
-        directional_shadow_textures_sampler,
-        point_lights,
-        cluster_light_index_lists,
-        cluster_offsets_and_counts,
-        material,
-        base_color_texture,
-        base_color_sampler,
-        emissive_texture,
-        emissive_sampler,
-        metallic_roughness_texture,
-        metallic_roughness_sampler,
-        occlusion_texture,
-        occlusion_sampler,
-        normal_map_texture,
-        normal_map_sampler,
-        mesh,
-        in_is_front,
-        in_frag_coord,
-        &in_world_position,
-        &in_world_normal,
-        &in_uv,
-        &(),
-        &(),
-        output_color,
-    )
 }

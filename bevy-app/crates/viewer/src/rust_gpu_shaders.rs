@@ -5,9 +5,8 @@ pub enum MeshVertex {}
 impl RustGpuEntryPoint for MeshVertex {
     const NAME: RustGpuEntryPointName = "mesh::entry_points::vertex";
     const MAPPINGS: RustGpuEntryPointMappings = &[
-        (&[("VERTEX_POSITIONS", "position")], "none"),
-        (&[("VERTEX_NORMALS", "normal")], "none"),
         (&[("VERTEX_TANGENTS", "tangent")], "none"),
+        (&[("VERTEX_COLORS", "color")], "none"),
         (&[("SKINNED", "skinned")], "none"),
     ];
 }

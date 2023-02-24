@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "crates/bevy-pbr-rust",
+    "crates/bevy-rust-gpu-macros",
     "crates/shader",
     "crates/shader-builder",
 ]
