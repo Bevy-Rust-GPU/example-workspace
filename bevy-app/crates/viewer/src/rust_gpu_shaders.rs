@@ -5,9 +5,9 @@ pub enum MeshVertex {}
 impl RustGpuEntryPoint for MeshVertex {
     const NAME: RustGpuEntryPointName = "mesh::entry_points::vertex";
     const MAPPINGS: RustGpuEntryPointMappings = &[
-        (&[("VERTEX_TANGENTS", "tangent")], "none"),
-        (&[("VERTEX_COLORS", "color")], "none"),
-        (&[("SKINNED", "skinned")], "none"),
+        (&[("VERTEX_TANGENTS", "some")], "none"),
+        (&[("VERTEX_COLORS", "some")], "none"),
+        (&[("SKINNED", "some")], "none"),
     ];
 }
 
@@ -25,15 +25,15 @@ impl RustGpuEntryPoint for PbrFragment {
     const MAPPINGS: RustGpuEntryPointMappings = &[
         (&[("NO_TEXTURE_ARRAYS_SUPPORT", "texture")], "array"),
         (&[("NO_STORAGE_BUFFERS_SUPPORT", "uniform")], "storage"),
-        (&[("VERTEX_POSITIONS", "position")], "none"),
-        (&[("VERTEX_NORMALS", "normal")], "none"),
-        (&[("VERTEX_UVS", "uv")], "none"),
-        (&[("VERTEX_TANGENTS", "tangent")], "none"),
-        (&[("VERTEX_COLORS", "color")], "none"),
-        (&[("STANDARDMATERIAL_NORMAL_MAP", "normal_map")], "none"),
-        (&[("SKINNED", "skinned")], "none"),
-        (&[("TONEMAP_IN_SHADER", "tonemap")], "none"),
-        (&[("DEBAND_DITHER", "deband")], "none"),
+        (&[("VERTEX_POSITIONS", "some")], "none"),
+        (&[("VERTEX_NORMALS", "some")], "none"),
+        (&[("VERTEX_UVS", "some")], "none"),
+        (&[("VERTEX_TANGENTS", "some")], "none"),
+        (&[("VERTEX_COLORS", "some")], "none"),
+        (&[("STANDARDMATERIAL_NORMAL_MAP", "some")], "none"),
+        (&[("SKINNED", "some")], "none"),
+        (&[("TONEMAP_IN_SHADER", "some")], "none"),
+        (&[("DEBAND_DITHER", "some")], "none"),
         (
             &[
                 ("CLUSTERED_FORWARD_DEBUG_Z_SLICES", "debug_z_slices"),

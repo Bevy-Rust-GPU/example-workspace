@@ -10,30 +10,30 @@ use crate::prelude::{
     Mesh, SkinnedMesh, Skinning, VertexNormal, VertexPosition, VertexTangent, View,
 };
 
+#[spirv(vertex)]
+#[allow(non_snake_case)]
 #[permutate(
     mappings = {
-        tangent: tangent | none,
-        color: color | none,
-        skinned: skinned | none
+        tangent: some | none,
+        color: some | none,
+        skinned: some | none
     },
     permutations = [
         (none, none, none),
-        (tangent, none, none),
-        (tangent, color, none),
-        (tangent, none, skinned),
-        (none, color, skinned),
-        (none, color, none),
-        (none, none, skinned),
-        (tangent, color, skinned),
+        (some, none, none),
+        (none, some, none),
+        (none, none, some),
+        (some, some, none),
+        (some, none, some),
+        (none, some, some),
+        (some, some, some),
     ]
 )]
-#[allow(non_snake_case)]
-#[spirv(vertex)]
 pub fn vertex(
     #[spirv(uniform, descriptor_set = 0, binding = 0)] view: &View,
     #[spirv(uniform, descriptor_set = 2, binding = 0)] mesh: &Mesh,
 
-    #[permutate(skinned = skinned)]
+    #[permutate(skinned = some)]
     #[spirv(uniform, descriptor_set = 2, binding = 1)]
     joint_matrices: &SkinnedMesh,
 
@@ -41,24 +41,24 @@ pub fn vertex(
     in_normal: Vec3,
     in_uv: Vec2,
 
-    #[permutate(tangent = tangent)] in_tangent: Vec4,
+    #[permutate(tangent = some)] in_tangent: Vec4,
 
-    #[permutate(color = color)] in_color: Vec4,
+    #[permutate(color = some)] in_color: Vec4,
 
-    #[permutate(skinned = skinned)] in_joint_indices: UVec4,
-    #[permutate(skinned = skinned)] in_joint_weights: Vec4,
+    #[permutate(skinned = some)] in_joint_indices: UVec4,
+    #[permutate(skinned = some)] in_joint_weights: Vec4,
 
     #[spirv(position)] out_clip_position: &mut Vec4,
     out_world_position: &mut Vec4,
     out_world_normal: &mut Vec3,
     out_uv: &mut Vec2,
-    #[permutate(tangent = tangent)] out_tangent: &mut Vec4,
-    #[permutate(color = color)] out_color: &mut Vec4,
+    #[permutate(tangent = some)] out_tangent: &mut Vec4,
+    #[permutate(color = some)] out_color: &mut Vec4,
 ) {
     let mut in_position = in_position.extend(1.0);
     let mut in_normal = in_normal;
 
-    #[permutate(tangent = tangent)]
+    #[permutate(tangent = some)]
     let mut in_tangent = in_tangent;
 
     vertex_impl(
@@ -66,19 +66,19 @@ pub fn vertex(
         mesh,
         &mut in_position,
         &mut in_normal,
-        #[permutate(tangent = tangent)]
+        #[permutate(tangent = some)]
         &mut in_tangent,
         #[permutate(tangent = none)]
         &mut (),
-        #[permutate(skinned = skinned)]
+        #[permutate(skinned = some)]
         joint_matrices,
         #[permutate(skinned = none)]
         &(),
-        #[permutate(skinned = skinned)]
+        #[permutate(skinned = some)]
         in_joint_indices,
         #[permutate(skinned = none)]
         (),
-        #[permutate(skinned = skinned)]
+        #[permutate(skinned = some)]
         in_joint_weights,
         #[permutate(skinned = none)]
         (),
@@ -89,10 +89,10 @@ pub fn vertex(
     *out_world_normal = in_normal;
     *out_uv = in_uv;
 
-    #[permutate(tangent = tangent)]
+    #[permutate(tangent = some)]
     *out_tangent = in_tangent;
 
-    #[permutate(color = color)]
+    #[permutate(color = some)]
     *out_color = in_color;
 }
 
@@ -114,8 +114,8 @@ pub fn vertex_impl<P: VertexPosition, N: VertexNormal, T: VertexTangent, SM: Ski
     vertex_tangent.transform_tangent(mesh, model);
 }
 
-#[allow(unused_variables)]
 #[spirv(fragment)]
+#[allow(unused_variables)]
 pub fn fragment(
     #[spirv(position)] in_clip_position: Vec4,
     in_world_position: Vec4,

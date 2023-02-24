@@ -21,23 +21,23 @@ use super::BaseMaterial;
 
 #[permutate(
     mappings = {
-        texture: texture | array,
-        buffer: uniform | storage,
-        position: position | none,
-        normal: normal | none,
-        uv: uv | none,
-        tangent: tangent | none,
-        color: color | none,
-        normal_map: normal_map | none,
-        skinned: skinned | none,
-        tonemap: tonemap | none,
-        deband: deband | none,
+        texture_format: texture | array,
+        buffer_format: uniform | storage,
+        position: some | none,
+        normal: some | none,
+        uv: some | none,
+        tangent: some | none,
+        color: some | none,
+        normal_map: some | none,
+        skinned: some | none,
+        tonemap: some | none,
+        deband: some | none,
         cluster_debug: debug_z_slices | debug_cluster_light_complexity | debug_cluster_coherence | none,
     },
     permutations = [
-        (array, uniform, position, normal, uv, none, none, none, none, tonemap, deband, none),
-        (array, uniform, position, normal, uv, tangent, none, none, none, tonemap, deband, none),
-        (array, uniform, position, normal, uv, tangent, color, none, none, tonemap, deband, none),
+        (array, uniform, some, some, some, none, none, none, none, some, some, none),
+        (array, uniform, some, some, some, some, none, none, none, some, some, none),
+        (array, uniform, some, some, some, some, some, none, none, some, some, none),
     ]
 )]
 #[spirv(fragment)]
@@ -46,47 +46,47 @@ pub fn fragment(
     #[spirv(uniform, descriptor_set = 0, binding = 0)] view: &View,
     #[spirv(uniform, descriptor_set = 0, binding = 1)] lights: &Lights,
 
-    #[permutate(texture = texture)]
+    #[permutate(texture_format = texture)]
     #[spirv(descriptor_set = 0, binding = 2)]
     point_shadow_textures: &PointShadowTexture,
 
-    #[permutate(texture = array)]
+    #[permutate(texture_format = array)]
     #[spirv(descriptor_set = 0, binding = 2)]
     point_shadow_textures: &PointShadowTextureArray,
 
     #[spirv(descriptor_set = 0, binding = 3)] point_shadow_textures_sampler: &Sampler,
 
-    #[permutate(texture = texture)]
+    #[permutate(texture_format = texture)]
     #[spirv(descriptor_set = 0, binding = 4)]
     directional_shadow_textures: &DirectionalShadowTexture,
 
-    #[permutate(texture = array)]
+    #[permutate(texture_format = array)]
     #[spirv(descriptor_set = 0, binding = 4)]
     directional_shadow_textures: &DirectionalShadowTextureArray,
 
     #[spirv(descriptor_set = 0, binding = 5)] directional_shadow_textures_sampler: &Sampler,
 
-    #[permutate(buffer = uniform)]
+    #[permutate(buffer_format = uniform)]
     #[spirv(uniform, descriptor_set = 0, binding = 6)]
     point_lights: &PointLightsUniform,
 
-    #[permutate(buffer = storage)]
+    #[permutate(buffer_format = storage)]
     #[spirv(storage_buffer, descriptor_set = 0, binding = 6)]
     point_lights: &PointLightsStorage,
 
-    #[permutate(buffer = uniform)]
+    #[permutate(buffer_format = uniform)]
     #[spirv(uniform, descriptor_set = 0, binding = 7)]
     cluster_light_index_lists: &ClusterLightIndexListsUniform,
 
-    #[permutate(buffer = storage)]
+    #[permutate(buffer_format = storage)]
     #[spirv(storage_buffer, descriptor_set = 0, binding = 7)]
     cluster_light_index_lists: &ClusterLightIndexListsStorage,
 
-    #[permutate(buffer = uniform)]
+    #[permutate(buffer_format = uniform)]
     #[spirv(uniform, descriptor_set = 0, binding = 8)]
     cluster_offsets_and_counts: &ClusterOffsetsAndCountsUniform,
 
-    #[permutate(buffer = storage)]
+    #[permutate(buffer_format = storage)]
     #[spirv(storage_buffer, descriptor_set = 0, binding = 8)]
     cluster_offsets_and_counts: &ClusterOffsetsAndCountsStorage,
 
@@ -109,76 +109,76 @@ pub fn fragment(
     in_world_position: Vec4,
     in_world_normal: Vec3,
     in_uv: Vec2,
-    #[permutate(tangent = tangent)] in_tangent: Vec4,
-    #[permutate(color = color)] in_color: Vec4,
+    #[permutate(tangent = some)] in_tangent: Vec4,
+    #[permutate(color = some)] in_color: Vec4,
     output_color: &mut Vec4,
 ) {
-    #[permutate(texture = texture)]
+    #[permutate(texture_format = texture)]
     type _PointShadow = PointShadowTexture;
-    #[permutate(texture = array)]
+    #[permutate(texture_format = array)]
     type _PointShadow = PointShadowTextureArray;
 
-    #[permutate(texture = texture)]
+    #[permutate(texture_format = texture)]
     type _DirectionalShadow = DirectionalShadowTexture;
-    #[permutate(texture = array)]
+    #[permutate(texture_format = array)]
     type _DirectionalShadow = DirectionalShadowTextureArray;
 
-    #[permutate(buffer = uniform)]
+    #[permutate(buffer_format = uniform)]
     type _PointLights = PointLightsUniform;
-    #[permutate(buffer = storage)]
+    #[permutate(buffer_format = storage)]
     type _PointLights = PointLightsStorage;
 
-    #[permutate(buffer = uniform)]
+    #[permutate(buffer_format = uniform)]
     type _ClusterLightIndexLists = ClusterLightIndexListsUniform;
-    #[permutate(buffer = storage)]
+    #[permutate(buffer_format = storage)]
     type _ClusterLightIndexLists = ClusterLightIndexListsStorage;
 
-    #[permutate(buffer = uniform)]
+    #[permutate(buffer_format = uniform)]
     type _ClusterOffsetsAndCounts = ClusterOffsetsAndCountsUniform;
-    #[permutate(buffer = storage)]
+    #[permutate(buffer_format = storage)]
     type _ClusterOffsetsAndCounts = ClusterOffsetsAndCountsStorage;
 
-    #[permutate(position = position)]
+    #[permutate(position = some)]
     type _Position = Vec4;
     #[permutate(position = none)]
     type _Position = ();
 
-    #[permutate(normal = normal)]
+    #[permutate(normal = some)]
     type _Normal = Vec3;
     #[permutate(normal = none)]
     type _Normal = ();
 
-    #[permutate(uv = uv)]
+    #[permutate(uv = some)]
     type _Uv = Vec2;
     #[permutate(uv = none)]
     type _Uv = ();
 
-    #[permutate(tangent = tangent)]
+    #[permutate(tangent = some)]
     type _Tangent = Vec4;
     #[permutate(tangent = none)]
     type _Tangent = ();
 
-    #[permutate(color = color)]
+    #[permutate(color = some)]
     type _Color = Vec4;
     #[permutate(color = none)]
     type _Color = ();
 
-    #[permutate(normal_map = normal_map)]
+    #[permutate(normal_map = some)]
     type _NormalMap = StandardMaterialNormalMap;
     #[permutate(normal_map = none)]
     type _NormalMap = ();
 
-    #[permutate(skinned = skinned)]
+    #[permutate(skinned = some)]
     type _Skinned = SkinnedMesh;
     #[permutate(skinned = none)]
     type _Skinned = ();
 
-    #[permutate(tonemap = tonemap)]
+    #[permutate(tonemap = some)]
     type _Tonemap = TonemapInShader;
     #[permutate(tonemap = none)]
     type _Tonemap = ();
 
-    #[permutate(deband = deband)]
+    #[permutate(deband = some)]
     type _Deband = DebandDither;
     #[permutate(deband = none)]
     type _Deband = ();
@@ -232,23 +232,23 @@ pub fn fragment(
         mesh,
         in_is_front,
         in_frag_coord,
-        #[permutate(position = position)]
+        #[permutate(position = some)]
         &in_world_position,
         #[permutate(position = none)]
         &(),
-        #[permutate(normal = normal)]
+        #[permutate(normal = some)]
         &in_world_normal,
         #[permutate(normal = none)]
         &(),
-        #[permutate(uv = uv)]
+        #[permutate(uv = some)]
         &in_uv,
         #[permutate(uv = none)]
         &(),
-        #[permutate(tangent = tangent)]
+        #[permutate(tangent = some)]
         &in_tangent,
         #[permutate(tangent = none)]
         &(),
-        #[permutate(color = color)]
+        #[permutate(color = some)]
         &in_color,
         #[permutate(color = none)]
         &(),
