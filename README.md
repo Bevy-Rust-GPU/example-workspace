@@ -47,9 +47,9 @@ Contains a working reimplementation of `bevy_pbr`.
 Shader def conditionals are implemented using compile-time trait generics, and entrypoint permutations are generated via macro annotations.
 
 At time of writing, `rust-gpu` only supports read-write access to storage buffers,
-which renders it incompatible with the read-only buffers bevy uses to store light and cluster data on supported platforms.
+which renders it implementation incompatible with the read-only buffers bevy uses to store light and cluster data on supported platforms.
 
-As such, the `NO_STORAGE_BUFFER_SUPPORT` feature is enabled by default, and the bevy app is configured to match.
+As such, the `viewer` crate is configured to ensure this data is stored in uniforms.
 
 ### `bevy-rust-gpu-macros` Crate
 
