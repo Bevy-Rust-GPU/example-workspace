@@ -53,7 +53,7 @@ As such, the `NO_STORAGE_BUFFER_SUPPORT` feature is enabled by default, and the 
 
 ### `bevy-rust-gpu-macros` Crate
 
-Macros for programmatically generating shader entrypoints.
+Procedural macros for programmatically generating shader entrypoints.
 
 ### `shader`
 
