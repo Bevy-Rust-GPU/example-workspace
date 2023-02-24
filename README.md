@@ -20,7 +20,9 @@ Bevy binary crate, loads an example scene that renders a side-by-side comparison
 
 Uses the workspace root as its asset folder, and hot-reloads `rust-gpu/target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv` via AssetServer.
 
-The shader is loaded into a custom `ShaderMaterial` material, which composes `StandardMaterial` with overrides for vertex / fragment shaders and their entrypoints.
+The shader is loaded into a custom `RustGpuMaterial` material, which composes `StandardMaterial` with type-level entrypoint overrides and value-level shader overrides.
+
+Shader permutations are selected by using the `RustGpuEntryPoint` trait to translate shader defs into an entrypoint name.
 
 `WgpuLimits::max_storage_buffers_per_shader_stage` is forced to 0 via `WgpuSettings` to ensure a `NO_STORAGE_BUFFER_SUPPORT` environment.
 
@@ -42,12 +44,16 @@ Nightly rust workspace housing `rust-gpu` crates.
 
 Contains a working reimplementation of `bevy_pbr`.
 
-Shader def conditionals are implemented using compile-time trait generics, which opens the door to programmatic permutation generation.
+Shader def conditionals are implemented using compile-time trait generics, and entrypoint permutations are generated via macro annotations.
 
 At time of writing, `rust-gpu` only supports read-write access to storage buffers,
 which renders it incompatible with the read-only buffers bevy uses to store light and cluster data on supported platforms.
 
 As such, the `NO_STORAGE_BUFFER_SUPPORT` feature is enabled by default, and the bevy app is configured to match.
+
+### `bevy-rust-gpu-macros` Crate
+
+Macros for programmatically generating shader entrypoints.
 
 ### `shader`
 
