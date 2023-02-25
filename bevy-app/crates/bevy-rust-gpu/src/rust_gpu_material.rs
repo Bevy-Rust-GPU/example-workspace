@@ -2,13 +2,16 @@ use std::marker::PhantomData;
 
 use bevy::{
     pbr::StandardMaterialUniform,
-    prelude::{default, Handle, Image, Material, Shader, StandardMaterial},
+    prelude::{default, info, warn, Handle, Image, Material, Shader, StandardMaterial},
     reflect::TypeUuid,
     render::render_resource::{AsBindGroup, AsBindGroupShaderType, Face, ShaderType},
     utils::Uuid,
 };
 
-use crate::rust_gpu_entry_point::RustGpuEntryPoint;
+use crate::{
+    prelude::{ModuleMeta, MODULE_METAS},
+    rust_gpu_entry_point::RustGpuEntryPoint,
+};
 
 #[derive(ShaderType)]
 pub struct BaseMaterial {
@@ -18,8 +21,10 @@ pub struct BaseMaterial {
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
 pub struct ShaderMaterialKey {
     vertex_shader: Option<Handle<Shader>>,
+    vertex_meta: Option<Handle<ModuleMeta>>,
     vertex_defs: Vec<String>,
     fragment_shader: Option<Handle<Shader>>,
+    fragment_meta: Option<Handle<ModuleMeta>>,
     fragment_defs: Vec<String>,
     normal_map: bool,
     cull_mode: Option<Face>,
@@ -29,8 +34,10 @@ impl<V, F> From<&RustGpuMaterial<V, F>> for ShaderMaterialKey {
     fn from(value: &RustGpuMaterial<V, F>) -> Self {
         ShaderMaterialKey {
             vertex_shader: value.vertex_shader.clone(),
+            vertex_meta: value.vertex_meta.clone(),
             vertex_defs: value.vertex_defs.clone(),
             fragment_shader: value.fragment_shader.clone(),
+            fragment_meta: value.fragment_meta.clone(),
             fragment_defs: value.fragment_defs.clone(),
             normal_map: value.normal_map_texture.is_some(),
             cull_mode: value.base.cull_mode,
@@ -45,8 +52,10 @@ pub struct RustGpuMaterial<V, F> {
     pub base: StandardMaterial,
 
     pub vertex_shader: Option<Handle<Shader>>,
+    pub vertex_meta: Option<Handle<ModuleMeta>>,
     pub vertex_defs: Vec<String>,
     pub fragment_shader: Option<Handle<Shader>>,
+    pub fragment_meta: Option<Handle<ModuleMeta>>,
     pub fragment_defs: Vec<String>,
 
     #[texture(1)]
@@ -77,8 +86,10 @@ impl<V, F> Default for RustGpuMaterial<V, F> {
         RustGpuMaterial {
             base: default(),
             vertex_shader: default(),
+            vertex_meta: default(),
             vertex_defs: default(),
             fragment_shader: default(),
+            fragment_meta: default(),
             fragment_defs: default(),
             base_color_texture: default(),
             emissive_texture: default(),
@@ -95,8 +106,10 @@ impl<V, F> Clone for RustGpuMaterial<V, F> {
         RustGpuMaterial {
             base: self.base.clone(),
             vertex_shader: self.vertex_shader.clone(),
+            vertex_meta: self.vertex_meta.clone(),
             vertex_defs: self.vertex_defs.clone(),
             fragment_shader: self.fragment_shader.clone(),
+            fragment_meta: self.fragment_meta.clone(),
             fragment_defs: self.fragment_defs.clone(),
             base_color_texture: self.base_color_texture.clone(),
             emissive_texture: self.emissive_texture.clone(),
@@ -149,8 +162,6 @@ where
         key: bevy::pbr::MaterialPipelineKey<Self>,
     ) -> Result<(), bevy::render::render_resource::SpecializedMeshPipelineError> {
         if let Some(vertex_shader) = key.bind_group_data.vertex_shader {
-            descriptor.vertex.shader = vertex_shader;
-
             let shader_defs: Vec<_> = descriptor
                 .vertex
                 .shader_defs
@@ -159,7 +170,25 @@ where
                 .chain(key.bind_group_data.vertex_defs.iter().cloned())
                 .collect();
 
-            descriptor.vertex.entry_point = V::build(&shader_defs).into();
+            let entry_point = V::build(&shader_defs);
+
+            let mut apply = true;
+
+            if let Some(vertex_meta) = key.bind_group_data.vertex_meta {
+                let metas = MODULE_METAS.read().unwrap();
+                if let Some(vertex_meta) = metas.get(&vertex_meta) {
+                    if !vertex_meta.entry_points.contains(&entry_point) {
+                        warn!("Missing entry point {entry_point:}");
+                        warn!("Falling back to default vertex shader.");
+                        apply = false;
+                    }
+                }
+            }
+
+            if apply {
+                descriptor.vertex.shader = vertex_shader;
+                descriptor.vertex.entry_point = entry_point.into();
+            }
         }
 
         if let Some(fragment_descriptor) = descriptor.fragment.as_mut() {
@@ -170,8 +199,6 @@ where
             }
 
             if let Some(fragment_shader) = key.bind_group_data.fragment_shader {
-                fragment_descriptor.shader = fragment_shader;
-
                 let shader_defs: Vec<_> = fragment_descriptor
                     .shader_defs
                     .iter()
@@ -179,7 +206,25 @@ where
                     .chain(key.bind_group_data.fragment_defs.iter().cloned())
                     .collect();
 
-                fragment_descriptor.entry_point = F::build(&shader_defs).into();
+                let entry_point = F::build(&shader_defs).into();
+
+                let mut apply = true;
+
+                if let Some(fragment_meta) = key.bind_group_data.fragment_meta {
+                    let metas = MODULE_METAS.read().unwrap();
+                    if let Some(fragment_meta) = metas.get(&fragment_meta) {
+                        if !fragment_meta.entry_points.contains(&entry_point) {
+                            warn!("Missing entry point {entry_point:}, falling back to default fragment shader.");
+                            warn!("Falling back to default fragment shader.");
+                            apply = false;
+                        }
+                    }
+                }
+
+                if apply {
+                    fragment_descriptor.shader = fragment_shader;
+                    fragment_descriptor.entry_point = entry_point.into();
+                }
             }
         }
 

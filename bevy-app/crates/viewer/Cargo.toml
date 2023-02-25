@@ -8,7 +8,6 @@ default = []
 webgl = []
 
 [dependencies]
-#bevy = "0.9.1"
-bevy = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
+bevy = "0.9.1"
 bevy-rust-gpu = { path = "../bevy-rust-gpu" }
 shader-util = { path = "../../../shared/shader-util" }

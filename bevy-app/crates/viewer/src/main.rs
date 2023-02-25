@@ -9,8 +9,17 @@ use bevy::{
     },
     render::settings::{WgpuLimits, WgpuSettings},
 };
-use bevy_rust_gpu::prelude::{rust_gpu_shader_defs, RustGpuMaterial};
+use bevy_rust_gpu::{
+    prelude::{rust_gpu_shader_defs, RustGpuMaterial, RustGpuShaderPlugin},
+    rust_gpu_shader_meta::{ModuleMeta, RustGpuMaterials, rust_gpu_materials},
+};
 use rust_gpu_shaders::{MeshVertex, PbrFragment};
+
+const SHADER_PATH: &'static str =
+    "rust-gpu/target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv";
+
+const SHADER_META_PATH: &'static str =
+    "rust-gpu/target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv.json";
 
 fn main() {
     let mut app = App::default();
@@ -31,11 +40,16 @@ fn main() {
         ..default()
     }));
 
+    app.add_plugin(RustGpuShaderPlugin)
+        .init_resource::<RustGpuMaterials<MeshVertex, PbrFragment>>();
+
     // Setup ShaderMaterial
     app.add_plugin(MaterialPlugin::<RustGpuMaterial<MeshVertex, PbrFragment>>::default());
 
     // Setup scene
     app.add_startup_system(setup);
+
+    app.add_system(rust_gpu_materials::<MeshVertex, PbrFragment>);
 
     // Run
     app.run();
@@ -45,8 +59,9 @@ fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut shader_materials: ResMut<Assets<RustGpuMaterial<MeshVertex, PbrFragment>>>,
+    mut rust_gpu_material_storage: ResMut<RustGpuMaterials<MeshVertex, PbrFragment>>,
     mut standard_materials: ResMut<Assets<StandardMaterial>>,
+    mut rust_gpu_materials: Res<Assets<RustGpuMaterial<MeshVertex, PbrFragment>>>,
 ) {
     // Spawn camera
     commands.spawn(Camera3dBundle::default());
@@ -76,18 +91,22 @@ fn setup(
 
     let mesh = meshes.add(Cube { size: 1.0 }.into());
 
-    let shader = asset_server.load::<Shader, _>(
-        "rust-gpu/target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv",
-    );
+    let shader = asset_server.load::<Shader, _>(SHADER_PATH);
+    let shader_meta = asset_server.load::<ModuleMeta, _>(SHADER_META_PATH);
 
     let extra_defs = rust_gpu_shader_defs();
-    let shader_material = shader_materials.add(RustGpuMaterial {
-        vertex_shader: Some(shader.clone()),
-        vertex_defs: extra_defs.clone(),
-        fragment_shader: Some(shader),
-        fragment_defs: extra_defs,
-        ..default()
-    });
+    let shader_material = rust_gpu_material_storage.add(
+        &rust_gpu_materials,
+        RustGpuMaterial {
+            vertex_shader: Some(shader.clone()),
+            vertex_meta: Some(shader_meta.clone()),
+            vertex_defs: extra_defs.clone(),
+            fragment_shader: Some(shader),
+            fragment_meta: Some(shader_meta),
+            fragment_defs: extra_defs,
+            ..default()
+        },
+    );
 
     // Spawn example cubes
     commands.spawn(MaterialMeshBundle {

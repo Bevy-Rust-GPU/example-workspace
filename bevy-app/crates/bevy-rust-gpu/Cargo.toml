@@ -4,5 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-#bevy = "0.9.1"
-bevy = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
+bevy = "0.9.1"
+serde = "1.0.152"
+bevy_common_assets = { version = "0.4.0", features = ["json"] }
+once_cell = "1.17.1"
