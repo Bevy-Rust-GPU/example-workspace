@@ -4,7 +4,7 @@ pub enum MeshVertex {}
 
 impl RustGpuEntryPoint for MeshVertex {
     const NAME: RustGpuEntryPointName = "mesh::entry_points::vertex";
-    const MAPPINGS: RustGpuEntryPointMappings = &[
+    const PARAMETERS: RustGpuEntryPointMappings = &[
         (&[("VERTEX_TANGENTS", "some")], "none"),
         (&[("VERTEX_COLORS", "some")], "none"),
         (&[("SKINNED", "some")], "none"),
@@ -15,14 +15,14 @@ pub enum MeshFragment {}
 
 impl RustGpuEntryPoint for MeshFragment {
     const NAME: RustGpuEntryPointName = "mesh::entry_points::fragment";
-    const MAPPINGS: RustGpuEntryPointMappings = &[];
+    const PARAMETERS: RustGpuEntryPointMappings = &[];
 }
 
 pub enum PbrFragment {}
 
 impl RustGpuEntryPoint for PbrFragment {
     const NAME: RustGpuEntryPointName = "pbr::entry_points::fragment";
-    const MAPPINGS: RustGpuEntryPointMappings = &[
+    const PARAMETERS: RustGpuEntryPointMappings = &[
         (&[("NO_TEXTURE_ARRAYS_SUPPORT", "texture")], "array"),
         (&[("NO_STORAGE_BUFFERS_SUPPORT", "uniform")], "storage"),
         (&[("VERTEX_POSITIONS", "some")], "none"),

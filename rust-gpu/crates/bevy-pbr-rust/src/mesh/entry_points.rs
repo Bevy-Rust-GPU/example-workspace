@@ -13,7 +13,7 @@ use crate::prelude::{
 #[spirv(vertex)]
 #[allow(non_snake_case)]
 #[permutate(
-    mappings = {
+    parameters = {
         tangent: some | none,
         color: some | none,
         skinned: some | none

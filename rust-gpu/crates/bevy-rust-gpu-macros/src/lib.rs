@@ -41,11 +41,11 @@ impl Parse for MappingVariants {
 }
 
 #[derive(Debug)]
-struct Mappings {
-    mappings: Vec<(Ident, Vec<Ident>)>,
+struct Parameters {
+    parameters: Vec<(Ident, Vec<Ident>)>,
 }
 
-impl Parse for Mappings {
+impl Parse for Parameters {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let _ident: Ident = input.parse()?;
 
@@ -54,20 +54,20 @@ impl Parse for Mappings {
         let content: ParseBuffer;
         let _brace = braced!(content in input);
 
-        let mut mappings: Vec<(Ident, Vec<Ident>)> = Default::default();
+        let mut parameters: Vec<(Ident, Vec<Ident>)> = Default::default();
         loop {
             let Ok(variants): Result<MappingVariants, _> = content.parse() else {
                 break
             };
 
-            mappings.push((variants.field, variants.variants));
+            parameters.push((variants.field, variants.variants));
 
             let Ok(_): Result<Comma, _> = content.parse() else {
                 break
             };
         }
 
-        Ok(Mappings { mappings })
+        Ok(Parameters { parameters })
     }
 }
 
@@ -94,13 +94,13 @@ impl Parse for Permutations {
 }
 
 impl Permutations {
-    fn to_idents(&self, mappings: &Mappings) -> Vec<Vec<Ident>> {
+    fn to_idents(&self, parameters: &Parameters) -> Vec<Vec<Ident>> {
         let mut idents = vec![];
         for (i, permutation) in self.permutations.iter().enumerate() {
             let mut ids = vec![];
             match permutation {
                 PermutationVariant::Explicit(explicit) => ids.extend(explicit.clone()),
-                PermutationVariant::Glob => ids.extend(mappings.mappings[i].1.clone()),
+                PermutationVariant::Glob => ids.extend(parameters.parameters[i].1.clone()),
             }
             idents.push(ids);
         }
@@ -109,18 +109,18 @@ impl Permutations {
 }
 
 struct MacroInput {
-    mappings: Mappings,
+    parameters: Parameters,
     permutations: Permutations,
 }
 
 impl Parse for MacroInput {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
-        let mappings: Mappings = input.parse()?;
+        let parameters: Parameters = input.parse()?;
         let _comma: Token![,] = input.parse()?;
         let permutations: Permutations = input.parse()?;
 
         Ok(MacroInput {
-            mappings,
+            parameters,
             permutations,
         })
     }
@@ -211,9 +211,9 @@ pub fn permutate(
     attr: proc_macro::TokenStream,
     item: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-    // Parse function attribute into mappings
+    // Parse function attribute into parameters
     let MacroInput {
-        mappings,
+        parameters,
         permutations: ps,
     } = parse_macro_input!(attr as MacroInput);
 
@@ -222,7 +222,7 @@ pub fn permutate(
 
     let mut out = vec![];
 
-    let permutations = permutations(ps.to_idents(&mappings));
+    let permutations = permutations(ps.to_idents(&parameters));
     for permutation in permutations {
         // Create a new copy of the function
         let mut item_fn = item_fn.clone();
@@ -253,16 +253,16 @@ pub fn permutate(
                 };
 
                 if let Some(attr) = attrs.remove(&ident) {
-                    let mapping_conditional =
+                    let parameter_conditional =
                         attr.parse_args_with(MappingConditional::parse).unwrap();
 
-                    let idx = mappings
-                        .mappings
+                    let idx = parameters
+                        .parameters
                         .iter()
-                        .position(|(name, _)| *name == mapping_conditional.lhs)
+                        .position(|(name, _)| *name == parameter_conditional.lhs)
                         .unwrap();
 
-                    return if permutation[idx] == mapping_conditional.rhs {
+                    return if permutation[idx] == parameter_conditional.rhs {
                         let input: FnArg = parse_quote!(#attrs);
                         Some(input)
                     } else {
@@ -284,16 +284,16 @@ pub fn permutate(
 
                 if let Ok(mut attrs) = syn::parse::<Attributes<Stmt>>(s) {
                     if let Some(attr) = attrs.remove(&ident) {
-                        let mapping_conditional =
+                        let parameter_conditional =
                             attr.parse_args_with(MappingConditional::parse).unwrap();
 
-                        let idx = mappings
-                            .mappings
+                        let idx = parameters
+                            .parameters
                             .iter()
-                            .position(|(name, _)| *name == mapping_conditional.lhs)
+                            .position(|(name, _)| *name == parameter_conditional.lhs)
                             .unwrap();
 
-                        if permutation[idx] != mapping_conditional.rhs {
+                        if permutation[idx] != parameter_conditional.rhs {
                             return None;
                         };
                     }
@@ -312,17 +312,17 @@ pub fn permutate(
 
 
                                 if let Some(attr) = attrs.remove(&ident) {
-                                    let mapping_conditional =
+                                    let parameter_conditional =
                                         attr.parse_args_with(MappingConditional::parse).unwrap();
 
 
-                                    let idx = mappings
-                                        .mappings
+                                    let idx = parameters
+                                        .parameters
                                         .iter()
-                                        .position(|(name, _)| *name == mapping_conditional.lhs)
+                                        .position(|(name, _)| *name == parameter_conditional.lhs)
                                         .unwrap();
 
-                                    return if permutation[idx] == mapping_conditional.rhs {
+                                    return if permutation[idx] == parameter_conditional.rhs {
                                         let expr: Expr = parse_quote!(#attrs);
                                         Some(expr)
                                     } else {

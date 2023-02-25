@@ -15,7 +15,7 @@ use crate::prelude::{
 use super::BaseMaterial;
 
 #[permutate(
-    mappings = {
+    parameters = {
         texture_format: texture | array,
         buffer_format: uniform | storage,
         position: some | none,

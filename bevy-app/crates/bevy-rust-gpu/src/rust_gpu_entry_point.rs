@@ -4,7 +4,7 @@ pub type RustGpuEntryPointMappings =
 
 pub trait RustGpuEntryPoint: 'static + Send + Sync {
     const NAME: &'static str;
-    const MAPPINGS: RustGpuEntryPointMappings;
+    const PARAMETERS: RustGpuEntryPointMappings;
 
     fn is_defined(shader_defs: &Vec<String>, def: &String) -> bool {
         let def = def.into();
@@ -14,7 +14,7 @@ pub trait RustGpuEntryPoint: 'static + Send + Sync {
     fn build(shader_defs: &Vec<String>) -> String {
         let mut entry_point = Self::NAME.to_string();
 
-        for (defined, undefined) in Self::MAPPINGS.iter() {
+        for (defined, undefined) in Self::PARAMETERS.iter() {
             entry_point += "__";
             entry_point += if let Some(mapping) = defined.iter().find_map(|(def, mapping)| {
                 if Self::is_defined(shader_defs, &def.to_string()) {
@@ -35,7 +35,7 @@ pub trait RustGpuEntryPoint: 'static + Send + Sync {
 
 impl RustGpuEntryPoint for () {
     const NAME: &'static str = "";
-    const MAPPINGS: RustGpuEntryPointMappings = &[];
+    const PARAMETERS: RustGpuEntryPointMappings = &[];
 }
 
 /// Manually compose `bevy_render` shader defs that aren't available during specialization
