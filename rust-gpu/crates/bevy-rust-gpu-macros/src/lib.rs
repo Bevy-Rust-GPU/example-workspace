@@ -1,17 +1,15 @@
 extern crate proc_macro;
 
 use proc_macro::Span;
-use quote::{quote, ToTokens, TokenStreamExt};
-use std::collections::BTreeMap;
+use quote::{quote, ToTokens};
 
 use syn::{
-    braced, bracketed, parenthesized,
+    braced, parenthesized,
     parse::{Parse, ParseBuffer},
     parse_macro_input, parse_quote,
     punctuated::Punctuated,
     token::{Comma, Or},
-    Attribute, Expr, FieldValue, FnArg, GenericArgument, Ident, ItemFn, Member, PathArguments,
-    PathSegment, Stmt, Token,
+    Attribute, Error, Expr, FnArg, Ident, ItemFn, Stmt, Token,
 };
 
 #[derive(Debug)]
@@ -22,11 +20,8 @@ struct MappingVariants {
 
 impl Parse for MappingVariants {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
-        eprintln!("MappingVariants::parse");
         let field: Ident = input.parse()?;
-        eprintln!("Field: {field:?}");
         let _colon: Token![:] = input.parse()?;
-        eprintln!("Colon");
 
         let mut variants = vec![];
         loop {
@@ -41,7 +36,6 @@ impl Parse for MappingVariants {
             };
         }
 
-        eprintln!("Variants");
         Ok(MappingVariants { field, variants })
     }
 }
@@ -53,13 +47,9 @@ struct Mappings {
 
 impl Parse for Mappings {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
-        eprintln!("Parsing mappings");
-
         let _ident: Ident = input.parse()?;
-        eprintln!("Mappings Ident");
 
         let _eq: Token![=] = input.parse()?;
-        eprintln!("Mappings Eq");
 
         let content: ParseBuffer;
         let _brace = braced!(content in input);
@@ -83,7 +73,39 @@ impl Parse for Mappings {
 
 #[derive(Debug)]
 struct Permutations {
-    permutations: Vec<PermutationTuple>,
+    permutations: Vec<PermutationVariant>,
+}
+
+impl Parse for Permutations {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let _ident: Ident = input.parse()?;
+
+        let _eq: Token![=] = input.parse()?;
+
+        let content: ParseBuffer;
+        let _paren = parenthesized!(content in input);
+
+        let permutations =
+            Punctuated::<PermutationVariant, Token![,]>::parse_separated_nonempty(&content)?;
+        let permutations: Vec<_> = permutations.into_iter().collect();
+
+        Ok(Permutations { permutations })
+    }
+}
+
+impl Permutations {
+    fn to_idents(&self, mappings: &Mappings) -> Vec<Vec<Ident>> {
+        let mut idents = vec![];
+        for (i, permutation) in self.permutations.iter().enumerate() {
+            let mut ids = vec![];
+            match permutation {
+                PermutationVariant::Explicit(explicit) => ids.extend(explicit.clone()),
+                PermutationVariant::Glob => ids.extend(mappings.mappings[i].1.clone()),
+            }
+            idents.push(ids);
+        }
+        idents
+    }
 }
 
 struct MacroInput {
@@ -105,40 +127,21 @@ impl Parse for MacroInput {
 }
 
 #[derive(Debug)]
-struct PermutationTuple {
-    tuple: Vec<Ident>,
+enum PermutationVariant {
+    Explicit(Vec<Ident>),
+    Glob,
 }
 
-impl Parse for PermutationTuple {
+impl Parse for PermutationVariant {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
-        let inner: ParseBuffer;
-        let _paren = parenthesized!(inner in input);
-
-        let tuple: Punctuated<_, Token![,]> = inner.parse_terminated(Ident::parse)?;
-        let tuple: Vec<_> = tuple.into_iter().collect();
-
-        Ok(PermutationTuple { tuple })
-    }
-}
-
-impl Parse for Permutations {
-    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
-        eprintln!("Parsing Permutations");
-
-        let _ident: Ident = input.parse()?;
-        eprintln!("Permutations Ident");
-
-        let _eq: Token![=] = input.parse()?;
-        eprintln!("Permutations Eq");
-
-        let content: ParseBuffer;
-        let _bracket = bracketed!(content in input);
-
-        let permutations: Punctuated<PermutationTuple, Token![,]> =
-            content.parse_terminated(PermutationTuple::parse)?;
-        let permutations: Vec<_> = permutations.into_iter().collect();
-
-        Ok(Permutations { permutations })
+        if let Ok(_) = <Token![*]>::parse(input) {
+            Ok(PermutationVariant::Glob)
+        } else if let Ok(explicit) = Punctuated::<Ident, Token![|]>::parse_separated_nonempty(input)
+        {
+            Ok(PermutationVariant::Explicit(explicit.into_iter().collect()))
+        } else {
+            Err(Error::new(input.span(), "Invalid permutation variant"))
+        }
     }
 }
 
@@ -211,24 +214,22 @@ pub fn permutate(
     // Parse function attribute into mappings
     let MacroInput {
         mappings,
-        permutations,
+        permutations: ps,
     } = parse_macro_input!(attr as MacroInput);
-
-    eprintln!("Mappings: {mappings:#?}");
-    eprintln!("Permutations: {permutations:#?}");
 
     // Parse function
     let item_fn = parse_macro_input!(item as ItemFn);
 
     let mut out = vec![];
-    for permutation in permutations.permutations {
+
+    let permutations = permutations(ps.to_idents(&mappings));
+    for permutation in permutations {
         // Create a new copy of the function
         let mut item_fn = item_fn.clone();
 
         // Set name based on permutation
         let ident = item_fn.sig.ident.to_string()
             + &permutation
-                .tuple
                 .iter()
                 .map(ToString::to_string)
                 .map(|t| "__".to_string() + &t)
@@ -252,10 +253,8 @@ pub fn permutate(
                 };
 
                 if let Some(attr) = attrs.remove(&ident) {
-                    eprintln!("Fn Sig Attr {:#?}", attr.path.get_ident());
                     let mapping_conditional =
                         attr.parse_args_with(MappingConditional::parse).unwrap();
-                    eprintln!("Sn Sig Expr {:#?}", mapping_conditional);
 
                     let idx = mappings
                         .mappings
@@ -263,7 +262,7 @@ pub fn permutate(
                         .position(|(name, _)| *name == mapping_conditional.lhs)
                         .unwrap();
 
-                    return if permutation.tuple[idx] == mapping_conditional.rhs {
+                    return if permutation[idx] == mapping_conditional.rhs {
                         let input: FnArg = parse_quote!(#attrs);
                         Some(input)
                     } else {
@@ -276,22 +275,17 @@ pub fn permutate(
             .collect();
 
         // Process block statements
-        eprintln!("Parsing statements");
         item_fn.block.stmts = item_fn
             .block
             .stmts
             .into_iter()
             .filter_map(|mut stmt| {
-                eprintln!("Fn Block Stmt");
                 let s = proc_macro::TokenStream::from(quote!(#stmt));
-                eprintln!("{s:}");
 
                 if let Ok(mut attrs) = syn::parse::<Attributes<Stmt>>(s) {
                     if let Some(attr) = attrs.remove(&ident) {
-                        eprintln!("Fn Block Attr {:#?}", attr.path.get_ident());
                         let mapping_conditional =
                             attr.parse_args_with(MappingConditional::parse).unwrap();
-                        eprintln!("Fn Block Expr {:#?}", mapping_conditional);
 
                         let idx = mappings
                             .mappings
@@ -299,7 +293,7 @@ pub fn permutate(
                             .position(|(name, _)| *name == mapping_conditional.lhs)
                             .unwrap();
 
-                        if permutation.tuple[idx] != mapping_conditional.rhs {
+                        if permutation[idx] != mapping_conditional.rhs {
                             return None;
                         };
                     }
@@ -307,28 +301,20 @@ pub fn permutate(
                     stmt = parse_quote!(#attrs);
                 };
 
-                eprintln!("Fn Block Inner");
-
                 match &mut stmt {
                     Stmt::Expr(expr) | Stmt::Semi(expr, _) => match expr {
                         syn::Expr::Call(call) => {
-                            eprintln!("Fn Block Call Expr");
-
                             call.args = call.args.iter().cloned().filter_map(|arg| {
-                                eprintln!("Fn Block Call Arg");
                                 let a = quote!(#arg);
                                 let Ok(mut attrs) = syn::parse::<Attributes<Expr>>(a.into()) else {
                                     return Some(arg);
                                 };
 
-                                eprintln!("Fn Blok Call Arg Attrs");
 
                                 if let Some(attr) = attrs.remove(&ident) {
-                                    eprintln!("Fn Block Call Arg Attr {:#?}", attr.path.get_ident());
                                     let mapping_conditional =
                                         attr.parse_args_with(MappingConditional::parse).unwrap();
 
-                                    eprintln!("Fn Block Call Arg Expr {:#?}", mapping_conditional);
 
                                     let idx = mappings
                                         .mappings
@@ -336,7 +322,7 @@ pub fn permutate(
                                         .position(|(name, _)| *name == mapping_conditional.lhs)
                                         .unwrap();
 
-                                    return if permutation.tuple[idx] == mapping_conditional.rhs {
+                                    return if permutation[idx] == mapping_conditional.rhs {
                                         let expr: Expr = parse_quote!(#attrs);
                                         Some(expr)
                                     } else {
@@ -363,7 +349,26 @@ pub fn permutate(
         #(#out)*
     };
 
-    eprintln!("Output: {output:}");
-
     output.into()
+}
+
+fn permutations<T: Clone>(sets: Vec<Vec<T>>) -> Vec<Vec<T>> {
+    permutations_inner(sets.into_iter(), Default::default())
+}
+
+fn permutations_inner<It: Clone + Iterator<Item = Vec<T>>, T: Clone>(
+    mut sets: It,
+    acc: Vec<T>,
+) -> Vec<Vec<T>> {
+    sets.next()
+        .map(|set| {
+            set.into_iter()
+                .flat_map(|item| {
+                    let mut tmp = acc.clone();
+                    tmp.push(item);
+                    permutations_inner(sets.clone(), tmp)
+                })
+                .collect()
+        })
+        .unwrap_or_else(|| vec![acc])
 }

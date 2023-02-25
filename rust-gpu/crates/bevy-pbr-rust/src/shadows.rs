@@ -25,7 +25,7 @@ impl DirectionalShadowTextures for DirectionalShadowTexture {
         _: u32,
         _: i32,
     ) -> f32 {
-        self.sample_depth_reference(*sampler, shadow_uv, depth)
+        self.sample_depth_reference_by_lod(*sampler, shadow_uv, depth, 0.0)
     }
 }
 
@@ -42,9 +42,9 @@ impl DirectionalShadowTextures for DirectionalShadowTextureArray {
     ) -> f32 {
         self.sample_depth_reference_by_lod(
             *sampler,
-            shadow_uv.extend(0.0),
+            shadow_uv.extend(light_id as f32 + spot_light_shadowmap_offset as f32),
             depth,
-            light_id as f32 + spot_light_shadowmap_offset as f32,
+            0.0,
         )
     }
 }
@@ -62,14 +62,8 @@ pub trait PointShadowTextures {
 pub type PointShadowTexture = Image!(cube, type = f32, depth = true);
 
 impl PointShadowTextures for PointShadowTexture {
-    fn sample_depth_reference(
-        &self,
-        sampler: &Sampler,
-        frag_ls: Vec3,
-        depth: f32,
-        _: u32,
-    ) -> f32 {
-        self.sample_depth_reference(*sampler, frag_ls, depth)
+    fn sample_depth_reference(&self, sampler: &Sampler, frag_ls: Vec3, depth: f32, _: u32) -> f32 {
+        self.sample_depth_reference_by_lod(*sampler, frag_ls, depth, 0.0)
     }
 }
 
@@ -83,6 +77,6 @@ impl PointShadowTextures for PointShadowTextureArray {
         depth: f32,
         light_id: u32,
     ) -> f32 {
-        self.sample_depth_reference_by_lod(*sampler, frag_ls.extend(1.0), depth, light_id as f32)
+        self.sample_depth_reference_by_lod(*sampler, frag_ls.extend(light_id as f32), depth, 0.0)
     }
 }

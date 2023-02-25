@@ -6,14 +6,9 @@ use spirv_std::{
 };
 
 use crate::prelude::{
-    BaseColorTexture, BaseMaterialNormalMap, ClusterDebugVisualization, ClusterLightIndexLists,
-    ClusterLightIndexListsStorage, ClusterLightIndexListsUniform, ClusterOffsetsAndCounts,
-    ClusterOffsetsAndCountsStorage, ClusterOffsetsAndCountsUniform, DebandDither, DebugZSlices,
-    DirectionalShadowTexture, DirectionalShadowTextureArray, DirectionalShadowTextures, Dither,
+    BaseColorTexture, BaseMaterialNormalMap, ClusterDebugVisualization, ClusterLightIndexLists, ClusterOffsetsAndCounts, DirectionalShadowTextures, Dither,
     EmissiveTexture, Lights, Mesh, MetallicRoughnessTexture, NormalMapTexture, OcclusionTexture,
-    PbrInput, PointLights, PointLightsStorage, PointLightsUniform, PointShadowTexture,
-    PointShadowTextureArray, PointShadowTextures, SkinnedMesh, Skinning, StandardMaterialNormalMap,
-    TonemapInShader, Tonemapper, VertexColor, VertexNormal, VertexPosition, VertexTangent,
+    PbrInput, PointLights, PointLightsUniform, PointShadowTextures, Skinning, Tonemapper, VertexColor, VertexNormal, VertexPosition, VertexTangent,
     VertexUv, View, STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT, STANDARD_MATERIAL_FLAGS_UNLIT_BIT,
 };
 
@@ -32,13 +27,9 @@ use super::BaseMaterial;
         skinned: some | none,
         tonemap: some | none,
         deband: some | none,
-        cluster_debug: debug_z_slices | debug_cluster_light_complexity | debug_cluster_coherence | none,
+        cluster_debug: debug_z_slices | debug_cluster_light_complexity | debug_cluster_coherency | none,
     },
-    permutations = [
-        (array, uniform, some, some, some, none, none, none, none, some, some, none),
-        (array, uniform, some, some, some, some, none, none, none, some, some, none),
-        (array, uniform, some, some, some, some, some, none, none, some, some, none),
-    ]
+    permutations = (array, uniform, some, some, some, none, none, none, none, some, some, none)
 )]
 #[spirv(fragment)]
 #[allow(non_snake_case)]
@@ -48,47 +39,47 @@ pub fn fragment(
 
     #[permutate(texture_format = texture)]
     #[spirv(descriptor_set = 0, binding = 2)]
-    point_shadow_textures: &PointShadowTexture,
+    point_shadow_textures: &crate::prelude::PointShadowTexture,
 
     #[permutate(texture_format = array)]
     #[spirv(descriptor_set = 0, binding = 2)]
-    point_shadow_textures: &PointShadowTextureArray,
+    point_shadow_textures: &crate::prelude::PointShadowTextureArray,
 
     #[spirv(descriptor_set = 0, binding = 3)] point_shadow_textures_sampler: &Sampler,
 
     #[permutate(texture_format = texture)]
     #[spirv(descriptor_set = 0, binding = 4)]
-    directional_shadow_textures: &DirectionalShadowTexture,
+    directional_shadow_textures: &crate::prelude::DirectionalShadowTexture,
 
     #[permutate(texture_format = array)]
     #[spirv(descriptor_set = 0, binding = 4)]
-    directional_shadow_textures: &DirectionalShadowTextureArray,
+    directional_shadow_textures: &crate::prelude::DirectionalShadowTextureArray,
 
     #[spirv(descriptor_set = 0, binding = 5)] directional_shadow_textures_sampler: &Sampler,
 
     #[permutate(buffer_format = uniform)]
     #[spirv(uniform, descriptor_set = 0, binding = 6)]
-    point_lights: &PointLightsUniform,
+    point_lights: &crate::prelude::PointLightsUniform,
 
     #[permutate(buffer_format = storage)]
     #[spirv(storage_buffer, descriptor_set = 0, binding = 6)]
-    point_lights: &PointLightsStorage,
+    point_lights: &crate::prelude::PointLightsStorage,
 
     #[permutate(buffer_format = uniform)]
     #[spirv(uniform, descriptor_set = 0, binding = 7)]
-    cluster_light_index_lists: &ClusterLightIndexListsUniform,
+    cluster_light_index_lists: &crate::prelude::ClusterLightIndexListsUniform,
 
     #[permutate(buffer_format = storage)]
     #[spirv(storage_buffer, descriptor_set = 0, binding = 7)]
-    cluster_light_index_lists: &ClusterLightIndexListsStorage,
+    cluster_light_index_lists: &crate::prelude::ClusterLightIndexListsStorage,
 
     #[permutate(buffer_format = uniform)]
     #[spirv(uniform, descriptor_set = 0, binding = 8)]
-    cluster_offsets_and_counts: &ClusterOffsetsAndCountsUniform,
+    cluster_offsets_and_counts: &crate::prelude::ClusterOffsetsAndCountsUniform,
 
     #[permutate(buffer_format = storage)]
     #[spirv(storage_buffer, descriptor_set = 0, binding = 8)]
-    cluster_offsets_and_counts: &ClusterOffsetsAndCountsStorage,
+    cluster_offsets_and_counts: &crate::prelude::ClusterOffsetsAndCountsStorage,
 
     #[spirv(uniform, descriptor_set = 1, binding = 0)] material: &BaseMaterial,
     #[spirv(descriptor_set = 1, binding = 1)] base_color_texture: &BaseColorTexture,
@@ -114,14 +105,14 @@ pub fn fragment(
     output_color: &mut Vec4,
 ) {
     #[permutate(texture_format = texture)]
-    type _PointShadow = PointShadowTexture;
+    type _PointShadow = crate::prelude::PointShadowTexture;
     #[permutate(texture_format = array)]
-    type _PointShadow = PointShadowTextureArray;
+    type _PointShadow = crate::prelude::PointShadowTextureArray;
 
     #[permutate(texture_format = texture)]
-    type _DirectionalShadow = DirectionalShadowTexture;
+    type _DirectionalShadow = crate::prelude::DirectionalShadowTexture;
     #[permutate(texture_format = array)]
-    type _DirectionalShadow = DirectionalShadowTextureArray;
+    type _DirectionalShadow = crate::prelude::DirectionalShadowTextureArray;
 
     #[permutate(buffer_format = uniform)]
     type _PointLights = PointLightsUniform;
@@ -129,14 +120,14 @@ pub fn fragment(
     type _PointLights = PointLightsStorage;
 
     #[permutate(buffer_format = uniform)]
-    type _ClusterLightIndexLists = ClusterLightIndexListsUniform;
+    type _ClusterLightIndexLists = crate::prelude::ClusterLightIndexListsUniform;
     #[permutate(buffer_format = storage)]
-    type _ClusterLightIndexLists = ClusterLightIndexListsStorage;
+    type _ClusterLightIndexLists = crate::prelude::ClusterLightIndexListsStorage;
 
     #[permutate(buffer_format = uniform)]
-    type _ClusterOffsetsAndCounts = ClusterOffsetsAndCountsUniform;
+    type _ClusterOffsetsAndCounts = crate::prelude::ClusterOffsetsAndCountsUniform;
     #[permutate(buffer_format = storage)]
-    type _ClusterOffsetsAndCounts = ClusterOffsetsAndCountsStorage;
+    type _ClusterOffsetsAndCounts = crate::prelude::ClusterOffsetsAndCountsStorage;
 
     #[permutate(position = some)]
     type _Position = Vec4;
@@ -164,31 +155,31 @@ pub fn fragment(
     type _Color = ();
 
     #[permutate(normal_map = some)]
-    type _NormalMap = StandardMaterialNormalMap;
+    type _NormalMap = crate::prelude::StandardMaterialNormalMap;
     #[permutate(normal_map = none)]
     type _NormalMap = ();
 
     #[permutate(skinned = some)]
-    type _Skinned = SkinnedMesh;
+    type _Skinned = crate::prelude::SkinnedMesh;
     #[permutate(skinned = none)]
     type _Skinned = ();
 
     #[permutate(tonemap = some)]
-    type _Tonemap = TonemapInShader;
+    type _Tonemap = crate::prelude::TonemapInShader;
     #[permutate(tonemap = none)]
     type _Tonemap = ();
 
     #[permutate(deband = some)]
-    type _Deband = DebandDither;
+    type _Deband = crate::prelude::DebandDither;
     #[permutate(deband = none)]
     type _Deband = ();
 
     #[permutate(cluster_debug = debug_z_slices)]
-    type _ClusterDebug = DebugZSlices;
+    type _ClusterDebug = crate::prelude::DebugZSlices;
     #[permutate(cluster_debug = debug_cluster_light_complexity)]
-    type _ClusterDebug = DebugClusterLightComplexity;
-    #[permutate(cluster_debug = debug_cluster_coherence)]
-    type _ClusterDebug = DebugClusterCoherence;
+    type _ClusterDebug = crate::prelude::DebugClusterLightComplexity;
+    #[permutate(cluster_debug = debug_cluster_coherency)]
+    type _ClusterDebug = crate::prelude::DebugClusterCoherency;
     #[permutate(cluster_debug = none)]
     type _ClusterDebug = ();
 

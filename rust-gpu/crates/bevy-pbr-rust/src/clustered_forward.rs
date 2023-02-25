@@ -1,5 +1,5 @@
-use shader_util::{hsv2rgb, random_1d, smooth_step::SmoothStep};
 use crate::glam::{UVec3, Vec4};
+use shader_util::{hsv2rgb, random_1d, smooth_step::SmoothStep};
 
 #[allow(unused_imports)]
 use spirv_std::num_traits::Float;
@@ -82,13 +82,13 @@ impl ClusterDebugVisualization for DebugClusterLightComplexity {
 
         output_color.x = (1.0 - cluster_overlay_alpha) * output_color.x
             + cluster_overlay_alpha
-                * ((offset_and_counts[1] + offset_and_counts[2]) as f32)
+                * ((offset_and_counts.y + offset_and_counts.z) as f32)
                     .smooth_step(0.0, max_light_complexity_per_cluster);
 
         output_color.y = (1.0 - cluster_overlay_alpha) * output_color.y
             + cluster_overlay_alpha
                 * (1.0
-                    - ((offset_and_counts[1] + offset_and_counts[2]) as f32)
+                    - ((offset_and_counts.y + offset_and_counts.z) as f32)
                         .smooth_step(0.0, max_light_complexity_per_cluster));
 
         output_color
