@@ -1,2 +1,5 @@
 rust-gpu/target
 bevy-app/target
+
+*.dot
+*.svg

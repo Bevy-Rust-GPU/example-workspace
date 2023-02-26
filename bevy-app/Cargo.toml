@@ -7,7 +7,11 @@ members = [
 default-members = ["crates/viewer"]
 
 [patch.crates-io]
+bevy_ecs = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
+bevy_app = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
+bevy_render = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
 bevy = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
+
 
 # Fast-compile config
 [profile.dev]

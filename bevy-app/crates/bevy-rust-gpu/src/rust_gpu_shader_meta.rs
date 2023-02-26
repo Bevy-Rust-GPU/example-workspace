@@ -5,10 +5,8 @@ use std::sync::RwLock;
 use once_cell::sync::Lazy;
 
 use bevy::{
-    asset::HandleId,
     prelude::{
-        default, AssetEvent, Assets, CoreStage, Deref, DerefMut, EventReader, Handle, Plugin,
-        Res, ResMut, Resource, info,
+        info, AssetEvent, Assets, Deref, DerefMut, EventReader, Handle, Plugin, Res, ResMut, Shader,
     },
     reflect::TypeUuid,
     utils::HashMap,
@@ -26,8 +24,6 @@ impl Plugin for RustGpuShaderPlugin {
         if !app.is_plugin_added::<JsonAssetPlugin<ModuleMeta>>() {
             app.add_plugin(JsonAssetPlugin::<ModuleMeta>::new(&["spv.json"]));
         }
-
-        app.add_system_to_stage(CoreStage::PreUpdate, load_shader_meta);
     }
 }
 
@@ -43,106 +39,74 @@ pub struct ModuleMeta {
     pub module: String,
 }
 
-pub fn load_shader_meta(
-    mut events: EventReader<AssetEvent<ModuleMeta>>,
+pub fn module_meta_events<V, F>(
+    mut shader_events: EventReader<AssetEvent<Shader>>,
+    mut module_meta_events: EventReader<AssetEvent<ModuleMeta>>,
     assets: Res<Assets<ModuleMeta>>,
-) {
-    for event in events.iter() {
-        match event {
-            AssetEvent::Created { handle } | AssetEvent::Modified { handle } => {
-                info!("Updating shader meta");
-                let asset = assets.get(handle).unwrap();
-                MODULE_METAS
-                    .write()
-                    .unwrap()
-                    .insert(handle.clone(), asset.clone());
-            }
-            AssetEvent::Removed { handle } => {
-                info!("Removing shader meta");
-                MODULE_METAS.write().unwrap().remove(handle);
-            }
-        }
-    }
-}
-
-#[derive(Debug, Resource)]
-pub struct RustGpuMaterials<V: RustGpuEntryPoint, F: RustGpuEntryPoint> {
-    pub materials: HashMap<Handle<RustGpuMaterial<V, F>>, RustGpuMaterial<V, F>>,
-}
-
-impl<V, F> RustGpuMaterials<V, F>
-where
-    V: RustGpuEntryPoint,
-    F: RustGpuEntryPoint,
-{
-    pub fn add(
-        &mut self,
-        materials: &Assets<RustGpuMaterial<V, F>>,
-        material: RustGpuMaterial<V, F>,
-    ) -> Handle<RustGpuMaterial<V, F>> {
-        let handle_id = HandleId::random::<RustGpuMaterial<V, F>>();
-        let mut handle = Handle::<RustGpuMaterial<V, F>>::weak(handle_id);
-        handle.make_strong(&materials);
-        self.materials.insert(handle.clone(), material);
-        handle
-    }
-}
-
-impl<V, F> Default for RustGpuMaterials<V, F>
-where
-    V: RustGpuEntryPoint,
-    F: RustGpuEntryPoint,
-{
-    fn default() -> Self {
-        RustGpuMaterials {
-            materials: default(),
-        }
-    }
-}
-
-impl<V, F> Clone for RustGpuMaterials<V, F>
-where
-    V: RustGpuEntryPoint,
-    F: RustGpuEntryPoint,
-{
-    fn clone(&self) -> Self {
-        RustGpuMaterials {
-            materials: self.materials.clone(),
-        }
-    }
-}
-
-pub fn rust_gpu_materials<V, F>(
-    mut storage: ResMut<RustGpuMaterials<V, F>>,
     mut materials: ResMut<Assets<RustGpuMaterial<V, F>>>,
 ) where
     V: RustGpuEntryPoint,
     F: RustGpuEntryPoint,
 {
-    let module_meta = MODULE_METAS.read().unwrap();
+    let mut reload = false;
 
-    let mut to_apply = vec![];
-    for (handle, material) in storage.materials.iter() {
-        match (&material.vertex_meta, &material.fragment_meta) {
-            (None, None) => to_apply.push(handle.clone()),
-            (None, Some(meta)) | (Some(meta), None) => {
-                if module_meta.contains_key(&meta) {
-                    to_apply.push(handle.clone());
+    for event in shader_events.iter() {
+        info!("Shader event {event:#?}");
+        match event {
+            AssetEvent::Created { handle } | AssetEvent::Modified { handle } => {
+                for id in materials.ids().collect::<Vec<_>>() {
+                    let material_handle = Handle::<RustGpuMaterial<V, F>>::weak(id);
+                    if let Some(material) = materials.get_mut(&material_handle) {
+                        if material.vertex_shader == Some(handle.clone_weak())
+                            || material.fragment_shader == Some(handle.clone_weak())
+                        {
+                            {
+                                let mut module_meta = MODULE_METAS.write().unwrap();
+                                if let Some(meta) = &material.vertex_meta {
+                                    info!("Removing vertex meta {meta:?}");
+                                    module_meta.remove(meta);
+                                }
+
+                                if let Some(meta) = &material.fragment_meta {
+                                    info!("Removing fragment meta {meta:?}");
+                                    module_meta.remove(meta);
+                                }
+                            }
+
+                            reload = true
+                        }
+                    }
                 }
             }
-            (Some(meta_v), Some(meta_f)) => {
-                if module_meta.contains_key(&meta_v) && module_meta.contains_key(&meta_f) {
-                    to_apply.push(handle.clone());
+            _ => (),
+        }
+    }
+
+    for event in module_meta_events.iter() {
+        info!("Module meta event {event:#?}");
+        match event {
+            AssetEvent::Created { handle } | AssetEvent::Modified { handle } => {
+                info!("Updating shader meta for {handle:?}");
+                if let Some(asset) = assets.get(handle) {
+                    info!("Shader meta: {asset:#?}");
+                    MODULE_METAS
+                        .write()
+                        .unwrap()
+                        .insert(handle.clone(), asset.clone());
+                    reload = true;
                 }
+            }
+            AssetEvent::Removed { handle } => {
+                info!("Removing shader meta for {handle:?}");
+                MODULE_METAS.write().unwrap().remove(handle);
+                reload = true;
             }
         }
     }
 
-    for (handle, material) in storage
-        .materials
-        .drain_filter(|handle, _| to_apply.contains(&handle))
-    {
-        materials.set_untracked(handle, material);
+    if reload {
+        for (_, material) in materials.iter_mut() {
+            material.iteration += 1;
+        }
     }
 }
-

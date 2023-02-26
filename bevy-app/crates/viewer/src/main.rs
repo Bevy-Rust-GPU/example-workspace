@@ -1,22 +1,28 @@
 pub mod rust_gpu_shaders;
 
+use std::time::Instant;
+
 use bevy::{
     prelude::{
-        default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Color,
-        Commands, DefaultPlugins, DirectionalLight, DirectionalLightBundle, MaterialMeshBundle,
-        MaterialPlugin, Mesh, PluginGroup, PointLight, PointLightBundle, Quat, Res, ResMut, Shader,
-        StandardMaterial, Transform, Vec3,
+        default, info, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Color,
+        Commands, CoreStage, DefaultPlugins, DirectionalLight, DirectionalLightBundle,
+        IntoSystemDescriptor, Local, MaterialMeshBundle, MaterialPlugin, Mesh, PluginGroup,
+        PointLight, PointLightBundle, Quat, Query, Res, ResMut, Shader, StandardMaterial,
+        Transform, Vec3,
     },
     render::settings::{WgpuLimits, WgpuSettings},
+    time::Time,
 };
-use bevy_rust_gpu::prelude::{
-    rust_gpu_materials, rust_gpu_shader_defs, MissingEntryPointSender, ModuleMeta, RustGpuMaterial,
-    RustGpuMaterials, RustGpuMissingEntryPointPlugin, RustGpuShaderPlugin,
+use bevy_rust_gpu::{
+    prelude::{
+        rust_gpu_shader_defs, MissingEntryPointSender, ModuleMeta, RustGpuMaterial,
+        RustGpuMissingEntryPointPlugin, RustGpuShaderPlugin,
+    },
+    rust_gpu_shader_meta::module_meta_events,
 };
 use rust_gpu_shaders::{MeshVertex, PbrFragment};
 
-const SHADER_PATH: &'static str =
-    "rust-gpu/target/spirv-unknown-spv1.5/release/deps/shader.spv";
+const SHADER_PATH: &'static str = "rust-gpu/target/spirv-unknown-spv1.5/release/deps/shader.spv";
 
 const SHADER_META_PATH: &'static str =
     "rust-gpu/target/spirv-unknown-spv1.5/release/deps/shader.spv.json";
@@ -34,15 +40,16 @@ fn main() {
     });
 
     // Configure the asset plugin to watch the workspace path for changes
-    app.add_plugins(DefaultPlugins.set(AssetPlugin {
-        asset_folder: "../../../".into(),
-        watch_for_changes: true,
-        ..default()
-    }));
+    app.add_plugins(
+        DefaultPlugins.set(AssetPlugin {
+            asset_folder: "../../../".into(),
+            watch_for_changes: true,
+            ..default()
+        }), //.disable::<LogPlugin>(),
+    );
 
     app.add_plugin(RustGpuShaderPlugin)
-        .add_plugin(RustGpuMissingEntryPointPlugin)
-        .init_resource::<RustGpuMaterials<MeshVertex, PbrFragment>>();
+        .add_plugin(RustGpuMissingEntryPointPlugin);
 
     // Setup ShaderMaterial
     app.add_plugin(MaterialPlugin::<RustGpuMaterial<MeshVertex, PbrFragment>>::default());
@@ -50,7 +57,13 @@ fn main() {
     // Setup scene
     app.add_startup_system(setup);
 
-    app.add_system(rust_gpu_materials::<MeshVertex, PbrFragment>);
+    app.add_system_to_stage(
+        CoreStage::Last,
+        module_meta_events::<MeshVertex, PbrFragment>,
+    );
+
+    //std::fs::write("schedule.dot", bevy_mod_debugdump::get_schedule(&mut app)).unwrap();
+    //std::fs::write("render_schedule.dot", bevy_mod_debugdump::get_render_schedule(&mut app)).unwrap();
 
     // Run
     app.run();
@@ -60,10 +73,9 @@ fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut rust_gpu_material_storage: ResMut<RustGpuMaterials<MeshVertex, PbrFragment>>,
     mut standard_materials: ResMut<Assets<StandardMaterial>>,
+    mut shader_materials: ResMut<Assets<RustGpuMaterial<MeshVertex, PbrFragment>>>,
     missing_entry_point_sender: Res<MissingEntryPointSender>,
-    rust_gpu_materials: Res<Assets<RustGpuMaterial<MeshVertex, PbrFragment>>>,
 ) {
     // Spawn camera
     commands.spawn(Camera3dBundle::default());
@@ -74,7 +86,7 @@ fn setup(
             illuminance: 5000.0,
             ..default()
         },
-        transform: Transform::IDENTITY.looking_at(Vec3::new(1.0, -1.0, -1.0), Vec3::Y),
+        transform: Transform::IDENTITY.looking_at(Vec3::new(0.0, -1.0, -1.0), Vec3::Y),
         ..default()
     });
 
@@ -97,24 +109,21 @@ fn setup(
     let shader_meta = asset_server.load::<ModuleMeta, _>(SHADER_META_PATH);
 
     let extra_defs = rust_gpu_shader_defs();
-    let shader_material = rust_gpu_material_storage.add(
-        &rust_gpu_materials,
-        RustGpuMaterial {
-            vertex_shader: Some(shader.clone()),
-            vertex_meta: Some(shader_meta.clone()),
-            vertex_defs: extra_defs.clone(),
-            fragment_shader: Some(shader),
-            fragment_meta: Some(shader_meta),
-            fragment_defs: extra_defs,
-            sender: Some(missing_entry_point_sender.clone()),
-            ..default()
-        },
-    );
+    let shader_material = shader_materials.add(RustGpuMaterial {
+        vertex_shader: Some(shader.clone()),
+        vertex_meta: Some(shader_meta.clone()),
+        vertex_defs: extra_defs.clone(),
+        fragment_shader: Some(shader),
+        fragment_meta: Some(shader_meta),
+        fragment_defs: extra_defs,
+        sender: Some(missing_entry_point_sender.clone()),
+        ..default()
+    });
 
     // Spawn example cubes
     commands.spawn(MaterialMeshBundle {
         transform: Transform::from_xyz(-1.0, 0.0, -6.0)
-            .with_rotation(Quat::from_axis_angle(Vec3::ONE, 45.0).normalize()),
+            .with_rotation(Quat::from_axis_angle(Vec3::new(1.0, 1.0, 1.0), 45.0).normalize()),
         mesh: mesh.clone(),
         material: standard_material,
         ..default()
@@ -122,7 +131,7 @@ fn setup(
 
     commands.spawn(MaterialMeshBundle {
         transform: Transform::from_xyz(1.0, 0.0, -6.0)
-            .with_rotation(Quat::from_axis_angle(Vec3::ONE, -45.0).normalize()),
+            .with_rotation(Quat::from_axis_angle(Vec3::new(-1.0, 1.0, 1.0), -45.0).normalize()),
         mesh,
         material: shader_material,
         ..default()
