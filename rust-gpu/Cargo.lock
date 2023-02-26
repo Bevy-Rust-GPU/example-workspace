@@ -54,6 +54,7 @@ dependencies = [
 name = "bevy-rust-gpu-macros"
 version = "0.1.0"
 dependencies = [
+ "proc-macro2",
  "quote",
  "syn",
 ]

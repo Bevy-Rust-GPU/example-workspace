@@ -18,7 +18,9 @@ use crate::prelude::{
         color: some | none,
         skinned: some | none
     },
-    permutations = (*, *, *)
+    permutations = [
+        (*, *, *)
+    ]
 )]
 pub fn vertex(
     #[spirv(uniform, descriptor_set = 0, binding = 0)] view: &View,

@@ -6,10 +6,12 @@ use spirv_std::{
 };
 
 use crate::prelude::{
-    BaseColorTexture, BaseMaterialNormalMap, ClusterDebugVisualization, ClusterLightIndexLists, ClusterOffsetsAndCounts, DirectionalShadowTextures, Dither,
-    EmissiveTexture, Lights, Mesh, MetallicRoughnessTexture, NormalMapTexture, OcclusionTexture,
-    PbrInput, PointLights, PointLightsUniform, PointShadowTextures, Skinning, Tonemapper, VertexColor, VertexNormal, VertexPosition, VertexTangent,
-    VertexUv, View, STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT, STANDARD_MATERIAL_FLAGS_UNLIT_BIT,
+    BaseColorTexture, BaseMaterialNormalMap, ClusterDebugVisualization, ClusterLightIndexLists,
+    ClusterOffsetsAndCounts, DirectionalShadowTextures, Dither, EmissiveTexture, Lights, Mesh,
+    MetallicRoughnessTexture, NormalMapTexture, OcclusionTexture, PbrInput, PointLights,
+    PointLightsUniform, PointShadowTextures, Skinning, Tonemapper, VertexColor, VertexNormal,
+    VertexPosition, VertexTangent, VertexUv, View, STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT,
+    STANDARD_MATERIAL_FLAGS_UNLIT_BIT,
 };
 
 use super::BaseMaterial;
@@ -27,9 +29,12 @@ use super::BaseMaterial;
         skinned: some | none,
         tonemap: some | none,
         deband: some | none,
-        cluster_debug: debug_z_slices | debug_cluster_light_complexity | debug_cluster_coherency | none,
+        cluster_debug: debug_z_slices | debug_cluster_light_complexity | debug_cluster_coherency | none
     },
-    permutations = (array, uniform, some, some, some, none, none, none, none, some, some, none)
+    permutations = [
+        (array, uniform, some, some, some, none, none, none, none, some, some, none),
+        (*, uniform, some, some, some, none, none, none, none, *, *, none)
+    ]
 )]
 #[spirv(fragment)]
 #[allow(non_snake_case)]
