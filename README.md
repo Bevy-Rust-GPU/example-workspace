@@ -68,7 +68,7 @@ i.e. `mesh::vertex`, `pbr::fragment`.
 
 ### `shader-builder` Crate
 
-Empty library crate used to invoke `spirv-builder` via `build.rs` independently of the bevy app.
+File-watching shader compilation daemon. Used to recompile the `shader` crate in response to changes in source or permutation files.
 
 ## `shared` Directory
 
