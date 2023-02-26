@@ -9,8 +9,9 @@ use bevy::{
 };
 
 use crate::{
-    prelude::{ModuleMeta, MODULE_METAS},
+    prelude::{MissingEntryPoint, ModuleMeta, MODULE_METAS},
     rust_gpu_entry_point::RustGpuEntryPoint,
+    rust_gpu_missing_entry_points::MissingEntryPointSender,
 };
 
 #[derive(ShaderType)]
@@ -18,7 +19,7 @@ pub struct BaseMaterial {
     base: StandardMaterialUniform,
 }
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone)]
 pub struct ShaderMaterialKey {
     vertex_shader: Option<Handle<Shader>>,
     vertex_meta: Option<Handle<ModuleMeta>>,
@@ -28,7 +29,36 @@ pub struct ShaderMaterialKey {
     fragment_defs: Vec<String>,
     normal_map: bool,
     cull_mode: Option<Face>,
+    sender: Option<MissingEntryPointSender>,
 }
+
+impl PartialEq for ShaderMaterialKey {
+    fn eq(&self, other: &Self) -> bool {
+        self.vertex_shader.eq(&other.vertex_shader)
+            && self.vertex_meta.eq(&other.vertex_meta)
+            && self.vertex_defs.eq(&other.vertex_defs)
+            && self.fragment_shader.eq(&other.fragment_shader)
+            && self.fragment_meta.eq(&other.fragment_meta)
+            && self.fragment_defs.eq(&other.fragment_defs)
+            && self.normal_map.eq(&other.normal_map)
+            && self.cull_mode.eq(&other.cull_mode)
+    }
+}
+
+impl std::hash::Hash for ShaderMaterialKey {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.vertex_shader.hash(state);
+        self.vertex_meta.hash(state);
+        self.vertex_defs.hash(state);
+        self.fragment_shader.hash(state);
+        self.fragment_meta.hash(state);
+        self.fragment_defs.hash(state);
+        self.normal_map.hash(state);
+        self.cull_mode.hash(state);
+    }
+}
+
+impl Eq for ShaderMaterialKey {}
 
 impl<V, F> From<&RustGpuMaterial<V, F>> for ShaderMaterialKey {
     fn from(value: &RustGpuMaterial<V, F>) -> Self {
@@ -41,6 +71,7 @@ impl<V, F> From<&RustGpuMaterial<V, F>> for ShaderMaterialKey {
             fragment_defs: value.fragment_defs.clone(),
             normal_map: value.normal_map_texture.is_some(),
             cull_mode: value.base.cull_mode,
+            sender: value.sender.clone(),
         }
     }
 }
@@ -78,6 +109,7 @@ pub struct RustGpuMaterial<V, F> {
     #[sampler(10)]
     pub normal_map_texture: Option<Handle<Image>>,
 
+    pub sender: Option<MissingEntryPointSender>,
     pub _phantom: PhantomData<(V, F)>,
 }
 
@@ -96,6 +128,7 @@ impl<V, F> Default for RustGpuMaterial<V, F> {
             metallic_roughness_texture: default(),
             occlusion_texture: default(),
             normal_map_texture: default(),
+            sender: default(),
             _phantom: default(),
         }
     }
@@ -116,6 +149,7 @@ impl<V, F> Clone for RustGpuMaterial<V, F> {
             metallic_roughness_texture: self.metallic_roughness_texture.clone(),
             occlusion_texture: self.occlusion_texture.clone(),
             normal_map_texture: self.occlusion_texture.clone(),
+            sender: self.sender.clone(),
             _phantom: default(),
         }
     }
@@ -161,6 +195,7 @@ where
         _layout: &bevy::render::mesh::MeshVertexBufferLayout,
         key: bevy::pbr::MaterialPipelineKey<Self>,
     ) -> Result<(), bevy::render::render_resource::SpecializedMeshPipelineError> {
+        info!("Specializing RustGpuMaterial");
         if let Some(vertex_shader) = key.bind_group_data.vertex_shader {
             let shader_defs: Vec<_> = descriptor
                 .vertex
@@ -183,6 +218,15 @@ where
                         apply = false;
                     }
                 }
+            }
+
+            if let Some(sender) = &key.bind_group_data.sender {
+                sender
+                    .send(MissingEntryPoint {
+                        shader: V::NAME,
+                        permutation: V::permutation(&shader_defs),
+                    })
+                    .unwrap();
             }
 
             if apply {
@@ -219,6 +263,15 @@ where
                             apply = false;
                         }
                     }
+                }
+
+                if let Some(sender) = &key.bind_group_data.sender {
+                    sender
+                        .send(MissingEntryPoint {
+                            shader: F::NAME,
+                            permutation: F::permutation(&shader_defs),
+                        })
+                        .unwrap();
                 }
 
                 if apply {

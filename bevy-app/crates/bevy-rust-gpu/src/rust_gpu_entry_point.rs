@@ -11,25 +11,34 @@ pub trait RustGpuEntryPoint: 'static + Send + Sync {
         shader_defs.contains(def)
     }
 
-    fn build(shader_defs: &Vec<String>) -> String {
-        let mut entry_point = Self::NAME.to_string();
+    fn permutation(shader_defs: &Vec<String>) -> Vec<String> {
+        let mut permutation = vec![];
 
         for (defined, undefined) in Self::PARAMETERS.iter() {
-            entry_point += "__";
-            entry_point += if let Some(mapping) = defined.iter().find_map(|(def, mapping)| {
+            if let Some(mapping) = defined.iter().find_map(|(def, mapping)| {
                 if Self::is_defined(shader_defs, &def.to_string()) {
                     Some(mapping)
                 } else {
                     None
                 }
             }) {
-                mapping
+                permutation.push(mapping.to_string());
             } else {
-                undefined
+                permutation.push(undefined.to_string())
             };
         }
 
-        entry_point
+        permutation
+    }
+
+    fn build(shader_defs: &Vec<String>) -> String {
+        std::iter::once(Self::NAME.to_string())
+            .chain(
+                Self::permutation(shader_defs)
+                    .into_iter()
+                    .map(|variant| "__".to_string() + &variant),
+            )
+            .collect::<String>()
     }
 }
 

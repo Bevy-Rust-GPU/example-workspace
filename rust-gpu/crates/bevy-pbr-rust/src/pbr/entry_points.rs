@@ -1,16 +1,15 @@
 use bevy_rust_gpu_macros::permutate;
 use spirv_std::{
     glam::{Vec2, Vec3, Vec4},
-    macros::spirv,
-    Sampler,
+    spirv, Sampler,
 };
 
 use crate::prelude::{
     BaseColorTexture, BaseMaterialNormalMap, ClusterDebugVisualization, ClusterLightIndexLists,
     ClusterOffsetsAndCounts, DirectionalShadowTextures, Dither, EmissiveTexture, Lights, Mesh,
     MetallicRoughnessTexture, NormalMapTexture, OcclusionTexture, PbrInput, PointLights,
-    PointLightsUniform, PointShadowTextures, Skinning, Tonemapper, VertexColor, VertexNormal,
-    VertexPosition, VertexTangent, VertexUv, View, STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT,
+    PointShadowTextures, Skinning, Tonemapper, VertexColor, VertexNormal, VertexPosition,
+    VertexTangent, VertexUv, View, STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT,
     STANDARD_MATERIAL_FLAGS_UNLIT_BIT,
 };
 
@@ -32,8 +31,9 @@ use super::BaseMaterial;
         cluster_debug: debug_z_slices | debug_cluster_light_complexity | debug_cluster_coherency | none
     },
     permutations = [
-        (array, uniform, some, some, some, none, none, none, none, some, some, none),
-        (*, uniform, some, some, some, none, none, none, none, *, *, none)
+        //(array, uniform, some, some, some, none, none, none, none, some, some, none),
+        //(*, uniform, some, some, some, none, none, none, none, *, *, none)
+        file("crates/shader-builder/entrypoints.json", "pbr::entry_points")
     ]
 )]
 #[spirv(fragment)]
@@ -120,9 +120,9 @@ pub fn fragment(
     type _DirectionalShadow = crate::prelude::DirectionalShadowTextureArray;
 
     #[permutate(buffer_format = uniform)]
-    type _PointLights = PointLightsUniform;
+    type _PointLights = crate::prelude::PointLightsUniform;
     #[permutate(buffer_format = storage)]
-    type _PointLights = PointLightsStorage;
+    type _PointLights = crate::prelude::PointLightsStorage;
 
     #[permutate(buffer_format = uniform)]
     type _ClusterLightIndexLists = crate::prelude::ClusterLightIndexListsUniform;

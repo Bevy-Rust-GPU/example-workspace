@@ -21,8 +21,14 @@ pub fn macro_impl(
 ) -> Result<TokenStream, Error> {
     let parameters = attr.parameters()?;
 
+    eprintln!("Parameters");
+
     // Calculate permutations
-    let permutations = attr.permutations()?.into_permutations(parameters);
+    let permutations = attr
+        .permutations()?
+        .into_permutations(&item_fn.sig.ident, parameters);
+
+    eprintln!("Permutations");
 
     // Iterate permutations
     let mut out = vec![];

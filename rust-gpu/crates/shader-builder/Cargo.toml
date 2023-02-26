@@ -2,6 +2,9 @@
 name = "shader-builder"
 version = "0.1.0"
 edition = "2021"
+build = false
 
-[build-dependencies]
+[dependencies]
 spirv-builder = "0.5.0"
+ctrlc = "3.2.5"
+notify-debouncer-mini = "0.2.1"

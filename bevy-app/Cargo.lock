@@ -198,6 +198,7 @@ dependencies = [
  "bevy_common_assets",
  "once_cell",
  "serde",
+ "serde_json",
 ]
 
 [[package]]

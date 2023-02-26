@@ -1,12 +1,14 @@
+use json::JsonValue;
+use proc_macro2::Span;
 use syn::{
     bracketed, parenthesized,
     parse::{Parse, ParseBuffer, ParseStream},
     punctuated::Punctuated,
     token::{Bracket, Comma, Or, Paren, Star},
-    Error, Ident,
+    Error, Ident, LitStr,
 };
 
-use super::parameters::Parameters;
+use super::{keywords, parameters::Parameters};
 
 pub struct Permutation {
     _paren: Paren,
@@ -21,6 +23,50 @@ impl Parse for Permutation {
             variants: Punctuated::parse_separated_nonempty(&content)?,
         })
     }
+}
+
+fn parse_file(mod_path: &str, lit_str: &LitStr, fn_ident: &Ident) -> Vec<Vec<Ident>> {
+    let path = lit_str.value();
+    let file = std::fs::read_to_string(path).unwrap();
+    let json = json::parse(&file).unwrap();
+    let JsonValue::Object(object) = json else {
+        panic!();
+    };
+
+    let entry_points = object.get("entry_points").unwrap();
+    let JsonValue::Object(object) = entry_points else {
+        panic!();
+    };
+
+    let source_path = mod_path.to_string() + "::" + &fn_ident.to_string();
+    let Some(entry_point) = object.get(&source_path) else {
+        return Default::default()
+    };
+
+    let JsonValue::Array(array) = entry_point else {
+        panic!();
+    };
+
+    let values = array
+        .into_iter()
+        .map(|value| {
+            let JsonValue::Array(array) = value else {
+                panic!()
+            };
+
+            array
+                .into_iter()
+                .map(|value| {
+                    let Some(string) = value.as_str() else {
+                        panic!()
+                    };
+                    Ident::new(string, Span::call_site())
+                })
+                .collect()
+        })
+        .collect::<Vec<Vec<_>>>();
+
+    values
 }
 
 impl Permutation {
@@ -50,11 +96,66 @@ impl Permutation {
     }
 }
 
+pub struct PermutationsFile {
+    ident: Ident,
+    paren: Paren,
+    file: LitStr,
+    comma: Comma,
+    mod_path: LitStr,
+}
+
+impl Parse for PermutationsFile {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let content: ParseBuffer;
+        Ok(PermutationsFile {
+            ident: input.parse()?,
+            paren: parenthesized!(content in input),
+            file: content.parse()?,
+            comma: content.parse()?,
+            mod_path: content.parse()?,
+        })
+    }
+}
+
+pub enum PermutationsVariant {
+    Literal(Permutation),
+    File(PermutationsFile),
+}
+
+impl PermutationsVariant {
+    fn validate(&self, parameters: &Parameters) -> Result<(), Error> {
+        match self {
+            PermutationsVariant::Literal(literal) => literal.validate(parameters),
+            PermutationsVariant::File(_) => Ok(()),
+        }
+    }
+
+    fn into_permutations(&self, fn_ident: &Ident, parameters: &Parameters) -> Vec<Vec<Ident>> {
+        match self {
+            PermutationsVariant::Literal(literal) => literal.into_permutations(parameters),
+            PermutationsVariant::File(file) => {
+                parse_file(&file.mod_path.value(), &file.file, fn_ident)
+            }
+        }
+    }
+}
+
+impl Parse for PermutationsVariant {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let lookahead = input.lookahead1();
+        if lookahead.peek(keywords::file) {
+            Ok(PermutationsVariant::File(input.parse()?))
+        } else {
+            Ok(PermutationsVariant::Literal(input.parse()?))
+        }
+    }
+}
+
 pub struct Permutations {
     _ident: Ident,
     _eq: syn::token::Eq,
     _bracket: Bracket,
-    permutations: Punctuated<Permutation, Comma>,
+    permutations: Punctuated<PermutationsVariant, Comma>,
 }
 
 impl Parse for Permutations {
@@ -79,10 +180,10 @@ impl Permutations {
         Ok(())
     }
 
-    pub fn into_permutations(&self, parameters: &Parameters) -> Vec<Vec<Ident>> {
+    pub fn into_permutations(&self, fn_ident: &Ident, parameters: &Parameters) -> Vec<Vec<Ident>> {
         let mut permutations = vec![];
         for permutation in self.permutations.iter() {
-            permutations.extend(permutation.into_permutations(parameters))
+            permutations.extend(permutation.into_permutations(fn_ident, parameters))
         }
         permutations.sort();
         permutations.dedup();

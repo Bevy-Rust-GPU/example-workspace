@@ -9,17 +9,17 @@ use bevy::{
     },
     render::settings::{WgpuLimits, WgpuSettings},
 };
-use bevy_rust_gpu::{
-    prelude::{rust_gpu_shader_defs, RustGpuMaterial, RustGpuShaderPlugin},
-    rust_gpu_shader_meta::{ModuleMeta, RustGpuMaterials, rust_gpu_materials},
+use bevy_rust_gpu::prelude::{
+    rust_gpu_materials, rust_gpu_shader_defs, MissingEntryPointSender, ModuleMeta, RustGpuMaterial,
+    RustGpuMaterials, RustGpuMissingEntryPointPlugin, RustGpuShaderPlugin,
 };
 use rust_gpu_shaders::{MeshVertex, PbrFragment};
 
 const SHADER_PATH: &'static str =
-    "rust-gpu/target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv";
+    "rust-gpu/target/spirv-unknown-spv1.5/release/deps/shader.spv";
 
 const SHADER_META_PATH: &'static str =
-    "rust-gpu/target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv.json";
+    "rust-gpu/target/spirv-unknown-spv1.5/release/deps/shader.spv.json";
 
 fn main() {
     let mut app = App::default();
@@ -41,6 +41,7 @@ fn main() {
     }));
 
     app.add_plugin(RustGpuShaderPlugin)
+        .add_plugin(RustGpuMissingEntryPointPlugin)
         .init_resource::<RustGpuMaterials<MeshVertex, PbrFragment>>();
 
     // Setup ShaderMaterial
@@ -61,7 +62,8 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut rust_gpu_material_storage: ResMut<RustGpuMaterials<MeshVertex, PbrFragment>>,
     mut standard_materials: ResMut<Assets<StandardMaterial>>,
-    mut rust_gpu_materials: Res<Assets<RustGpuMaterial<MeshVertex, PbrFragment>>>,
+    missing_entry_point_sender: Res<MissingEntryPointSender>,
+    rust_gpu_materials: Res<Assets<RustGpuMaterial<MeshVertex, PbrFragment>>>,
 ) {
     // Spawn camera
     commands.spawn(Camera3dBundle::default());
@@ -104,6 +106,7 @@ fn setup(
             fragment_shader: Some(shader),
             fragment_meta: Some(shader_meta),
             fragment_defs: extra_defs,
+            sender: Some(missing_entry_point_sender.clone()),
             ..default()
         },
     );

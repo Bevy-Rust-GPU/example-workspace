@@ -10,3 +10,4 @@ proc-macro = true
 proc-macro2 = "1.0.51"
 syn = { version = "1.0.108", features = ["full"] }
 quote = "1.0.23"
+json = "0.12.4"

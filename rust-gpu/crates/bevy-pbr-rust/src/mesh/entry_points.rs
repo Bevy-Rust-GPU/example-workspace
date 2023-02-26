@@ -10,6 +10,8 @@ use crate::prelude::{
     Mesh, SkinnedMesh, Skinning, VertexNormal, VertexPosition, VertexTangent, View,
 };
 
+const _: &'static str = include_str!("../../../../crates/shader-builder/entrypoints.json");
+
 #[spirv(vertex)]
 #[allow(non_snake_case)]
 #[permutate(
@@ -19,7 +21,7 @@ use crate::prelude::{
         skinned: some | none
     },
     permutations = [
-        (*, *, *)
+        file("crates/shader-builder/entrypoints.json", "mesh::entry_points")
     ]
 )]
 pub fn vertex(
