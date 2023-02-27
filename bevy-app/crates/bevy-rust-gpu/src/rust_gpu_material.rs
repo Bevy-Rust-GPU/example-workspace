@@ -9,7 +9,7 @@ use bevy::{
 };
 
 use crate::{
-    prelude::{MissingEntryPoint, ModuleMeta, MODULE_METAS},
+    prelude::{MissingEntryPoint, MODULE_METAS},
     rust_gpu_entry_point::RustGpuEntryPoint,
     rust_gpu_missing_entry_points::MissingEntryPointSender,
 };
@@ -22,42 +22,36 @@ pub struct BaseMaterial {
 #[derive(Debug, Default, Clone)]
 pub struct ShaderMaterialKey {
     vertex_shader: Option<Handle<Shader>>,
-    vertex_meta: Option<Handle<ModuleMeta>>,
     vertex_defs: Vec<String>,
     fragment_shader: Option<Handle<Shader>>,
-    fragment_meta: Option<Handle<ModuleMeta>>,
     fragment_defs: Vec<String>,
     normal_map: bool,
     cull_mode: Option<Face>,
     sender: Option<MissingEntryPointSender>,
-    foo: usize,
+    iteration: usize,
 }
 
 impl PartialEq for ShaderMaterialKey {
     fn eq(&self, other: &Self) -> bool {
         self.vertex_shader.eq(&other.vertex_shader)
-            && self.vertex_meta.eq(&other.vertex_meta)
             && self.vertex_defs.eq(&other.vertex_defs)
             && self.fragment_shader.eq(&other.fragment_shader)
-            && self.fragment_meta.eq(&other.fragment_meta)
             && self.fragment_defs.eq(&other.fragment_defs)
             && self.normal_map.eq(&other.normal_map)
             && self.cull_mode.eq(&other.cull_mode)
-            && self.foo.eq(&other.foo)
+            && self.iteration.eq(&other.iteration)
     }
 }
 
 impl std::hash::Hash for ShaderMaterialKey {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.vertex_shader.hash(state);
-        self.vertex_meta.hash(state);
         self.vertex_defs.hash(state);
         self.fragment_shader.hash(state);
-        self.fragment_meta.hash(state);
         self.fragment_defs.hash(state);
         self.normal_map.hash(state);
         self.cull_mode.hash(state);
-        self.foo.hash(state);
+        self.iteration.hash(state);
     }
 }
 
@@ -67,15 +61,13 @@ impl<V, F> From<&RustGpuMaterial<V, F>> for ShaderMaterialKey {
     fn from(value: &RustGpuMaterial<V, F>) -> Self {
         ShaderMaterialKey {
             vertex_shader: value.vertex_shader.clone(),
-            vertex_meta: value.vertex_meta.clone(),
             vertex_defs: value.vertex_defs.clone(),
             fragment_shader: value.fragment_shader.clone(),
-            fragment_meta: value.fragment_meta.clone(),
             fragment_defs: value.fragment_defs.clone(),
             normal_map: value.normal_map_texture.is_some(),
             cull_mode: value.base.cull_mode,
             sender: value.sender.clone(),
-            foo: value.iteration.clone(),
+            iteration: value.iteration.clone(),
         }
     }
 }
@@ -87,10 +79,8 @@ pub struct RustGpuMaterial<V, F> {
     pub base: StandardMaterial,
 
     pub vertex_shader: Option<Handle<Shader>>,
-    pub vertex_meta: Option<Handle<ModuleMeta>>,
     pub vertex_defs: Vec<String>,
     pub fragment_shader: Option<Handle<Shader>>,
-    pub fragment_meta: Option<Handle<ModuleMeta>>,
     pub fragment_defs: Vec<String>,
 
     #[texture(1)]
@@ -123,10 +113,8 @@ impl<V, F> Default for RustGpuMaterial<V, F> {
         RustGpuMaterial {
             base: default(),
             vertex_shader: default(),
-            vertex_meta: default(),
             vertex_defs: default(),
             fragment_shader: default(),
-            fragment_meta: default(),
             fragment_defs: default(),
             base_color_texture: default(),
             emissive_texture: default(),
@@ -145,10 +133,8 @@ impl<V, F> Clone for RustGpuMaterial<V, F> {
         RustGpuMaterial {
             base: self.base.clone(),
             vertex_shader: self.vertex_shader.clone(),
-            vertex_meta: self.vertex_meta.clone(),
             vertex_defs: self.vertex_defs.clone(),
             fragment_shader: self.fragment_shader.clone(),
-            fragment_meta: self.fragment_meta.clone(),
             fragment_defs: self.fragment_defs.clone(),
             base_color_texture: self.base_color_texture.clone(),
             emissive_texture: self.emissive_texture.clone(),
@@ -218,17 +204,16 @@ where
             let entry_point = V::build(&shader_defs);
 
             let mut apply = false;
-            if let Some(vertex_meta) = key.bind_group_data.vertex_meta {
-                info!("Vertex meta is present");
-                let metas = MODULE_METAS.read().unwrap();
-                if let Some(vertex_meta) = metas.get(&vertex_meta) {
-                    info!("Vertex meta is valid");
-                    if vertex_meta.entry_points.contains(&entry_point) {
-                        apply = true;
-                    } else {
-                        warn!("Missing entry point {entry_point:}");
-                    }
+            let metas = MODULE_METAS.read().unwrap();
+            if let Some(vertex_meta) = metas.get(&vertex_shader) {
+                info!("Vertex meta is valid");
+                if vertex_meta.entry_points.contains(&entry_point) {
+                    apply = true;
+                } else {
+                    warn!("Missing entry point {entry_point:}");
                 }
+            } else {
+                apply = true;
             }
 
             if let Some(sender) = &key.bind_group_data.sender {
@@ -273,17 +258,17 @@ where
                 let entry_point = F::build(&shader_defs).into();
 
                 let mut apply = false;
-                if let Some(fragment_meta) = key.bind_group_data.fragment_meta {
-                    info!("Fragment meta is present");
-                    let metas = MODULE_METAS.read().unwrap();
-                    if let Some(fragment_meta) = metas.get(&fragment_meta) {
-                        info!("Fragment meta is valid");
-                        if fragment_meta.entry_points.contains(&entry_point) {
-                            apply = true;
-                        } else {
-                            warn!("Missing entry point {entry_point:}, falling back to default fragment shader.");
-                        }
+                info!("Fragment meta is present");
+                let metas = MODULE_METAS.read().unwrap();
+                if let Some(fragment_meta) = metas.get(&fragment_shader) {
+                    info!("Fragment meta is valid");
+                    if fragment_meta.entry_points.contains(&entry_point) {
+                        apply = true;
+                    } else {
+                        warn!("Missing entry point {entry_point:}, falling back to default fragment shader.");
                     }
+                } else {
+                    apply = true;
                 }
 
                 if let Some(sender) = &key.bind_group_data.sender {
