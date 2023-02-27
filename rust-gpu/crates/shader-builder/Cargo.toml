@@ -11,3 +11,4 @@ notify = "5.1.0"
 futures = { version = "0.3.26", features = ["thread-pool"] }
 tracing = "0.1.37"
 tracing-subscriber = "0.3.16"
+clap = { version = "4.1.6", features = ["derive"] }
