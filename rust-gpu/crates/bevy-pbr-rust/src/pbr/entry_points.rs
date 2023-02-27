@@ -33,7 +33,7 @@ use super::BaseMaterial;
     permutations = [
         //(array, uniform, some, some, some, none, none, none, none, some, some, none),
         //(*, uniform, some, some, some, none, none, none, none, *, *, none)
-        file("crates/shader-builder/entrypoints.json", "pbr::entry_points")
+        file("../../entry_points.json", "pbr::entry_points")
     ]
 )]
 #[spirv(fragment)]

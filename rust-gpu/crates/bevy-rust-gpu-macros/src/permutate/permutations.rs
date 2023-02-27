@@ -11,8 +11,8 @@ use syn::{
 use super::{keywords, parameters::Parameters};
 
 pub struct Permutation {
-    _paren: Paren,
-    variants: Punctuated<PermutationVariant, Comma>,
+    pub _paren: Paren,
+    pub variants: Punctuated<PermutationVariant, Comma>,
 }
 
 impl Parse for Permutation {
@@ -25,9 +25,8 @@ impl Parse for Permutation {
     }
 }
 
-fn parse_file(mod_path: &str, lit_str: &LitStr, fn_ident: &Ident) -> Vec<Vec<Ident>> {
-    let path = lit_str.value();
-    let file = std::fs::read_to_string(path).unwrap();
+fn parse_file(mod_path: &str, file_path: &str, fn_ident: &Ident) -> Vec<Vec<Ident>> {
+    let file = std::fs::read_to_string(file_path).unwrap();
     let json = json::parse(&file).unwrap();
     let JsonValue::Object(object) = json else {
         panic!();
@@ -97,11 +96,11 @@ impl Permutation {
 }
 
 pub struct PermutationsFile {
-    ident: Ident,
-    paren: Paren,
-    file: LitStr,
-    comma: Comma,
-    mod_path: LitStr,
+    pub ident: Ident,
+    pub paren: Paren,
+    pub file: LitStr,
+    pub comma: Comma,
+    pub mod_path: LitStr,
 }
 
 impl Parse for PermutationsFile {
@@ -134,7 +133,16 @@ impl PermutationsVariant {
         match self {
             PermutationsVariant::Literal(literal) => literal.into_permutations(parameters),
             PermutationsVariant::File(file) => {
-                parse_file(&file.mod_path.value(), &file.file, fn_ident)
+                let mod_path = file.mod_path.value();
+                let path = file.file.value();
+
+                let mut file_path = Span::call_site().unwrap().source_file().path();
+                file_path.pop();
+
+                let path = file_path.join(path);
+                let path = path.to_str().unwrap();
+
+                parse_file(&mod_path, path, fn_ident)
             }
         }
     }
@@ -152,10 +160,10 @@ impl Parse for PermutationsVariant {
 }
 
 pub struct Permutations {
-    _ident: Ident,
-    _eq: syn::token::Eq,
-    _bracket: Bracket,
-    permutations: Punctuated<PermutationsVariant, Comma>,
+    pub _ident: Ident,
+    pub _eq: syn::token::Eq,
+    pub _bracket: Bracket,
+    pub permutations: Punctuated<PermutationsVariant, Comma>,
 }
 
 impl Parse for Permutations {
@@ -189,9 +197,19 @@ impl Permutations {
         permutations.dedup();
         permutations
     }
+
+    pub fn file_paths(&self) -> Vec<String> {
+        self.permutations
+            .iter()
+            .flat_map(|permutation| match permutation {
+                PermutationsVariant::File(file) => Some(file.file.value()),
+                _ => None,
+            })
+            .collect()
+    }
 }
 
-enum PermutationVariant {
+pub enum PermutationVariant {
     Explicit(Punctuated<Ident, Or>),
     Glob(Star),
 }

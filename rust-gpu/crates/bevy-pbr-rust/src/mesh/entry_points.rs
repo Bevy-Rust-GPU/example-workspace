@@ -1,4 +1,3 @@
-use shader_util::glam::UVec4;
 use spirv_std::{
     glam::{Vec2, Vec3, Vec4},
     spirv,
@@ -6,11 +5,7 @@ use spirv_std::{
 
 use bevy_rust_gpu_macros::permutate;
 
-use crate::prelude::{
-    Mesh, SkinnedMesh, Skinning, VertexNormal, VertexPosition, VertexTangent, View,
-};
-
-const _: &'static str = include_str!("../../../../crates/shader-builder/entrypoints.json");
+use crate::prelude::{Mesh, Skinning, VertexNormal, VertexPosition, VertexTangent, View};
 
 #[spirv(vertex)]
 #[allow(non_snake_case)]
@@ -21,7 +16,7 @@ const _: &'static str = include_str!("../../../../crates/shader-builder/entrypoi
         skinned: some | none
     },
     permutations = [
-        file("crates/shader-builder/entrypoints.json", "mesh::entry_points")
+        file("../../entry_points.json", "mesh::entry_points")
     ]
 )]
 pub fn vertex(
@@ -30,7 +25,7 @@ pub fn vertex(
 
     #[permutate(skinned = some)]
     #[spirv(uniform, descriptor_set = 2, binding = 1)]
-    joint_matrices: &SkinnedMesh,
+    joint_matrices: &crate::prelude::SkinnedMesh,
 
     in_position: Vec3,
     in_normal: Vec3,
@@ -40,8 +35,8 @@ pub fn vertex(
 
     #[permutate(color = some)] in_color: Vec4,
 
-    #[permutate(skinned = some)] in_joint_indices: UVec4,
-    #[permutate(skinned = some)] in_joint_weights: Vec4,
+    #[permutate(skinned = some)] in_joint_indices: shader_util::glam::UVec4,
+    #[permutate(skinned = some)] in_joint_weights: shader_util::glam::Vec4,
 
     #[spirv(position)] out_clip_position: &mut Vec4,
     out_world_position: &mut Vec4,

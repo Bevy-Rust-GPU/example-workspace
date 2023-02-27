@@ -7,4 +7,7 @@ build = false
 [dependencies]
 spirv-builder = "0.5.0"
 ctrlc = "3.2.5"
-notify-debouncer-mini = "0.2.1"
+notify = "5.1.0"
+futures = { version = "0.3.26", features = ["thread-pool"] }
+tracing = "0.1.37"
+tracing-subscriber = "0.3.16"

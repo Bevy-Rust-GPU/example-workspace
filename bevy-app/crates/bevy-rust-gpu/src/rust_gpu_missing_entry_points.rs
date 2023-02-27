@@ -67,7 +67,7 @@ impl Plugin for RustGpuMissingEntryPointPlugin {
                         .spawn(async move {
                             info!("Writing entrypoints.json");
                             let writer = std::fs::File::create(
-                                "../rust-gpu/crates/shader-builder/entrypoints.json",
+                                "../rust-gpu/crates/bevy-pbr-rust/entry_points.json",
                             )
                             .unwrap();
                             serde_json::to_writer_pretty(writer, &missing_entry_points).unwrap();

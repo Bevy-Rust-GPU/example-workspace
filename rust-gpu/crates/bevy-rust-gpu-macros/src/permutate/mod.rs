@@ -21,17 +21,15 @@ pub fn macro_impl(
 ) -> Result<TokenStream, Error> {
     let parameters = attr.parameters()?;
 
-    eprintln!("Parameters");
-
     // Calculate permutations
-    let permutations = attr
-        .permutations()?
-        .into_permutations(&item_fn.sig.ident, parameters);
+    let permutations = attr.permutations()?;
 
-    eprintln!("Permutations");
+    let file_paths = permutations.file_paths();
+
+    let permutations = permutations.into_permutations(&item_fn.sig.ident, parameters);
 
     // Iterate permutations
-    let mut out = vec![];
+    let mut permutation_fns = vec![];
 
     for permutation in permutations.into_iter() {
         // Create a new copy of the function
@@ -102,11 +100,12 @@ pub fn macro_impl(
             }
         }
 
-        out.push(item_fn);
+        permutation_fns.push(item_fn);
     }
 
     Ok(quote! {
-        #(#out)*
+        #(const _: &'static str = include_str!(#file_paths);)*
+        #(#permutation_fns)*
     })
 }
 
