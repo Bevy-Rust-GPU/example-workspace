@@ -13,16 +13,11 @@ use futures::{
 
 use notify::{Event, RecommendedWatcher, RecursiveMode, Watcher};
 
-use spirv_builder::{MetadataPrintout, SpirvBuilder, SpirvMetadata};
+use spirv_builder::{
+    CompileResult, MetadataPrintout, SpirvBuilder, SpirvBuilderError, SpirvMetadata,
+};
 
 use tracing::{error, info};
-
-fn build_shader(path_to_crate: impl AsRef<Path>, target: impl Into<String>) {
-    SpirvBuilder::new(path_to_crate, target)
-        .print_metadata(MetadataPrintout::None)
-        .build()
-        .ok();
-}
 
 fn async_watcher() -> notify::Result<(RecommendedWatcher, Receiver<notify::Result<Event>>)> {
     let (mut tx, rx) = channel(1);
@@ -108,7 +103,7 @@ struct ShaderBuilder {
 }
 
 impl ShaderBuilder {
-    pub fn build_shader(&self) {
+    pub fn build_shader(&self) -> Result<CompileResult, SpirvBuilderError> {
         SpirvBuilder::new(&self.path_to_crate, &self.target)
             .deny_warnings(self.deny_warnings)
             .release(self.release)
@@ -123,7 +118,6 @@ impl ShaderBuilder {
             .preserve_bindings(self.preserve_bindings)
             .print_metadata(MetadataPrintout::None)
             .build()
-            .ok();
     }
 }
 
@@ -137,8 +131,11 @@ fn main() {
     println!();
 
     info!("Building shader...");
-    build_shader(&args.path_to_crate, &args.target);
-    info!("Build complete!");
+    if args.build_shader().is_ok() {
+        info!("Build complete!");
+    } else {
+        error!("Build failed!");
+    }
     println!();
 
     if args.watch_path.is_none() {
@@ -147,7 +144,7 @@ fn main() {
 
     let pool = ThreadPool::new().expect("Failed to build pool");
     let (change_tx, mut change_rx) = mpsc::unbounded::<()>();
-    let (build_tx, mut build_rx) = mpsc::unbounded::<()>();
+    let (build_tx, mut build_rx) = mpsc::unbounded::<bool>();
 
     let mut building = false;
 
@@ -178,14 +175,19 @@ fn main() {
                             let mut build_tx = build_tx.clone();
                             let args = args.clone();
                             async move {
-                                args.build_shader();
-                                build_tx.send(()).await.unwrap();
+                                build_tx.send(args.build_shader().is_ok()).await.unwrap();
                             }
                         })
                     }
                 },
-                _ = build_complete => {
-                    info!("Build complete!");
+                result = build_complete => {
+                    let result = result.unwrap();
+                    if result {
+                        info!("Build complete!");
+                    }
+                    else {
+                        error!("Build failed!");
+                    }
                     println!();
                     building = false;
                 }
