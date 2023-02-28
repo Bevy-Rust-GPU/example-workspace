@@ -1,0 +1,3 @@
+[submodule "rust-gpu/crates/rust-gpu-builder"]
+	path = rust-gpu/crates/rust-gpu-builder
+	url = https://github.com/Shfty/rust-gpu-builder
