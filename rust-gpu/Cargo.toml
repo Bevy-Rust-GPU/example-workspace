@@ -8,3 +8,7 @@ members = [
 ]
 default-members = ["crates/shader-builder"]
 
+[patch.crates-io]
+bevy-pbr-rust = { path = "crates/bevy-pbr-rust" }
+shader-util = { path = "../shared/shader-util" }
+bevy-rust-gpu-macros = { path = "crates/bevy-rust-gpu-macros" }

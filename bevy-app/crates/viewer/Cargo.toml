@@ -12,5 +12,5 @@ webgl = []
 [dependencies]
 bevy = "0.9.1"
 bevy_mod_debugdump = "0.6.0"
-bevy-rust-gpu = { path = "../bevy-rust-gpu" }
-shader-util = { path = "../../../shared/shader-util" }
+bevy-rust-gpu = "0.1.0"
+shader-util = "0.1.0"

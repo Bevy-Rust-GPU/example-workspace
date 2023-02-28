@@ -11,6 +11,8 @@ bevy_ecs = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
 bevy_app = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
 bevy_render = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
 bevy = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
+bevy-rust-gpu = { path = "crates/bevy-rust-gpu" }
+shader-util = { path = "../shared/shader-util" }
 
 
 # Fast-compile config

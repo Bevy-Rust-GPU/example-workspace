@@ -8,4 +8,4 @@ crate-type = ["dylib"]
 
 [dependencies]
 spirv-std = { version = "0.5.0", features = ["glam"] }
-bevy-pbr-rust = { path = "../bevy-pbr-rust" }
+bevy-pbr-rust = "0.1.0"
