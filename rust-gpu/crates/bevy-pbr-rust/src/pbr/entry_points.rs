@@ -1,4 +1,4 @@
-use bevy_rust_gpu_macros::permutate;
+use permutate_macro::permutate;
 use spirv_std::{
     glam::{Vec2, Vec3, Vec4},
     spirv, Sampler,

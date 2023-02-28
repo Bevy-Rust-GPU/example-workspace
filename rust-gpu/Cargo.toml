@@ -2,13 +2,13 @@
 resolver = "2"
 members = [
     "crates/bevy-pbr-rust",
-    "crates/bevy-rust-gpu-macros",
+    "crates/permutate-macro",
     "crates/shader",
-    "crates/shader-builder",
+    "crates/rust-gpu-builder",
 ]
-default-members = ["crates/shader-builder"]
+default-members = ["crates/rust-gpu-builder"]
 
 [patch.crates-io]
 bevy-pbr-rust = { path = "crates/bevy-pbr-rust" }
-shader-util = { path = "../shared/shader-util" }
-bevy-rust-gpu-macros = { path = "crates/bevy-rust-gpu-macros" }
+rust-gpu-util = { path = "../shared/rust-gpu-util" }
+permutate-macro = { path = "crates/permutate-macro" }

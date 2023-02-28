@@ -7,9 +7,9 @@ use spirv_std::{
 #[allow(unused_imports)]
 use spirv_std::num_traits::Float;
 
-use crate::prelude::{DirectionalLight, DirectionalShadowTextures, View};
+use rust_gpu_util::prelude::NaturalLog;
 
-pub const NATURAL_LOG_BASE: f32 = 2.718281828459;
+use crate::prelude::{DirectionalLight, DirectionalShadowTextures, View};
 
 #[derive(Default, Copy, Clone, PartialEq)]
 #[repr(C)]
@@ -91,8 +91,7 @@ impl Lights {
             ((view_z - self.cluster_factors.z) * self.cluster_factors.w).floor() as u32
         } else {
             // NOTE: had to use -view_z to make it positive else log(negative) is nan
-            ((-view_z).log(NATURAL_LOG_BASE) * self.cluster_factors.z - self.cluster_factors.w
-                + 1.0) as u32
+            ((-view_z).natural_log() * self.cluster_factors.z - self.cluster_factors.w + 1.0) as u32
         };
         // NOTE: We use min as we may limit the far z plane used for clustering to be closeer than
         // the furthest thing being drawn. This means that we need to limit to the maximum cluster.

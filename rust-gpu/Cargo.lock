@@ -44,20 +44,10 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 name = "bevy-pbr-rust"
 version = "0.1.0"
 dependencies = [
- "bevy-rust-gpu-macros",
  "bitflags",
- "shader-util",
+ "permutate-macro",
+ "rust-gpu-util",
  "spirv-std",
-]
-
-[[package]]
-name = "bevy-rust-gpu-macros"
-version = "0.1.0"
-dependencies = [
- "json",
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -604,6 +594,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
 
 [[package]]
+name = "permutate-macro"
+version = "0.1.0"
+dependencies = [
+ "json",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "pin-project-lite"
 version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -698,6 +698,26 @@ dependencies = [
  "fxhash",
  "num-traits",
  "spirv",
+]
+
+[[package]]
+name = "rust-gpu-builder"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "ctrlc",
+ "futures",
+ "notify",
+ "spirv-builder",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "rust-gpu-util"
+version = "0.1.0"
+dependencies = [
+ "spirv-std",
 ]
 
 [[package]]
@@ -824,34 +844,6 @@ name = "shader"
 version = "0.1.0"
 dependencies = [
  "bevy-pbr-rust",
- "spirv-std",
-]
-
-[[package]]
-name = "shader-builder"
-version = "0.1.0"
-dependencies = [
- "clap",
- "ctrlc",
- "futures",
- "notify",
- "spirv-builder",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "shader-glam"
-version = "0.1.0"
-dependencies = [
- "spirv-std",
-]
-
-[[package]]
-name = "shader-util"
-version = "0.1.0"
-dependencies = [
- "shader-glam",
  "spirv-std",
 ]
 

@@ -10,7 +10,7 @@ use spirv_std::{
     Sampler,
 };
 
-use shader_util::prelude::Reflect;
+use rust_gpu_util::prelude::Reflect;
 
 use crate::prelude::{
     env_brdf_approx, perceptual_roughness_to_roughness, ClusterDebugVisualization,

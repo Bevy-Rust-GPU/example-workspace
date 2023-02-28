@@ -1,5 +1,5 @@
 [package]
-name = "shader-glam"
+name = "rust-gpu-util"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,4 +10,4 @@ spirv-std = ["dep:spirv-std"]
 
 [dependencies]
 glam = { version = "0.23.0", optional = true }
-spirv-std = { version = "0.5.0", optional = true }
+spirv-std = { version = "0.5", optional = true }

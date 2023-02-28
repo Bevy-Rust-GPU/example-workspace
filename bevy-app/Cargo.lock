@@ -2474,6 +2474,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "rust-gpu-util"
+version = "0.1.0"
+dependencies = [
+ "glam 0.23.0",
+]
+
+[[package]]
 name = "rustc-hash"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2575,20 +2582,6 @@ name = "sha1_smol"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ae1a47186c03a32177042e55dbc5fd5aee900b8e0069a8d70fba96a9375cd012"
-
-[[package]]
-name = "shader-glam"
-version = "0.1.0"
-dependencies = [
- "glam 0.23.0",
-]
-
-[[package]]
-name = "shader-util"
-version = "0.1.0"
-dependencies = [
- "shader-glam",
-]
 
 [[package]]
 name = "sharded-slab"
@@ -2957,7 +2950,7 @@ dependencies = [
  "bevy",
  "bevy-rust-gpu",
  "bevy_mod_debugdump",
- "shader-util",
+ "rust-gpu-util",
 ]
 
 [[package]]

@@ -1,6 +1,6 @@
 #![no_std]
 
-use shader_util::glam;
+use rust_gpu_util::glam;
 
 pub mod clustered_forward;
 pub mod mesh;

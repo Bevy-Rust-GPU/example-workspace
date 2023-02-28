@@ -3,7 +3,7 @@ use spirv_std::{
     spirv,
 };
 
-use bevy_rust_gpu_macros::permutate;
+use permutate_macro::permutate;
 
 use crate::prelude::{Mesh, Skinning, VertexNormal, VertexPosition, VertexTangent, View};
 
@@ -35,8 +35,8 @@ pub fn vertex(
 
     #[permutate(color = some)] in_color: Vec4,
 
-    #[permutate(skinned = some)] in_joint_indices: shader_util::glam::UVec4,
-    #[permutate(skinned = some)] in_joint_weights: shader_util::glam::Vec4,
+    #[permutate(skinned = some)] in_joint_indices: rust_gpu_util::glam::UVec4,
+    #[permutate(skinned = some)] in_joint_weights: rust_gpu_util::glam::Vec4,
 
     #[spirv(position)] out_clip_position: &mut Vec4,
     out_world_position: &mut Vec4,

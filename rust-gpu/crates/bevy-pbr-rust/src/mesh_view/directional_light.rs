@@ -1,6 +1,6 @@
 use spirv_std::glam::{Mat4, Vec3, Vec4};
 
-use shader_util::saturate::Saturate;
+use rust_gpu_util::saturate::Saturate;
 
 use crate::prelude::{fd_burley, specular};
 

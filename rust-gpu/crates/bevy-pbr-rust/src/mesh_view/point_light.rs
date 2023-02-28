@@ -3,7 +3,7 @@ use spirv_std::glam::{Vec3, Vec4};
 #[allow(unused_imports)]
 use spirv_std::num_traits::Float;
 
-use shader_util::saturate::Saturate;
+use rust_gpu_util::saturate::Saturate;
 
 use super::super::prelude::{fd_burley, get_distance_attenuation, specular};
 

@@ -1,10 +1,15 @@
 #![no_std]
 
-pub use shader_glam::glam;
+#[cfg(not(feature = "spirv-std"))]
+pub use glam;
+
+#[cfg(feature = "spirv-std")]
+pub use spirv_std::glam;
 
 pub mod reflect;
 pub mod saturate;
 pub mod smooth_step;
+pub mod natural_log;
 
 pub mod prelude;
 
