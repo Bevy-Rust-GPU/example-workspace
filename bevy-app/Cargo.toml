@@ -1,7 +1,6 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/bevy-rust-gpu",
     "crates/viewer",
 ]
 default-members = ["crates/viewer"]
@@ -11,7 +10,7 @@ bevy_ecs = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
 bevy_app = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
 bevy_render = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
 bevy = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
-bevy-rust-gpu = { path = "crates/bevy-rust-gpu" }
+bevy-rust-gpu = { git = "https://github.com/Shfty/bevy-rust-gpu" }
 rust-gpu-util = { path = "../shared/rust-gpu-util" }
 
 # Fast-compile config

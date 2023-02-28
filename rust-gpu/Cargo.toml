@@ -1,13 +1,12 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/bevy-pbr-rust",
     "crates/shader",
     "crates/rust-gpu-builder",
 ]
 default-members = ["crates/rust-gpu-builder"]
 
 [patch.crates-io]
-bevy-pbr-rust = { path = "crates/bevy-pbr-rust" }
 rust-gpu-util = { path = "../shared/rust-gpu-util" }
+bevy-pbr-rust = { git = "https://github.com/Shfty/bevy-pbr-rust" }
 permutate-macro = { git = "https://github.com/Shfty/permutate-macro" }
