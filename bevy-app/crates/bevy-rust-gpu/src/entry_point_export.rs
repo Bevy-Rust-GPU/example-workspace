@@ -13,6 +13,7 @@ use bevy::{
 };
 use serde::{Deserialize, Serialize};
 
+/// Handles exporting known `RustGpuMaterial` permutations to a JSON file for static compilation
 pub struct EntryPointExportPlugin;
 
 impl Plugin for EntryPointExportPlugin {

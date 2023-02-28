@@ -1,5 +1,12 @@
 {
   "entry_points": {
+    "mesh::entry_points::vertex": [
+      [
+        "none",
+        "none",
+        "none"
+      ]
+    ],
     "pbr::entry_points::fragment": [
       [
         "array",
@@ -13,13 +20,6 @@
         "none",
         "some",
         "some",
-        "none"
-      ]
-    ],
-    "mesh::entry_points::vertex": [
-      [
-        "none",
-        "none",
         "none"
       ]
     ]

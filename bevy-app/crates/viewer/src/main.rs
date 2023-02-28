@@ -3,25 +3,26 @@ pub mod rust_gpu_shaders;
 use bevy::{
     prelude::{
         default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Color,
-        Commands, CoreStage, DefaultPlugins, DirectionalLight, DirectionalLightBundle,
-        MaterialMeshBundle, MaterialPlugin, Mesh, NonSendMut, PluginGroup, PointLight,
-        PointLightBundle, Quat, Res, ResMut, Shader, StandardMaterial, Transform, Vec3,
+        Commands, DefaultPlugins, DirectionalLight, DirectionalLightBundle, MaterialMeshBundle,
+        MaterialPlugin, Mesh, PluginGroup, PointLight, PointLightBundle, Quat, Res, ResMut, Shader,
+        StandardMaterial, Transform, Vec3,
     },
     render::settings::{WgpuLimits, WgpuSettings},
 };
 
-use bevy_rust_gpu::{
-    prelude::{
-        rust_gpu_shader_defs, EntryPointExport, EntryPointExportPlugin, ModuleMeta,
-        RustGpuMaterial, ShaderMetaPlugin,
-    },
-    shader_meta::{module_meta_events, ShaderMetaMap},
-};
+use bevy_rust_gpu::prelude::{rust_gpu_shader_defs, RustGpuMaterial};
 
 use rust_gpu_shaders::{MeshVertex, PbrFragment};
 
+#[cfg(feature = "shader-meta")]
+use bevy_rust_gpu::prelude::{ModuleMeta, ShaderMetaMap, ShaderMetaPlugin};
+
+#[cfg(feature = "entry-point-export")]
+use bevy_rust_gpu::prelude::{EntryPointExport, EntryPointExportPlugin};
+
 const SHADER_PATH: &'static str = "rust-gpu/target/spirv-unknown-spv1.5/release/deps/shader.spv";
 
+#[cfg(feature = "shader-meta")]
 const SHADER_META_PATH: &'static str =
     "rust-gpu/target/spirv-unknown-spv1.5/release/deps/shader.spv.json";
 
@@ -46,19 +47,17 @@ fn main() {
         }), //.disable::<LogPlugin>(),
     );
 
-    app.add_plugin(ShaderMetaPlugin)
-        .add_plugin(EntryPointExportPlugin);
+    #[cfg(feature = "shader-meta")]
+    app.add_plugin(ShaderMetaPlugin::<MeshVertex, PbrFragment>::default());
+
+    #[cfg(feature = "entry-point-export")]
+    app.add_plugin(EntryPointExportPlugin);
 
     // Setup ShaderMaterial
     app.add_plugin(MaterialPlugin::<RustGpuMaterial<MeshVertex, PbrFragment>>::default());
 
     // Setup scene
     app.add_startup_system(setup);
-
-    app.add_system_to_stage(
-        CoreStage::Last,
-        module_meta_events::<MeshVertex, PbrFragment>,
-    );
 
     //std::fs::write("schedule.dot", bevy_mod_debugdump::get_schedule(&mut app)).unwrap();
     //std::fs::write("render_schedule.dot", bevy_mod_debugdump::get_render_schedule(&mut app)).unwrap();
@@ -73,8 +72,8 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut standard_materials: ResMut<Assets<StandardMaterial>>,
     mut shader_materials: ResMut<Assets<RustGpuMaterial<MeshVertex, PbrFragment>>>,
-    mut exports: NonSendMut<EntryPointExport>,
-    mut shader_meta_map: ResMut<ShaderMetaMap>,
+    #[cfg(feature = "shader-meta")] mut shader_meta_map: ResMut<ShaderMetaMap>,
+    #[cfg(feature = "entry-point-export")] mut exports: bevy::prelude::NonSendMut<EntryPointExport>,
 ) {
     // Spawn camera
     commands.spawn(Camera3dBundle::default());
@@ -105,9 +104,14 @@ fn setup(
     let mesh = meshes.add(Cube { size: 1.0 }.into());
 
     let shader = asset_server.load::<Shader, _>(SHADER_PATH);
-    let shader_meta = asset_server.load::<ModuleMeta, _>(SHADER_META_PATH);
-    shader_meta_map.add(shader.clone_weak(), shader_meta.clone_weak());
 
+    #[cfg(feature = "shader-meta")]
+    {
+        let shader_meta = asset_server.load::<ModuleMeta, _>(SHADER_META_PATH);
+        shader_meta_map.add(shader.clone_weak(), shader_meta.clone_weak());
+    }
+
+    #[cfg(feature = "entry-point-export")]
     let export = exports.export("../rust-gpu/crates/bevy-pbr-rust/entry_points.json");
 
     let extra_defs = rust_gpu_shader_defs();
@@ -116,6 +120,7 @@ fn setup(
         vertex_defs: extra_defs.clone(),
         fragment_shader: Some(shader),
         fragment_defs: extra_defs,
+        #[cfg(feature = "entry-point-export")]
         export: Some(export),
         ..default()
     });

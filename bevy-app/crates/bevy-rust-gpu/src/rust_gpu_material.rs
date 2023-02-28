@@ -8,7 +8,13 @@ use bevy::{
     utils::Uuid,
 };
 
-use crate::prelude::{EntryPoint, EntryPointSender, Export, SHADER_META};
+use crate::prelude::EntryPoint;
+
+#[cfg(feature = "entry-point-export")]
+use crate::prelude::{EntryPointSender, Export};
+
+#[cfg(feature = "shader-meta")]
+use crate::prelude::SHADER_META;
 
 #[derive(ShaderType)]
 pub struct BaseMaterial {
@@ -23,6 +29,7 @@ pub struct ShaderMaterialKey {
     fragment_defs: Vec<String>,
     normal_map: bool,
     cull_mode: Option<Face>,
+    #[cfg(feature = "entry-point-export")]
     sender: Option<EntryPointSender>,
     iteration: usize,
 }
@@ -62,6 +69,7 @@ impl<V, F> From<&RustGpuMaterial<V, F>> for ShaderMaterialKey {
             fragment_defs: value.fragment_defs.clone(),
             normal_map: value.normal_map_texture.is_some(),
             cull_mode: value.base.cull_mode,
+            #[cfg(feature = "entry-point-export")]
             sender: value.export.clone(),
             iteration: value.iteration.clone(),
         }
@@ -99,6 +107,7 @@ pub struct RustGpuMaterial<V, F> {
     #[sampler(10)]
     pub normal_map_texture: Option<Handle<Image>>,
 
+    #[cfg(feature = "entry-point-export")]
     pub export: Option<EntryPointSender>,
     pub iteration: usize,
     pub _phantom: PhantomData<(V, F)>,
@@ -117,6 +126,7 @@ impl<V, F> Default for RustGpuMaterial<V, F> {
             metallic_roughness_texture: default(),
             occlusion_texture: default(),
             normal_map_texture: default(),
+            #[cfg(feature = "entry-point-export")]
             export: default(),
             iteration: default(),
             _phantom: default(),
@@ -137,6 +147,7 @@ impl<V, F> Clone for RustGpuMaterial<V, F> {
             metallic_roughness_texture: self.metallic_roughness_texture.clone(),
             occlusion_texture: self.occlusion_texture.clone(),
             normal_map_texture: self.occlusion_texture.clone(),
+            #[cfg(feature = "entry-point-export")]
             export: self.export.clone(),
             iteration: self.iteration.clone(),
             _phantom: default(),
@@ -199,19 +210,22 @@ where
             info!("Building vertex entrypoint");
             let entry_point = V::build(&shader_defs);
 
-            let mut apply = false;
-            let metas = SHADER_META.read().unwrap();
-            if let Some(vertex_meta) = metas.get(&vertex_shader) {
-                info!("Vertex meta is valid");
-                if vertex_meta.entry_points.contains(&entry_point) {
-                    apply = true;
-                } else {
-                    warn!("Missing entry point {entry_point:}");
+            #[allow(unused_mut)]
+            let mut apply = true;
+
+            #[cfg(feature = "shader-meta")]
+            {
+                let metas = SHADER_META.read().unwrap();
+                if let Some(vertex_meta) = metas.get(&vertex_shader) {
+                    info!("Vertex meta is valid");
+                    if !vertex_meta.entry_points.contains(&entry_point) {
+                        warn!("Missing entry point {entry_point:}");
+                        apply = false;
+                    }
                 }
-            } else {
-                apply = true;
             }
 
+            #[cfg(feature = "entry-point-export")]
             if let Some(sender) = &key.bind_group_data.sender {
                 info!("Entrypoint sender is valid");
                 sender
@@ -249,22 +263,25 @@ where
                     .collect();
 
                 info!("Building fragment entrypoint");
-                let entry_point = F::build(&shader_defs).into();
+                let entry_point = F::build(&shader_defs);
 
-                let mut apply = false;
-                info!("Fragment meta is present");
-                let metas = SHADER_META.read().unwrap();
-                if let Some(fragment_meta) = metas.get(&fragment_shader) {
-                    info!("Fragment meta is valid");
-                    if fragment_meta.entry_points.contains(&entry_point) {
-                        apply = true;
-                    } else {
-                        warn!("Missing entry point {entry_point:}, falling back to default fragment shader.");
+                #[allow(unused_mut)]
+                let mut apply = true;
+
+                #[cfg(feature = "shader-meta")]
+                {
+                    info!("Fragment meta is present");
+                    let metas = SHADER_META.read().unwrap();
+                    if let Some(fragment_meta) = metas.get(&fragment_shader) {
+                        info!("Fragment meta is valid");
+                        if !fragment_meta.entry_points.contains(&entry_point) {
+                            apply = false;
+                            warn!("Missing entry point {entry_point:}, falling back to default fragment shader.");
+                        }
                     }
-                } else {
-                    apply = true;
                 }
 
+                #[cfg(feature = "entry-point-export")]
                 if let Some(sender) = &key.bind_group_data.sender {
                     sender
                         .send(Export {

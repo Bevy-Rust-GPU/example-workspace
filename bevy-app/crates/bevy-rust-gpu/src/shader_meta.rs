@@ -1,13 +1,13 @@
 pub static SHADER_META: Lazy<RwLock<ShaderMeta>> = Lazy::new(Default::default);
 
-use std::sync::RwLock;
+use std::{marker::PhantomData, sync::RwLock};
 
 use once_cell::sync::Lazy;
 
 use bevy::{
     prelude::{
-        info, AssetEvent, Assets, Deref, DerefMut, EventReader, Handle, Plugin, Res, ResMut,
-        Resource, Shader,
+        default, info, AssetEvent, Assets, Deref, DerefMut, EventReader, Handle, Plugin, Res,
+        ResMut, Resource, Shader,
     },
     reflect::TypeUuid,
     utils::{HashMap, HashSet},
@@ -18,15 +18,35 @@ use serde::{Deserialize, Serialize};
 
 use crate::prelude::{EntryPoint, RustGpuMaterial};
 
-pub struct ShaderMetaPlugin;
+/// Handles the loading of `.spv.json` shader metadata,
+/// and using it to conditionally re-specialize `RustGpuMaterial` instances on reload
+pub struct ShaderMetaPlugin<V, F> {
+    _phantom: PhantomData<(V, F)>,
+}
 
-impl Plugin for ShaderMetaPlugin {
+impl<V, F> Default for ShaderMetaPlugin<V, F> {
+    fn default() -> Self {
+        ShaderMetaPlugin {
+            _phantom: default(),
+        }
+    }
+}
+
+impl<V, F> Plugin for ShaderMetaPlugin<V, F>
+where
+    V: EntryPoint,
+    F: EntryPoint,
+{
     fn build(&self, app: &mut bevy::prelude::App) {
         if !app.is_plugin_added::<JsonAssetPlugin<ModuleMeta>>() {
             app.add_plugin(JsonAssetPlugin::<ModuleMeta>::new(&["spv.json"]));
         }
 
-        app.init_resource::<ShaderMetaMap>();
+        if !app.world.contains_resource::<ShaderMetaMap>() {
+            app.init_resource::<ShaderMetaMap>();
+        }
+
+        app.add_system_to_stage(bevy::prelude::CoreStage::Last, module_meta_events::<V, F>);
     }
 }
 
