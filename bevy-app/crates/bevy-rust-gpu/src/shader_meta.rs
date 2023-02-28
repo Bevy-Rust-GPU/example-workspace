@@ -1,4 +1,4 @@
-pub static MODULE_METAS: Lazy<RwLock<ShaderMetas>> = Lazy::new(Default::default);
+pub static SHADER_META: Lazy<RwLock<ShaderMeta>> = Lazy::new(Default::default);
 
 use std::sync::RwLock;
 
@@ -16,11 +16,11 @@ use bevy_common_assets::json::JsonAssetPlugin;
 
 use serde::{Deserialize, Serialize};
 
-use crate::prelude::{RustGpuEntryPoint, RustGpuMaterial};
+use crate::prelude::{EntryPoint, RustGpuMaterial};
 
-pub struct RustGpuShaderPlugin;
+pub struct ShaderMetaPlugin;
 
-impl Plugin for RustGpuShaderPlugin {
+impl Plugin for ShaderMetaPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
         if !app.is_plugin_added::<JsonAssetPlugin<ModuleMeta>>() {
             app.add_plugin(JsonAssetPlugin::<ModuleMeta>::new(&["spv.json"]));
@@ -62,7 +62,7 @@ impl ShaderMetaMap {
 }
 
 #[derive(Debug, Default, Clone, Deref, DerefMut)]
-pub struct ShaderMetas {
+pub struct ShaderMeta {
     pub metas: HashMap<Handle<Shader>, ModuleMeta>,
 }
 
@@ -80,13 +80,12 @@ pub fn module_meta_events<V, F>(
     mut materials: ResMut<Assets<RustGpuMaterial<V, F>>>,
     shader_meta_map: ResMut<ShaderMetaMap>,
 ) where
-    V: RustGpuEntryPoint,
-    F: RustGpuEntryPoint,
+    V: EntryPoint,
+    F: EntryPoint,
 {
     let mut changed_shaders = HashSet::default();
 
     for event in shader_events.iter() {
-        info!("Shader event {event:#?}");
         match event {
             AssetEvent::Created {
                 handle: shader_handle,
@@ -95,7 +94,7 @@ pub fn module_meta_events<V, F>(
                 handle: shader_handle,
             } => {
                 // Remove meta in case the shader and meta load on different frames
-                MODULE_METAS.write().unwrap().remove(shader_handle);
+                SHADER_META.write().unwrap().remove(shader_handle);
 
                 // Mark this shader for material reloading
                 changed_shaders.insert(shader_handle);
@@ -105,7 +104,6 @@ pub fn module_meta_events<V, F>(
     }
 
     for event in module_meta_events.iter() {
-        info!("Module meta event {event:#?}");
         match event {
             AssetEvent::Created { handle } | AssetEvent::Modified { handle } => {
                 // If this meta has an associated shader, mark it for material reloading
@@ -113,10 +111,9 @@ pub fn module_meta_events<V, F>(
                     changed_shaders.insert(shader);
 
                     // Update module meta
-                    info!("Updating shader meta for {handle:?}");
                     if let Some(asset) = assets.get(handle) {
-                        info!("Shader meta: {asset:#?}");
-                        MODULE_METAS
+                        info!("Updating shader meta for {handle:?}");
+                        SHADER_META
                             .write()
                             .unwrap()
                             .insert(shader.clone_weak(), asset.clone());

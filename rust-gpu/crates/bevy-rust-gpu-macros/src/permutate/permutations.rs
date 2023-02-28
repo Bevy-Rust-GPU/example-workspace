@@ -26,13 +26,15 @@ impl Parse for Permutation {
 }
 
 fn parse_file(mod_path: &str, file_path: &str, fn_ident: &Ident) -> Vec<Vec<Ident>> {
-    let file = std::fs::read_to_string(file_path).unwrap();
-    let json = json::parse(&file).unwrap();
+    let file = std::fs::read_to_string(file_path).expect("Failed to read permutations file");
+    let json = json::parse(&file).expect("Failed to parse permutations file");
     let JsonValue::Object(object) = json else {
         panic!();
     };
 
-    let entry_points = object.get("entry_points").unwrap();
+    let entry_points = object
+        .get("entry_points")
+        .expect("No top-level entry_points key in permutations file");
     let JsonValue::Object(object) = entry_points else {
         panic!();
     };
@@ -140,7 +142,7 @@ impl PermutationsVariant {
                 file_path.pop();
 
                 let path = file_path.join(path);
-                let path = path.to_str().unwrap();
+                let path = path.to_str().expect("Path is not valid unicode");
 
                 parse_file(&mod_path, path, fn_ident)
             }

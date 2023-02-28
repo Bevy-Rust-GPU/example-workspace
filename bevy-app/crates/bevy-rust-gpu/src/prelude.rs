@@ -1,2 +1,4 @@
-pub use crate::{rust_gpu_entry_point::*, rust_gpu_material::*, rust_gpu_shader_meta::*, rust_gpu_missing_entry_points::*, *};
-
+pub use crate::{
+    entry_point::*, rust_gpu_material::*, entry_point_export::*,
+    shader_meta::*, *,
+};

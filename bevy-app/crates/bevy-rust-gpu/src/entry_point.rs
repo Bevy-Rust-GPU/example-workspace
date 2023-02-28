@@ -1,10 +1,10 @@
-pub type RustGpuEntryPointName = &'static str;
-pub type RustGpuEntryPointMappings =
+pub type EntryPointName = &'static str;
+pub type EntryPointMappings =
     &'static [(&'static [(&'static str, &'static str)], &'static str)];
 
-pub trait RustGpuEntryPoint: 'static + Send + Sync {
+pub trait EntryPoint: 'static + Send + Sync {
     const NAME: &'static str;
-    const PARAMETERS: RustGpuEntryPointMappings;
+    const PARAMETERS: EntryPointMappings;
 
     fn is_defined(shader_defs: &Vec<String>, def: &String) -> bool {
         let def = def.into();
@@ -42,9 +42,9 @@ pub trait RustGpuEntryPoint: 'static + Send + Sync {
     }
 }
 
-impl RustGpuEntryPoint for () {
+impl EntryPoint for () {
     const NAME: &'static str = "";
-    const PARAMETERS: RustGpuEntryPointMappings = &[];
+    const PARAMETERS: EntryPointMappings = &[];
 }
 
 /// Manually compose `bevy_render` shader defs that aren't available during specialization

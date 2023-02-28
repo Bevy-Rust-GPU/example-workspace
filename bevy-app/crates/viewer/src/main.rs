@@ -4,18 +4,18 @@ use bevy::{
     prelude::{
         default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Color,
         Commands, CoreStage, DefaultPlugins, DirectionalLight, DirectionalLightBundle,
-        MaterialMeshBundle, MaterialPlugin, Mesh, PluginGroup, PointLight, PointLightBundle, Quat,
-        Res, ResMut, Shader, StandardMaterial, Transform, Vec3,
+        MaterialMeshBundle, MaterialPlugin, Mesh, NonSendMut, PluginGroup, PointLight,
+        PointLightBundle, Quat, Res, ResMut, Shader, StandardMaterial, Transform, Vec3,
     },
     render::settings::{WgpuLimits, WgpuSettings},
 };
 
 use bevy_rust_gpu::{
     prelude::{
-        rust_gpu_shader_defs, MissingEntryPointSender, ModuleMeta, RustGpuMaterial,
-        RustGpuMissingEntryPointPlugin, RustGpuShaderPlugin,
+        rust_gpu_shader_defs, EntryPointExport, EntryPointExportPlugin, ModuleMeta,
+        RustGpuMaterial, ShaderMetaPlugin,
     },
-    rust_gpu_shader_meta::{module_meta_events, ShaderMetaMap},
+    shader_meta::{module_meta_events, ShaderMetaMap},
 };
 
 use rust_gpu_shaders::{MeshVertex, PbrFragment};
@@ -46,8 +46,8 @@ fn main() {
         }), //.disable::<LogPlugin>(),
     );
 
-    app.add_plugin(RustGpuShaderPlugin)
-        .add_plugin(RustGpuMissingEntryPointPlugin);
+    app.add_plugin(ShaderMetaPlugin)
+        .add_plugin(EntryPointExportPlugin);
 
     // Setup ShaderMaterial
     app.add_plugin(MaterialPlugin::<RustGpuMaterial<MeshVertex, PbrFragment>>::default());
@@ -73,7 +73,7 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut standard_materials: ResMut<Assets<StandardMaterial>>,
     mut shader_materials: ResMut<Assets<RustGpuMaterial<MeshVertex, PbrFragment>>>,
-    missing_entry_point_sender: Res<MissingEntryPointSender>,
+    mut exports: NonSendMut<EntryPointExport>,
     mut shader_meta_map: ResMut<ShaderMetaMap>,
 ) {
     // Spawn camera
@@ -108,13 +108,15 @@ fn setup(
     let shader_meta = asset_server.load::<ModuleMeta, _>(SHADER_META_PATH);
     shader_meta_map.add(shader.clone_weak(), shader_meta.clone_weak());
 
+    let export = exports.export("../rust-gpu/crates/bevy-pbr-rust/entry_points.json");
+
     let extra_defs = rust_gpu_shader_defs();
     let shader_material = shader_materials.add(RustGpuMaterial {
         vertex_shader: Some(shader.clone()),
         vertex_defs: extra_defs.clone(),
         fragment_shader: Some(shader),
         fragment_defs: extra_defs,
-        sender: Some(missing_entry_point_sender.clone()),
+        export: Some(export),
         ..default()
     });
 

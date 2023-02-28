@@ -8,11 +8,7 @@ use bevy::{
     utils::Uuid,
 };
 
-use crate::{
-    prelude::{MissingEntryPoint, MODULE_METAS},
-    rust_gpu_entry_point::RustGpuEntryPoint,
-    rust_gpu_missing_entry_points::MissingEntryPointSender,
-};
+use crate::prelude::{EntryPoint, EntryPointSender, Export, SHADER_META};
 
 #[derive(ShaderType)]
 pub struct BaseMaterial {
@@ -27,7 +23,7 @@ pub struct ShaderMaterialKey {
     fragment_defs: Vec<String>,
     normal_map: bool,
     cull_mode: Option<Face>,
-    sender: Option<MissingEntryPointSender>,
+    sender: Option<EntryPointSender>,
     iteration: usize,
 }
 
@@ -66,7 +62,7 @@ impl<V, F> From<&RustGpuMaterial<V, F>> for ShaderMaterialKey {
             fragment_defs: value.fragment_defs.clone(),
             normal_map: value.normal_map_texture.is_some(),
             cull_mode: value.base.cull_mode,
-            sender: value.sender.clone(),
+            sender: value.export.clone(),
             iteration: value.iteration.clone(),
         }
     }
@@ -103,7 +99,7 @@ pub struct RustGpuMaterial<V, F> {
     #[sampler(10)]
     pub normal_map_texture: Option<Handle<Image>>,
 
-    pub sender: Option<MissingEntryPointSender>,
+    pub export: Option<EntryPointSender>,
     pub iteration: usize,
     pub _phantom: PhantomData<(V, F)>,
 }
@@ -121,7 +117,7 @@ impl<V, F> Default for RustGpuMaterial<V, F> {
             metallic_roughness_texture: default(),
             occlusion_texture: default(),
             normal_map_texture: default(),
-            sender: default(),
+            export: default(),
             iteration: default(),
             _phantom: default(),
         }
@@ -141,7 +137,7 @@ impl<V, F> Clone for RustGpuMaterial<V, F> {
             metallic_roughness_texture: self.metallic_roughness_texture.clone(),
             occlusion_texture: self.occlusion_texture.clone(),
             normal_map_texture: self.occlusion_texture.clone(),
-            sender: self.sender.clone(),
+            export: self.export.clone(),
             iteration: self.iteration.clone(),
             _phantom: default(),
         }
@@ -170,8 +166,8 @@ impl<V, F> AsBindGroupShaderType<BaseMaterial> for RustGpuMaterial<V, F> {
 
 impl<V, F> Material for RustGpuMaterial<V, F>
 where
-    V: RustGpuEntryPoint,
-    F: RustGpuEntryPoint,
+    V: EntryPoint,
+    F: EntryPoint,
     RustGpuMaterial<V, F>: AsBindGroup<Data = ShaderMaterialKey>,
 {
     fn alpha_mode(&self) -> bevy::prelude::AlphaMode {
@@ -204,7 +200,7 @@ where
             let entry_point = V::build(&shader_defs);
 
             let mut apply = false;
-            let metas = MODULE_METAS.read().unwrap();
+            let metas = SHADER_META.read().unwrap();
             if let Some(vertex_meta) = metas.get(&vertex_shader) {
                 info!("Vertex meta is valid");
                 if vertex_meta.entry_points.contains(&entry_point) {
@@ -219,7 +215,7 @@ where
             if let Some(sender) = &key.bind_group_data.sender {
                 info!("Entrypoint sender is valid");
                 sender
-                    .send(MissingEntryPoint {
+                    .send(Export {
                         shader: V::NAME,
                         permutation: V::permutation(&shader_defs),
                     })
@@ -233,8 +229,6 @@ where
             } else {
                 warn!("Falling back to default vertex shader.");
             }
-
-            info!("Vertex: {:#?}", descriptor.vertex);
         }
 
         if let Some(fragment_descriptor) = descriptor.fragment.as_mut() {
@@ -259,7 +253,7 @@ where
 
                 let mut apply = false;
                 info!("Fragment meta is present");
-                let metas = MODULE_METAS.read().unwrap();
+                let metas = SHADER_META.read().unwrap();
                 if let Some(fragment_meta) = metas.get(&fragment_shader) {
                     info!("Fragment meta is valid");
                     if fragment_meta.entry_points.contains(&entry_point) {
@@ -273,7 +267,7 @@ where
 
                 if let Some(sender) = &key.bind_group_data.sender {
                     sender
-                        .send(MissingEntryPoint {
+                        .send(Export {
                             shader: F::NAME,
                             permutation: F::permutation(&shader_defs),
                         })
@@ -281,13 +275,12 @@ where
                 }
 
                 if apply {
+                    info!("Applying fragment shader and entry point");
                     fragment_descriptor.shader = fragment_shader;
                     fragment_descriptor.entry_point = entry_point.into();
                 } else {
                     warn!("Falling back to default fragment shader.");
                 }
-
-                info!("Fragment: {:#?}", fragment_descriptor);
             }
         }
 

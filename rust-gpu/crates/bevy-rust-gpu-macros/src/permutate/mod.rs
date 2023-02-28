@@ -126,6 +126,7 @@ where
             let parameter_conditional =
                 attr.parse_args_with(ParameterConditional::parse(parameters))?;
 
+            // Safe to unwrap, since conditional parameters have already been validated 
             let idx = parameters
                 .parameters
                 .iter()
