@@ -2,7 +2,6 @@
 resolver = "2"
 members = [
     "crates/bevy-pbr-rust",
-    "crates/permutate-macro",
     "crates/shader",
     "crates/rust-gpu-builder",
 ]
@@ -11,4 +10,4 @@ default-members = ["crates/rust-gpu-builder"]
 [patch.crates-io]
 bevy-pbr-rust = { path = "crates/bevy-pbr-rust" }
 rust-gpu-util = { path = "../shared/rust-gpu-util" }
-permutate-macro = { path = "crates/permutate-macro" }
+permutate-macro = { git = "https://github.com/Shfty/permutate-macro" }

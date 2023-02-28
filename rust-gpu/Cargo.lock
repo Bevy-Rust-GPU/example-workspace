@@ -596,6 +596,7 @@ checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
 [[package]]
 name = "permutate-macro"
 version = "0.1.0"
+source = "git+https://github.com/Shfty/permutate-macro#ef4bd07890dfe04a1f262581d3fd65fbb4f0d3db"
 dependencies = [
  "json",
  "proc-macro2",
