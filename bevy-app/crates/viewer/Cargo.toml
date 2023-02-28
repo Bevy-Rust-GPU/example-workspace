@@ -13,4 +13,4 @@ webgl = []
 bevy = "0.9.1"
 bevy_mod_debugdump = "0.6.0"
 bevy-rust-gpu = "0.1.0"
-rust-gpu-util = "0.1.0"
+rust-gpu-bridge = "0.1.0"

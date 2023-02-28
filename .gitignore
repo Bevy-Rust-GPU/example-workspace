@@ -1,5 +1,6 @@
 rust-gpu/target
 bevy-app/target
+bevy-app/entry_points.json
 
 *.dot
 *.svg
