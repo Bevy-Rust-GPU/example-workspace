@@ -10,10 +10,6 @@ Stable rust workspace housing our `bevy` app.
 
 `cargo run` after building the `rust-gpu` workspace to preview the generated shader.
 
-### `bevy-rust-gpu` Crate
-
-Bevy library crate, houses support code for defining interfaces to `rust-gpu` entrypoints and using them via material.
-
 ### `viewer` Crate
 
 Bevy binary crate, loads an example scene that renders a side-by-side comparison of WGSL and Rust PBR materials.
@@ -42,44 +38,16 @@ Nightly rust workspace housing `rust-gpu` crates.
 
 `rust-toolchain` contains the necessary toolchain specification for `rust-gpu`.
 
-`cargo build` to produce `target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv`.
+`.cargo/config.toml` contains environment variables overriding the permutation file path used to compile `bevy-pbr-rust`.
 
-### `bevy-pbr-rust` Crate
+`cargo run --release "crates/shader"` to produce `target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv`.
 
-Contains a working reimplementation of `bevy_pbr`.
-
-Shader def conditionals are implemented using compile-time trait generics, and entrypoint permutations are generated via macro annotations.
-
-At time of writing, `rust-gpu` only supports read-write access to storage buffers,
-which renders it implementation incompatible with the read-only buffers bevy uses to store light and cluster data on supported platforms.
-
-As such, the `viewer` crate is configured to ensure this data is stored in uniforms.
-
-### `bevy-rust-gpu-macros` Crate
-
-Procedural macros for programmatically generating shader entrypoints.
+`cargo run --release "crates/shader" -w ./crates -w ../bevy-app/crates/viewer` to watch both workspaces and recompile on change.
 
 ### `shader`
 
-Project-level `rust-gpu` shader crate. Pulls in `bevy-pbr-rust`.
+Project-level `rust-gpu` shader crate. Pulls in `bevy-pbr-rust` to expose its entrypoints.
 
 Entrypoints are exported relative to their containing crate using rust module path syntax,
 i.e. `mesh::vertex`, `pbr::fragment`.
 
-### `shader-builder` Crate
-
-File-watching shader compilation daemon. Used to recompile the `shader` crate in response to changes in source or permutation files.
-
-## `shared` Directory
-
-Houses dependencies shared by the `shader` and `bevy-app` workspaces
-
-### `shader-glam` Crate
-
-Wrapper crate gating `glam` and `spirv-std::glam` behind cargo features.
-
-Used for writing crates that can be shared between `rust-gpu` and regular `rust`.
-
-### `shader-util` Crate
-
-Contains utility traits for replicating common shading language functions.
