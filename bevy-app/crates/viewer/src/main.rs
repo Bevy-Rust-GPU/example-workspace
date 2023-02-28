@@ -112,7 +112,7 @@ fn setup(
     }
 
     #[cfg(feature = "entry-point-export")]
-    let export = exports.export("entry_points.json");
+    let export = exports.export("crates/viewer/entry_points.json");
 
     let extra_defs = rust_gpu_shader_defs();
     let shader_material = shader_materials.add(RustGpuMaterial {

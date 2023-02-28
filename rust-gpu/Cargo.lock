@@ -43,7 +43,7 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 [[package]]
 name = "bevy-pbr-rust"
 version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/bevy-pbr-rust#f0a35ae77950749aaac5fa2f955a042e4cf4333e"
+source = "git+https://github.com/Bevy-Rust-GPU/bevy-pbr-rust#e07cca3691de847c87547f658f44235673fb52d7"
 dependencies = [
  "bitflags",
  "permutate-macro",
@@ -597,7 +597,7 @@ checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
 [[package]]
 name = "permutate-macro"
 version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/permutate-macro#59de48ba198837fa8ee61280ea7956780464bc40"
+source = "git+https://github.com/Bevy-Rust-GPU/permutate-macro#1388f91cef8360bc7262abb7a4a1a3d9af926442"
 dependencies = [
  "json",
  "proc-macro2",
