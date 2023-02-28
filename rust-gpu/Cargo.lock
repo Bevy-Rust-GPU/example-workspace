@@ -597,7 +597,7 @@ checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
 [[package]]
 name = "permutate-macro"
 version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/permutate-macro#1388f91cef8360bc7262abb7a4a1a3d9af926442"
+source = "git+https://github.com/Bevy-Rust-GPU/permutate-macro#d0803eb0034756020466fb4c0ef2c837a343ed88"
 dependencies = [
  "json",
  "proc-macro2",
