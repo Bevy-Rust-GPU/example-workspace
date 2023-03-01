@@ -2,20 +2,23 @@ pub mod rust_gpu_shaders;
 
 use bevy::prelude::{
     default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Color, Commands,
-    DefaultPlugins, DirectionalLight, DirectionalLightBundle, MaterialMeshBundle, MaterialPlugin,
-    Mesh, PluginGroup, PointLight, PointLightBundle, Quat, Res, ResMut, Shader, StandardMaterial,
+    DefaultPlugins, DirectionalLight, DirectionalLightBundle, MaterialMeshBundle, Mesh,
+    PluginGroup, PointLight, PointLightBundle, Quat, Res, ResMut, Shader, StandardMaterial,
     Transform, Vec3,
 };
 
-use bevy_rust_gpu::{plugin::BevyRustGpuPlugin, prelude::RustGpuMaterial};
+use bevy_rust_gpu::{
+    plugin::BevyRustGpuPlugin,
+    prelude::{RustGpuMaterial, RustGpuMaterialPlugin},
+};
 
 use rust_gpu_shaders::{MeshVertex, PbrFragment};
 
 #[cfg(feature = "shader-meta")]
-use bevy_rust_gpu::prelude::{ModuleMeta, ShaderMetaMap, ShaderMetaPlugin};
+use bevy_rust_gpu::prelude::{ModuleMeta, ShaderMetaMap};
 
 #[cfg(feature = "entry-point-export")]
-use bevy_rust_gpu::prelude::{EntryPointExport, EntryPointExportPlugin};
+use bevy_rust_gpu::prelude::EntryPointExport;
 
 const SHADER_PATH: &'static str = "rust-gpu/target/spirv-unknown-spv1.5/release/deps/shader.spv";
 
@@ -41,14 +44,8 @@ fn main() {
         ), //.disable::<LogPlugin>()
     );
 
-    #[cfg(feature = "entry-point-export")]
-    app.add_plugin(EntryPointExportPlugin);
-
     // Setup ShaderMaterial
-    app.add_plugin(MaterialPlugin::<RustGpuMaterial<MeshVertex, PbrFragment>>::default());
-
-    #[cfg(feature = "shader-meta")]
-    app.add_plugin(ShaderMetaPlugin::<MeshVertex, PbrFragment>::default());
+    app.add_plugin(RustGpuMaterialPlugin::<MeshVertex, PbrFragment>::default());
 
     // Setup scene
     app.add_startup_system(setup);
