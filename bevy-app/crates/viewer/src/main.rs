@@ -1,16 +1,13 @@
 pub mod rust_gpu_shaders;
 
-use bevy::{
-    prelude::{
-        default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Color,
-        Commands, DefaultPlugins, DirectionalLight, DirectionalLightBundle, MaterialMeshBundle,
-        MaterialPlugin, Mesh, PluginGroup, PointLight, PointLightBundle, Quat, Res, ResMut, Shader,
-        StandardMaterial, Transform, Vec3,
-    },
-    render::settings::{WgpuLimits, WgpuSettings},
+use bevy::prelude::{
+    default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Color, Commands,
+    DefaultPlugins, DirectionalLight, DirectionalLightBundle, MaterialMeshBundle, MaterialPlugin,
+    Mesh, PluginGroup, PointLight, PointLightBundle, Quat, Res, ResMut, Shader, StandardMaterial,
+    Transform, Vec3,
 };
 
-use bevy_rust_gpu::prelude::{rust_gpu_shader_defs, RustGpuMaterial};
+use bevy_rust_gpu::{plugin::BevyRustGpuPlugin, prelude::RustGpuMaterial};
 
 use rust_gpu_shaders::{MeshVertex, PbrFragment};
 
@@ -29,32 +26,29 @@ const SHADER_META_PATH: &'static str =
 fn main() {
     let mut app = App::default();
 
-    // Force the app not to use storage buffers
-    app.insert_resource(WgpuSettings {
-        constrained_limits: Some(WgpuLimits {
-            max_storage_buffers_per_shader_stage: 0,
-            ..default()
-        }),
-        ..default()
-    });
+    // Add the Bevy Rust-GPU plugin
+    app.add_plugin(BevyRustGpuPlugin);
 
-    // Configure the asset plugin to watch the workspace path for changes
+    // Add default plugins
     app.add_plugins(
-        DefaultPlugins.set(AssetPlugin {
-            asset_folder: "../../../".into(),
-            watch_for_changes: true,
-            ..default()
-        }), //.disable::<LogPlugin>(),
+        DefaultPlugins.set(
+            // Configure the asset plugin to watch the workspace path for changes
+            AssetPlugin {
+                asset_folder: "../../../".into(),
+                watch_for_changes: true,
+                ..default()
+            },
+        ), //.disable::<LogPlugin>()
     );
-
-    #[cfg(feature = "shader-meta")]
-    app.add_plugin(ShaderMetaPlugin::<MeshVertex, PbrFragment>::default());
 
     #[cfg(feature = "entry-point-export")]
     app.add_plugin(EntryPointExportPlugin);
 
     // Setup ShaderMaterial
     app.add_plugin(MaterialPlugin::<RustGpuMaterial<MeshVertex, PbrFragment>>::default());
+
+    #[cfg(feature = "shader-meta")]
+    app.add_plugin(ShaderMetaPlugin::<MeshVertex, PbrFragment>::default());
 
     // Setup scene
     app.add_startup_system(setup);
@@ -106,22 +100,16 @@ fn setup(
     let shader = asset_server.load::<Shader, _>(SHADER_PATH);
 
     #[cfg(feature = "shader-meta")]
-    {
-        let shader_meta = asset_server.load::<ModuleMeta, _>(SHADER_META_PATH);
-        shader_meta_map.add(shader.clone_weak(), shader_meta.clone_weak());
-    }
+    shader_meta_map.add(
+        shader.clone_weak(),
+        asset_server.load::<ModuleMeta, _>(SHADER_META_PATH),
+    );
 
-    #[cfg(feature = "entry-point-export")]
-    let export = exports.export("crates/viewer/entry_points.json");
-
-    let extra_defs = rust_gpu_shader_defs();
     let shader_material = shader_materials.add(RustGpuMaterial {
         vertex_shader: Some(shader.clone()),
-        vertex_defs: extra_defs.clone(),
         fragment_shader: Some(shader),
-        fragment_defs: extra_defs,
         #[cfg(feature = "entry-point-export")]
-        export: Some(export),
+        export: Some(exports.export("crates/viewer/entry_points.json")),
         ..default()
     });
 
