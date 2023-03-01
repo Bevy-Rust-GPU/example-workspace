@@ -3,28 +3,25 @@ pub mod rust_gpu_shaders;
 use bevy::prelude::{
     default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Color, Commands,
     DefaultPlugins, DirectionalLight, DirectionalLightBundle, MaterialMeshBundle, Mesh,
-    PluginGroup, PointLight, PointLightBundle, Quat, Res, ResMut, Shader, StandardMaterial,
-    Transform, Vec3,
+    PluginGroup, PointLight, PointLightBundle, Quat, Res, ResMut, StandardMaterial, Transform,
+    Vec3,
 };
 
 use bevy_rust_gpu::{
     plugin::BevyRustGpuPlugin,
     prelude::{RustGpuMaterial, RustGpuMaterialPlugin},
+    rust_gpu_material::LoadRustGpuShader,
 };
 
 use rust_gpu_shaders::{MeshVertex, PbrFragment};
 
 #[cfg(feature = "shader-meta")]
-use bevy_rust_gpu::prelude::{ModuleMeta, ShaderMetaMap};
+use bevy_rust_gpu::prelude::ShaderMetaMap;
 
 #[cfg(feature = "entry-point-export")]
 use bevy_rust_gpu::prelude::EntryPointExport;
 
 const SHADER_PATH: &'static str = "rust-gpu/target/spirv-unknown-spv1.5/release/deps/shader.spv";
-
-#[cfg(feature = "shader-meta")]
-const SHADER_META_PATH: &'static str =
-    "rust-gpu/target/spirv-unknown-spv1.5/release/deps/shader.spv.json";
 
 fn main() {
     let mut app = App::default();
@@ -94,13 +91,7 @@ fn setup(
 
     let mesh = meshes.add(Cube { size: 1.0 }.into());
 
-    let shader = asset_server.load::<Shader, _>(SHADER_PATH);
-
-    #[cfg(feature = "shader-meta")]
-    shader_meta_map.add(
-        shader.clone_weak(),
-        asset_server.load::<ModuleMeta, _>(SHADER_META_PATH),
-    );
+    let shader = asset_server.load_rust_gpu_shader(&mut shader_meta_map, SHADER_PATH);
 
     let shader_material = shader_materials.add(RustGpuMaterial {
         vertex_shader: Some(shader.clone()),
