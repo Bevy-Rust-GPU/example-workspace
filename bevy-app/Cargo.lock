@@ -2831,7 +2831,7 @@ dependencies = [
 [[package]]
 name = "rust-gpu-bridge"
 version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/rust-gpu-bridge#ce14129ad5ed0f92f634952c4bdfc7a37ee15042"
+source = "git+https://github.com/Bevy-Rust-GPU/rust-gpu-bridge#af24ce4ab7b8ca67afcce6edf89abc0580473584"
 dependencies = [
  "glam 0.23.0",
 ]
