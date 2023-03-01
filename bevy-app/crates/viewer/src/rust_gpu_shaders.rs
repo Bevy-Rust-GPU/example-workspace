@@ -1,10 +1,10 @@
-use bevy_rust_gpu::prelude::{EntryPoint, EntryPointMappings, EntryPointName};
+use bevy_rust_gpu::prelude::{EntryPoint, EntryPointParameters, EntryPointName};
 
 pub enum MeshVertex {}
 
 impl EntryPoint for MeshVertex {
     const NAME: EntryPointName = "mesh::entry_points::vertex";
-    const PARAMETERS: EntryPointMappings = &[
+    const PARAMETERS: EntryPointParameters = &[
         (&[("VERTEX_TANGENTS", "some")], "none"),
         (&[("VERTEX_COLORS", "some")], "none"),
         (&[("SKINNED", "some")], "none"),
@@ -15,14 +15,14 @@ pub enum MeshFragment {}
 
 impl EntryPoint for MeshFragment {
     const NAME: EntryPointName = "mesh::entry_points::fragment";
-    const PARAMETERS: EntryPointMappings = &[];
+    const PARAMETERS: EntryPointParameters = &[];
 }
 
 pub enum PbrFragment {}
 
 impl EntryPoint for PbrFragment {
     const NAME: EntryPointName = "pbr::entry_points::fragment";
-    const PARAMETERS: EntryPointMappings = &[
+    const PARAMETERS: EntryPointParameters = &[
         (&[("NO_TEXTURE_ARRAYS_SUPPORT", "texture")], "array"),
         (&[("NO_STORAGE_BUFFERS_SUPPORT", "uniform")], "storage"),
         (&[("VERTEX_POSITIONS", "some")], "none"),
