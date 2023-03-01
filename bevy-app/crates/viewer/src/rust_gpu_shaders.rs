@@ -1,5 +1,6 @@
 use bevy_rust_gpu::prelude::{EntryPoint, EntryPointParameters, EntryPointName};
 
+/// `bevy_rust_gpu::mesh::entry_points::vertex`
 pub enum MeshVertex {}
 
 impl EntryPoint for MeshVertex {
@@ -11,6 +12,7 @@ impl EntryPoint for MeshVertex {
     ];
 }
 
+/// `bevy_rust_gpu::mesh::entry_points::fragment`
 pub enum MeshFragment {}
 
 impl EntryPoint for MeshFragment {
@@ -18,6 +20,7 @@ impl EntryPoint for MeshFragment {
     const PARAMETERS: EntryPointParameters = &[];
 }
 
+/// `bevy_rust_gpu::pbr::entry_points::fragment`
 pub enum PbrFragment {}
 
 impl EntryPoint for PbrFragment {
