@@ -43,7 +43,7 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 [[package]]
 name = "bevy-pbr-rust"
 version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/bevy-pbr-rust#c9447bea533abfa361ff2b3c0da2bfae9acba55b"
+source = "git+https://github.com/Bevy-Rust-GPU/bevy-pbr-rust#5d24d39084e46656ceeee71dce11946368c139cb"
 dependencies = [
  "bitflags",
  "permutate-macro",
