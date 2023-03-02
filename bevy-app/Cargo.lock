@@ -193,7 +193,7 @@ dependencies = [
 [[package]]
 name = "bevy-rust-gpu"
 version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/bevy-rust-gpu#e2ac538c9f5fc38c59b5592384bcf266194ca184"
+source = "git+https://github.com/Bevy-Rust-GPU/bevy-rust-gpu#f37a495a73e2b3d89d1546966189ac052b7c87fa"
 dependencies = [
  "bevy",
  "bevy_common_assets",
