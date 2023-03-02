@@ -4,9 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-default = ["shader-meta", "entry-point-export"]
-shader-meta = ["bevy-rust-gpu/shader-meta"]
-entry-point-export = ["bevy-rust-gpu/entry-point-export"]
+default = []
 webgl = []
 
 [dependencies]
