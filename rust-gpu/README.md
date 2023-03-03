@@ -2,15 +2,15 @@
 
 Nightly rust workspace housing `rust-gpu` crates.
 
-`Cargo.toml` contains the `rust-gpu`-recommended `[profile.*.build-override]` settings to ensure fast shader compiles,
+`rust-toolchain` contains the necessary toolchain specification for `rust-gpu`,
+and `.cargo/config.toml` contains environment variables overriding the permutation file used to compile `bevy-pbr-rust` entry points.
 
-`rust-toolchain` contains the necessary toolchain specification for `rust-gpu`.
+To avoid depending on a local clone of `rust-gpu` for SPIR-V compilation, `rust-gpu-builder` has been added to the `crates` directory as a submodule,
+and is set as the workspace's default build target.
 
-`.cargo/config.toml` contains environment variables overriding the permutation file used to compile `bevy-pbr-rust` entry points.
+Run `cargo run --release -- "crates/shader"` to produce `target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv`.
 
-`cargo run --release -- "crates/shader"` to produce `target/spirv-builder/spirv-unknown-spv1.5/release/deps/shader.spv`.
-
-`cargo run --release -- "crates/shader" -w ./crates/shader/src -w ../bevy-app/crates/viewer/entry_points.json` to watch both workspaces and recompile on change.
+Run `cargo run --release -- "crates/shader" -w ./crates/shader/src -w ../bevy-app/crates/viewer/entry_points.json` to watch both workspaces and recompile on change.
 
 ### `shader`
 
