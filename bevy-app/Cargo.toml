@@ -8,7 +8,6 @@ default-members = ["crates/viewer"]
 [patch.crates-io]
 bevy = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
 bevy-rust-gpu = { git = "https://github.com/Bevy-Rust-GPU/bevy-rust-gpu" }
-rust-gpu-bridge = { git = "https://github.com/Bevy-Rust-GPU/rust-gpu-bridge" }
 
 # Fast-compile config
 [profile.dev]
