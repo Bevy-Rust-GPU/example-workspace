@@ -1,6 +1,6 @@
 ## `rust-gpu` Workspace
 
-Nightly rust workspace housing `rust-gpu` crates.
+Nightly rust workspace housing `rust-gpu` shader crates.
 
 `rust-toolchain` contains the necessary toolchain specification for `rust-gpu`,
 and `.cargo/config.toml` contains environment variables overriding the permutation file used to compile `bevy-pbr-rust` entry points.
