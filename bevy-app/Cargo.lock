@@ -150,12 +150,11 @@ dependencies = [
 
 [[package]]
 name = "async-lock"
-version = "2.6.0"
+version = "2.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8101efe8695a6c17e02911402145357e718ac92d3ff88ae8419e84b1707b685"
+checksum = "fa24f727524730b077666307f2734b4a1a1c57acb79193127dcc8914d5242dd7"
 dependencies = [
  "event-listener",
- "futures-lite",
 ]
 
 [[package]]
@@ -193,7 +192,7 @@ dependencies = [
 [[package]]
 name = "bevy-rust-gpu"
 version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/bevy-rust-gpu#f37a495a73e2b3d89d1546966189ac052b7c87fa"
+source = "git+https://github.com/Bevy-Rust-GPU/bevy-rust-gpu#e1fb7546fc9552ebb4f55c06d18fca79ea8af22b"
 dependencies = [
  "bevy",
  "bevy_common_assets",
@@ -2831,7 +2830,7 @@ dependencies = [
 [[package]]
 name = "rust-gpu-bridge"
 version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/rust-gpu-bridge#2ef9707393417fca1b3a5df69019ed514beb3a0b"
+source = "git+https://github.com/Bevy-Rust-GPU/rust-gpu-bridge#2a344d27214f0f475d9ade592cba82628bcae3d2"
 dependencies = [
  "glam 0.23.0",
 ]
