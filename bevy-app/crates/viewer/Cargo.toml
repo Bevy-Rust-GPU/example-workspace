@@ -16,5 +16,6 @@ name = "standard-material"
 path = "examples/standard-material.rs"
 
 [dependencies]
-bevy = "0.9.1"
-bevy-rust-gpu = "0.1.0"
+bevy = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
+bevy-rust-gpu = { git = "https://github.com/Bevy-Rust-GPU/bevy-rust-gpu" }
+
