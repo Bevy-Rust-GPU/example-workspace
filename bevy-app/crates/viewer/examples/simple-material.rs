@@ -3,7 +3,7 @@ use bevy::{
         default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Color,
         Commands, DefaultPlugins, DirectionalLight, DirectionalLightBundle, Material,
         MaterialMeshBundle, Mesh, PluginGroup, PointLight, PointLightBundle, Quat, Res, ResMut,
-        StandardMaterial, Transform, Vec3, Vec4,
+        Transform, Vec3, 
     },
     reflect::TypeUuid,
     render::render_resource::AsBindGroup,
@@ -65,8 +65,7 @@ fn main() {
         },
     ));
 
-    // Setup `RustGpu<StandardMaterial>`
-    app.add_plugin(RustGpuMaterialPlugin::<StandardMaterial>::default());
+    // Setup `RustGpu<ExampleMaterial>`
     app.add_plugin(RustGpuMaterialPlugin::<ExampleMaterial>::default());
 
     // Setup scene
@@ -80,8 +79,6 @@ fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut standard_materials: ResMut<Assets<StandardMaterial>>,
-    mut rust_gpu_standard_materials: ResMut<Assets<RustGpu<StandardMaterial>>>,
     mut example_materials: ResMut<Assets<RustGpu<ExampleMaterial>>>,
     #[cfg(feature = "entry-point-export")] mut exports: bevy::prelude::NonSendMut<EntryPointExport>,
 ) {
@@ -109,38 +106,13 @@ fn setup(
         ..default()
     });
 
-    // Create mesh, shader and material assets
-    let standard_material = standard_materials.add(default());
-
     let mesh = meshes.add(Cube { size: 1.0 }.into());
 
     let shader = asset_server.load_rust_gpu_shader(SHADER_PATH);
 
     // Spawn example cubes
     commands.spawn(MaterialMeshBundle {
-        transform: Transform::from_xyz(-1.0, 0.0, -6.0)
-            .with_rotation(Quat::from_axis_angle(Vec3::new(1.0, 1.0, 1.0), 45.0).normalize()),
-        mesh: mesh.clone(),
-        material: standard_material,
-        ..default()
-    });
-
-    commands.spawn(MaterialMeshBundle {
-        transform: Transform::from_xyz(1.0, 0.0, -6.0)
-            .with_rotation(Quat::from_axis_angle(Vec3::new(-1.0, 1.0, 1.0), -45.0).normalize()),
-        mesh: mesh.clone(),
-        material: rust_gpu_standard_materials.add(RustGpu {
-            vertex_shader: Some(shader.clone()),
-            fragment_shader: Some(shader.clone()),
-            #[cfg(feature = "entry-point-export")]
-            sender: Some(exports.export("crates/viewer/entry_points.json")),
-            ..default()
-        }),
-        ..default()
-    });
-
-    commands.spawn(MaterialMeshBundle {
-        transform: Transform::from_xyz(3.0, 0.0, -6.0)
+        transform: Transform::from_xyz(0.0, 0.0, -6.0)
             .with_rotation(Quat::from_axis_angle(Vec3::new(-1.0, 1.0, 1.0), -45.0).normalize()),
         mesh,
         material: example_materials.add(RustGpu {

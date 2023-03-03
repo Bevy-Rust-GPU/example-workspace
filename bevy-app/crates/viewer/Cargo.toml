@@ -7,6 +7,14 @@ edition = "2021"
 default = []
 webgl = []
 
+[[example]]
+name = "simple-material"
+path = "examples/simple-material.rs"
+
+[[example]]
+name = "standard-material"
+path = "examples/standard-material.rs"
+
 [dependencies]
 bevy = "0.9.1"
 bevy-rust-gpu = "0.1.0"
