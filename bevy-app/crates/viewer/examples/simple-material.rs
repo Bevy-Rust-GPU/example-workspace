@@ -65,7 +65,7 @@ fn main() {
 
     // Setup `RustGpu<ExampleMaterial>`
     app.add_plugin(RustGpuMaterialPlugin::<ExampleMaterial>::default());
-    //RustGpu::<ExampleMaterial>::export_to(ENTRY_POINTS_PATH);
+    RustGpu::<ExampleMaterial>::export_to(ENTRY_POINTS_PATH);
 
     // Setup scene
     app.add_startup_system(setup);

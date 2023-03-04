@@ -1,9 +1,10 @@
 #![no_std]
 
 pub use bevy_pbr_rust;
-use bevy_pbr_rust::prelude::{Globals, Mesh, VertexPosition, View};
+
+use bevy_pbr_rust::prelude::{Globals, Mesh, View};
 use spirv_std::{
-    glam::{Vec2, Vec3, Vec4},
+    glam::{Vec3, Vec4},
     spirv,
 };
 
@@ -22,14 +23,16 @@ pub fn vertex_warp(
     #[spirv(position)] out_clip_position: &mut Vec4,
     out_world_normal: &mut Vec3,
 ) {
-    let mut in_position = in_position.extend(1.0);
+    let mut position_local = in_position.extend(1.0);
 
-    in_position.x += in_position.x * in_position.z * globals.time.sin();
-    in_position.y += in_position.y * in_position.z * globals.time.cos();
-    in_position.z += in_position.z * globals.time.sin() * globals.time.cos();
+    position_local.x += position_local.x * position_local.z * globals.time.sin();
+    position_local.y += position_local.y * position_local.z * globals.time.cos();
+    position_local.z += position_local.z * globals.time.sin() * globals.time.cos();
 
-    in_position.transform_position(view, mesh, mesh.model, out_clip_position);
+    let position_world = mesh.model * position_local;
+    let position_clip = view.view_proj * position_world;
 
+    *out_clip_position = position_clip;
     *out_world_normal = in_normal;
 }
 

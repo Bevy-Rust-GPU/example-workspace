@@ -10,7 +10,8 @@ use bevy_rust_gpu::prelude::{LoadRustGpuShader, RustGpu, RustGpuMaterialPlugin, 
 /// Workspace-relative path to SPIR-V shader
 const SHADER_PATH: &'static str = "rust-gpu/target/spirv-unknown-spv1.5/release/deps/shader.spv";
 
-const EXPORT_PATH: &'static str = "crates/viewer/entry_points.json";
+/// Workspace-relative path to entry points file
+const ENTRY_POINTS_PATH: &'static str = "crates/viewer/entry_points.json";
 
 fn main() {
     let mut app = App::default();
@@ -30,7 +31,7 @@ fn main() {
 
     // Setup `RustGpu<StandardMaterial>`
     app.add_plugin(RustGpuMaterialPlugin::<StandardMaterial>::default());
-    //RustGpu::<StandardMaterial>::export_to(EXPORT_PATH);
+    RustGpu::<StandardMaterial>::export_to(ENTRY_POINTS_PATH);
 
     // Setup scene
     app.add_startup_system(setup);
