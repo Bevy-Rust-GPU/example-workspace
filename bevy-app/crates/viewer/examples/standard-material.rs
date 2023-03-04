@@ -5,10 +5,7 @@ use bevy::prelude::{
     Vec3, 
 };
 
-use bevy_rust_gpu::prelude::{LoadRustGpuShader, RustGpu, RustGpuMaterialPlugin, RustGpuPlugin};
-
-#[cfg(feature = "entry-point-export")]
-use bevy_rust_gpu::prelude::EntryPointExport;
+use bevy_rust_gpu::prelude::{LoadRustGpuShader, RustGpu, RustGpuMaterialPlugin, RustGpuPlugin, EntryPointExport};
 
 /// Workspace-relative path to SPIR-V shader
 const SHADER_PATH: &'static str = "rust-gpu/target/spirv-unknown-spv1.5/release/deps/shader.spv";
@@ -45,7 +42,7 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut standard_materials: ResMut<Assets<StandardMaterial>>,
     mut rust_gpu_standard_materials: ResMut<Assets<RustGpu<StandardMaterial>>>,
-    #[cfg(feature = "entry-point-export")] mut exports: bevy::prelude::NonSendMut<EntryPointExport>,
+    mut exports: bevy::prelude::NonSendMut<EntryPointExport>,
 ) {
     // Spawn camera
     commands.spawn(Camera3dBundle::default());
@@ -94,8 +91,7 @@ fn setup(
         material: rust_gpu_standard_materials.add(RustGpu {
             vertex_shader: Some(shader.clone()),
             fragment_shader: Some(shader.clone()),
-            #[cfg(feature = "entry-point-export")]
-            sender: Some(exports.export("crates/viewer/entry_points.json")),
+            export_handle: Some(exports.export("crates/viewer/entry_points.json")),
             ..default()
         }),
         ..default()

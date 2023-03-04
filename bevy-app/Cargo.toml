@@ -5,6 +5,9 @@ members = [
 ]
 default-members = ["crates/viewer"]
 
+[patch.crates-io]
+bevy = { git = "https://github.com/Shfty/bevy", branch = "remove-spv-defs" }
+
 # Fast-compile config
 [profile.dev]
 opt-level = 0

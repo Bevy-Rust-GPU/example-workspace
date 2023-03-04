@@ -3,7 +3,7 @@ use bevy::{
         default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Color,
         Commands, DefaultPlugins, DirectionalLight, DirectionalLightBundle, Material,
         MaterialMeshBundle, Mesh, PluginGroup, PointLight, PointLightBundle, Quat, Res, ResMut,
-        Transform, Vec3, 
+        Transform, Vec3,
     },
     reflect::TypeUuid,
     render::render_resource::AsBindGroup,
@@ -11,7 +11,7 @@ use bevy::{
 
 use bevy_rust_gpu::{
     bevy_pbr_rust::MeshFragment,
-    prelude::{LoadRustGpuShader, RustGpu, RustGpuMaterialPlugin, RustGpuPlugin},
+    prelude::{LoadRustGpuShader, RustGpu, RustGpuMaterialPlugin, RustGpuPlugin, EntryPointExport},
     EntryPoint, RustGpuMaterial,
 };
 
@@ -80,7 +80,7 @@ fn setup(
     asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut example_materials: ResMut<Assets<RustGpu<ExampleMaterial>>>,
-    #[cfg(feature = "entry-point-export")] mut exports: bevy::prelude::NonSendMut<EntryPointExport>,
+    mut exports: bevy::prelude::NonSendMut<EntryPointExport>,
 ) {
     // Spawn camera
     commands.spawn(Camera3dBundle::default());
@@ -118,8 +118,7 @@ fn setup(
         material: example_materials.add(RustGpu {
             vertex_shader: Some(shader.clone()),
             fragment_shader: Some(shader),
-            #[cfg(feature = "entry-point-export")]
-            sender: Some(exports.export("crates/viewer/entry_points.json")),
+            export_handle: Some(exports.export("crates/viewer/entry_points.json")),
             ..default()
         }),
         ..default()
