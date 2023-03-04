@@ -9,7 +9,11 @@ which is the `v0.9.1` tag patched to prevent rejection of SPIR-V modules when sh
 
 This is a necessary prerequisite for SPIR-V usage in `Material` implementors, and is tracked in [this `bevy` issue](https://github.com/bevyengine/bevy/issues/7771).
 
-`cargo run` after compiling shaders from the `rust-gpu` workspace to view the result.
+Compile shaders from the `rust-gpu` workspace, and run one of the following to view the result:
+
+`cargo run --example simple-material` to view a simple material that can be edited from the `shader` crate in the `rust-gpu` workspace.
+
+`cargo run --example standard-material` to view a side-by-side comparison of WGSL and Rust StandardMaterial.
 
 ## `viewer` Crate
 
