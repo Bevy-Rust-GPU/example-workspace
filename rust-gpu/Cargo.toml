@@ -6,7 +6,3 @@ members = [
 ]
 default-members = ["crates/rust-gpu-builder"]
 
-[patch.crates-io]
-rust-gpu-bridge = { git = "https://github.com/Bevy-Rust-GPU/rust-gpu-bridge" }
-bevy-pbr-rust = { git = "https://github.com/Bevy-Rust-GPU/bevy-pbr-rust" }
-permutate-macro = { git = "https://github.com/Bevy-Rust-GPU/permutate-macro" }

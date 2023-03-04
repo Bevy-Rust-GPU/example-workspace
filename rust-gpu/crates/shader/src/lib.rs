@@ -1,7 +1,7 @@
 #![no_std]
 
 pub use bevy_pbr_rust;
-use bevy_pbr_rust::prelude::{Globals, VertexPosition, View, Mesh};
+use bevy_pbr_rust::prelude::{Globals, Mesh, VertexPosition, View};
 use spirv_std::{
     glam::{Vec2, Vec3, Vec4},
     spirv,
@@ -18,12 +18,9 @@ pub fn vertex_warp(
 
     in_position: Vec3,
     in_normal: Vec3,
-    in_uv: Vec2,
 
     #[spirv(position)] out_clip_position: &mut Vec4,
-    out_world_position: &mut Vec4,
     out_world_normal: &mut Vec3,
-    out_uv: &mut Vec2,
 ) {
     let mut in_position = in_position.extend(1.0);
 
@@ -33,18 +30,14 @@ pub fn vertex_warp(
 
     in_position.transform_position(view, mesh, mesh.model, out_clip_position);
 
-    *out_world_position = in_position;
     *out_world_normal = in_normal;
-    *out_uv = in_uv;
 }
 
 #[spirv(fragment)]
 #[allow(unused_variables)]
 pub fn fragment_normal(
     #[spirv(position)] in_clip_position: Vec4,
-    in_world_position: Vec4,
     in_world_normal: Vec3,
-    in_uv: Vec2,
     out_color: &mut Vec4,
 ) {
     *out_color = in_world_normal.extend(1.0);
