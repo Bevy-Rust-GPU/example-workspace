@@ -2,13 +2,15 @@ use bevy::prelude::{
     default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Color, Commands,
     DefaultPlugins, DirectionalLight, DirectionalLightBundle, MaterialMeshBundle, Mesh,
     PluginGroup, PointLight, PointLightBundle, Quat, Res, ResMut, StandardMaterial, Transform,
-    Vec3, 
+    Vec3,
 };
 
-use bevy_rust_gpu::prelude::{LoadRustGpuShader, RustGpu, RustGpuMaterialPlugin, RustGpuPlugin, EntryPointExport};
+use bevy_rust_gpu::prelude::{LoadRustGpuShader, RustGpu, RustGpuMaterialPlugin, RustGpuPlugin};
 
 /// Workspace-relative path to SPIR-V shader
 const SHADER_PATH: &'static str = "rust-gpu/target/spirv-unknown-spv1.5/release/deps/shader.spv";
+
+const EXPORT_PATH: &'static str = "crates/viewer/entry_points.json";
 
 fn main() {
     let mut app = App::default();
@@ -28,6 +30,7 @@ fn main() {
 
     // Setup `RustGpu<StandardMaterial>`
     app.add_plugin(RustGpuMaterialPlugin::<StandardMaterial>::default());
+    //RustGpu::<StandardMaterial>::export_to(EXPORT_PATH);
 
     // Setup scene
     app.add_startup_system(setup);
@@ -42,7 +45,6 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut standard_materials: ResMut<Assets<StandardMaterial>>,
     mut rust_gpu_standard_materials: ResMut<Assets<RustGpu<StandardMaterial>>>,
-    mut exports: bevy::prelude::NonSendMut<EntryPointExport>,
 ) {
     // Spawn camera
     commands.spawn(Camera3dBundle::default());
@@ -91,7 +93,6 @@ fn setup(
         material: rust_gpu_standard_materials.add(RustGpu {
             vertex_shader: Some(shader.clone()),
             fragment_shader: Some(shader.clone()),
-            export_handle: Some(exports.export("crates/viewer/entry_points.json")),
             ..default()
         }),
         ..default()

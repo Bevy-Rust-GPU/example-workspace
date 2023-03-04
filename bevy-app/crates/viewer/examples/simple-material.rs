@@ -10,16 +10,14 @@ use bevy::{
 };
 
 use bevy_rust_gpu::{
-    bevy_pbr_rust::MeshFragment,
-    prelude::{EntryPointExport, LoadRustGpuShader, RustGpu, RustGpuMaterialPlugin, RustGpuPlugin},
+    prelude::{LoadRustGpuShader, RustGpu, RustGpuMaterialPlugin, RustGpuPlugin},
     EntryPoint, RustGpuMaterial,
 };
 
-#[cfg(feature = "entry-point-export")]
-use bevy_rust_gpu::prelude::EntryPointExport;
-
 /// Workspace-relative path to SPIR-V shader
 const SHADER_PATH: &'static str = "rust-gpu/target/spirv-unknown-spv1.5/release/deps/shader.spv";
+
+const ENTRY_POINTS_PATH: &'static str = "crates/viewer/entry_points.json";
 
 /// Marker type describing the `vertex_warp` entrypoint from the shader crate
 pub enum VertexWarp {}
@@ -67,6 +65,7 @@ fn main() {
 
     // Setup `RustGpu<ExampleMaterial>`
     app.add_plugin(RustGpuMaterialPlugin::<ExampleMaterial>::default());
+    //RustGpu::<ExampleMaterial>::export_to(ENTRY_POINTS_PATH);
 
     // Setup scene
     app.add_startup_system(setup);
@@ -80,7 +79,6 @@ fn setup(
     asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut example_materials: ResMut<Assets<RustGpu<ExampleMaterial>>>,
-    mut exports: bevy::prelude::NonSendMut<EntryPointExport>,
 ) {
     // Spawn camera
     commands.spawn(Camera3dBundle::default());
@@ -114,7 +112,6 @@ fn setup(
     let material = example_materials.add(RustGpu {
         vertex_shader: Some(shader.clone()),
         fragment_shader: Some(shader),
-        export_handle: Some(exports.export("crates/viewer/entry_points.json")),
         ..default()
     });
 
