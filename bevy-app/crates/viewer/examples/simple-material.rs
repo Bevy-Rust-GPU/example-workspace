@@ -11,7 +11,7 @@ use bevy::{
 
 use bevy_rust_gpu::{
     bevy_pbr_rust::MeshFragment,
-    prelude::{LoadRustGpuShader, RustGpu, RustGpuMaterialPlugin, RustGpuPlugin, EntryPointExport},
+    prelude::{EntryPointExport, LoadRustGpuShader, RustGpu, RustGpuMaterialPlugin, RustGpuPlugin},
     EntryPoint, RustGpuMaterial,
 };
 
@@ -106,21 +106,24 @@ fn setup(
         ..default()
     });
 
+    // Load mesh and shader
     let mesh = meshes.add(Cube { size: 1.0 }.into());
-
     let shader = asset_server.load_rust_gpu_shader(SHADER_PATH);
+
+    // Create material
+    let material = example_materials.add(RustGpu {
+        vertex_shader: Some(shader.clone()),
+        fragment_shader: Some(shader),
+        export_handle: Some(exports.export("crates/viewer/entry_points.json")),
+        ..default()
+    });
 
     // Spawn example cubes
     commands.spawn(MaterialMeshBundle {
         transform: Transform::from_xyz(0.0, 0.0, -6.0)
             .with_rotation(Quat::from_axis_angle(Vec3::new(-1.0, 1.0, 1.0), -45.0).normalize()),
         mesh,
-        material: example_materials.add(RustGpu {
-            vertex_shader: Some(shader.clone()),
-            fragment_shader: Some(shader),
-            export_handle: Some(exports.export("crates/viewer/entry_points.json")),
-            ..default()
-        }),
+        material,
         ..default()
     });
 }
