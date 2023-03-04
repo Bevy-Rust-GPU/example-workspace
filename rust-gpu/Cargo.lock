@@ -43,7 +43,7 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 [[package]]
 name = "bevy-pbr-rust"
 version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/bevy-pbr-rust#88e215919e861c372d5d8e06042d5de2d5575e34"
+source = "git+https://github.com/Bevy-Rust-GPU/bevy-pbr-rust?tag=v0.1.0#88e215919e861c372d5d8e06042d5de2d5575e34"
 dependencies = [
  "bitflags",
  "permutate-macro",
@@ -705,7 +705,7 @@ dependencies = [
 [[package]]
 name = "rust-gpu-bridge"
 version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/rust-gpu-bridge#2a344d27214f0f475d9ade592cba82628bcae3d2"
+source = "git+https://github.com/Bevy-Rust-GPU/rust-gpu-bridge#7067b5a13386393e32e72ddcc82e0b615a20deaa"
 dependencies = [
  "spirv-std",
 ]

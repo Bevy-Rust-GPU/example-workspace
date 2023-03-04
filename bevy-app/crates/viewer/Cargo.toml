@@ -17,5 +17,5 @@ path = "examples/standard-material.rs"
 
 [dependencies]
 bevy = "0.9.1"
-bevy-rust-gpu = { git = "https://github.com/Bevy-Rust-GPU/bevy-rust-gpu" }
+bevy-rust-gpu = { git = "https://github.com/Bevy-Rust-GPU/bevy-rust-gpu", tag = "v0.3.0" }
 
