@@ -8,4 +8,4 @@ crate-type = ["dylib"]
 
 [dependencies]
 spirv-std = { version = "0.5.0", features = ["glam"] }
-bevy-pbr-rust = { git = "https://github.com/Bevy-Rust-GPU/bevy-pbr-rust", tag = "v0.1.0" }
+bevy-pbr-rust = { git = "https://github.com/Bevy-Rust-GPU/bevy-pbr-rust", tag = "v0.1.1" }

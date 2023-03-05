@@ -43,7 +43,7 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 [[package]]
 name = "bevy-pbr-rust"
 version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/bevy-pbr-rust?tag=v0.1.0#88e215919e861c372d5d8e06042d5de2d5575e34"
+source = "git+https://github.com/Bevy-Rust-GPU/bevy-pbr-rust?tag=v0.1.1#9e7a0b08ca90aa049180618ba3bde4aaba991144"
 dependencies = [
  "bitflags",
  "permutate-macro",
@@ -597,7 +597,7 @@ checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
 [[package]]
 name = "permutate-macro"
 version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/permutate-macro#36e88de4cc2a74af33e6fbf94c7e10118023c1c5"
+source = "git+https://github.com/Bevy-Rust-GPU/permutate-macro?tag=v0.3.0#36e88de4cc2a74af33e6fbf94c7e10118023c1c5"
 dependencies = [
  "json",
  "proc-macro2",
@@ -705,7 +705,7 @@ dependencies = [
 [[package]]
 name = "rust-gpu-bridge"
 version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/rust-gpu-bridge#7067b5a13386393e32e72ddcc82e0b615a20deaa"
+source = "git+https://github.com/Bevy-Rust-GPU/rust-gpu-bridge?tag=v0.2.0#7067b5a13386393e32e72ddcc82e0b615a20deaa"
 dependencies = [
  "spirv-std",
 ]
@@ -774,9 +774,9 @@ dependencies = [
 
 [[package]]
 name = "rustix"
-version = "0.36.8"
+version = "0.36.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f43abb88211988493c1abb44a70efa56ff0ce98f233b7b276146f1f3f7ba9644"
+checksum = "fd5c6ff11fecd55b40746d1995a02f2eb375bf8c00d192d521ee09f42bef37bc"
 dependencies = [
  "bitflags",
  "errno",
