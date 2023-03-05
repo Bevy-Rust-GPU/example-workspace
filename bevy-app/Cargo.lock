@@ -184,15 +184,15 @@ checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
 [[package]]
 name = "bevy"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_internal",
 ]
 
 [[package]]
 name = "bevy-rust-gpu"
-version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/bevy-rust-gpu?tag=v0.3.0#6530d7d03641615dc8c54728e27b6c1231e2717f"
+version = "0.4.0"
+source = "git+https://github.com/Bevy-Rust-GPU/bevy-rust-gpu?tag=v0.4.0#13e68405734c379ab1219e69c783b21fcdef2d19"
 dependencies = [
  "bevy",
  "bevy_common_assets",
@@ -204,7 +204,7 @@ dependencies = [
 [[package]]
 name = "bevy_animation"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -221,7 +221,7 @@ dependencies = [
 [[package]]
 name = "bevy_app"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_derive",
  "bevy_ecs",
@@ -235,7 +235,7 @@ dependencies = [
 [[package]]
 name = "bevy_asset"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "anyhow",
  "bevy_app",
@@ -262,7 +262,7 @@ dependencies = [
 [[package]]
 name = "bevy_audio"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "anyhow",
  "bevy_app",
@@ -289,7 +289,7 @@ dependencies = [
 [[package]]
 name = "bevy_core"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -303,7 +303,7 @@ dependencies = [
 [[package]]
 name = "bevy_core_pipeline"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -322,7 +322,7 @@ dependencies = [
 [[package]]
 name = "bevy_derive"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_macro_utils",
  "quote",
@@ -332,7 +332,7 @@ dependencies = [
 [[package]]
 name = "bevy_diagnostic"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_app",
  "bevy_core",
@@ -345,7 +345,7 @@ dependencies = [
 [[package]]
 name = "bevy_ecs"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "async-channel",
  "bevy_ecs_macros",
@@ -364,7 +364,7 @@ dependencies = [
 [[package]]
 name = "bevy_ecs_macros"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_macro_utils",
  "proc-macro2",
@@ -375,7 +375,7 @@ dependencies = [
 [[package]]
 name = "bevy_encase_derive"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_macro_utils",
  "encase_derive_impl",
@@ -384,7 +384,7 @@ dependencies = [
 [[package]]
 name = "bevy_gilrs"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -396,7 +396,7 @@ dependencies = [
 [[package]]
 name = "bevy_gltf"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "anyhow",
  "base64",
@@ -424,7 +424,7 @@ dependencies = [
 [[package]]
 name = "bevy_hierarchy"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_app",
  "bevy_core",
@@ -438,7 +438,7 @@ dependencies = [
 [[package]]
 name = "bevy_input"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -451,7 +451,7 @@ dependencies = [
 [[package]]
 name = "bevy_internal"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_animation",
  "bevy_app",
@@ -488,7 +488,7 @@ dependencies = [
 [[package]]
 name = "bevy_log"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "android_log-sys",
  "bevy_app",
@@ -503,7 +503,7 @@ dependencies = [
 [[package]]
 name = "bevy_macro_utils"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "quote",
  "syn",
@@ -513,24 +513,24 @@ dependencies = [
 [[package]]
 name = "bevy_math"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
- "glam",
+ "glam 0.22.0",
  "serde",
 ]
 
 [[package]]
 name = "bevy_mikktspace"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
- "glam",
+ "glam 0.22.0",
 ]
 
 [[package]]
 name = "bevy_pbr"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -551,12 +551,12 @@ dependencies = [
 [[package]]
 name = "bevy_ptr"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 
 [[package]]
 name = "bevy_reflect"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_math",
  "bevy_ptr",
@@ -564,7 +564,7 @@ dependencies = [
  "bevy_utils",
  "downcast-rs",
  "erased-serde",
- "glam",
+ "glam 0.22.0",
  "once_cell",
  "parking_lot",
  "serde",
@@ -575,7 +575,7 @@ dependencies = [
 [[package]]
 name = "bevy_reflect_derive"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_macro_utils",
  "bit-set",
@@ -588,7 +588,7 @@ dependencies = [
 [[package]]
 name = "bevy_render"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "anyhow",
  "bevy_app",
@@ -629,7 +629,7 @@ dependencies = [
 [[package]]
 name = "bevy_render_macros"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_macro_utils",
  "proc-macro2",
@@ -640,7 +640,7 @@ dependencies = [
 [[package]]
 name = "bevy_scene"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "anyhow",
  "bevy_app",
@@ -661,7 +661,7 @@ dependencies = [
 [[package]]
 name = "bevy_sprite"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -685,7 +685,7 @@ dependencies = [
 [[package]]
 name = "bevy_tasks"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "async-channel",
  "async-executor",
@@ -699,7 +699,7 @@ dependencies = [
 [[package]]
 name = "bevy_text"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "ab_glyph",
  "anyhow",
@@ -721,7 +721,7 @@ dependencies = [
 [[package]]
 name = "bevy_time"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -733,7 +733,7 @@ dependencies = [
 [[package]]
 name = "bevy_transform"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -745,7 +745,7 @@ dependencies = [
 [[package]]
 name = "bevy_ui"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -773,7 +773,7 @@ dependencies = [
 [[package]]
 name = "bevy_utils"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "ahash",
  "getrandom",
@@ -786,7 +786,7 @@ dependencies = [
 [[package]]
 name = "bevy_window"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -800,7 +800,7 @@ dependencies = [
 [[package]]
 name = "bevy_winit"
 version = "0.9.1"
-source = "git+https://github.com/Shfty/bevy?branch=remove-spv-defs#82acf4b87fb39424800883e4cb8e8f25b3ab0228"
+source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs#27b785265454138b9241bce9a2d5cae51b3903fe"
 dependencies = [
  "approx",
  "bevy_app",
@@ -1236,7 +1236,7 @@ checksum = "48ec50086547d597b5c871a78399ec04a14828a6a5c445a61ed4687c540edec6"
 dependencies = [
  "const_panic",
  "encase_derive",
- "glam",
+ "glam 0.22.0",
  "thiserror",
 ]
 
@@ -1454,6 +1454,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "glam"
+version = "0.23.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8e4afd9ad95555081e109fe1d21f2a30c691b5f0919c67dfa690a2e1eb6bd51c"
+
+[[package]]
 name = "glob"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1605,11 +1611,11 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "hexasphere"
-version = "8.0.0"
+version = "8.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "619ce654558681d7d0a7809e1b20249c7032ff13ee6baa7bb7ff64f7f28a906a"
+checksum = "bd41d443f978bfa380a6dad58b62a08c43bcb960631f13e9d015b911eaf73588"
 dependencies = [
- "glam",
+ "glam 0.23.0",
  "once_cell",
 ]
 
@@ -3348,9 +3354,9 @@ dependencies = [
 
 [[package]]
 name = "winnow"
-version = "0.3.3"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "faf09497b8f8b5ac5d3bb4d05c0a99be20f26fd3d5f2db7b0716e946d5103658"
+checksum = "c95fb4ff192527911dd18eb138ac30908e7165b8944e528b6af93aa4c842d345"
 dependencies = [
  "memchr",
 ]
