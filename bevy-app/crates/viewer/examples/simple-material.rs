@@ -6,7 +6,7 @@ use bevy::{
         Transform, Vec3,
     },
     reflect::TypeUuid,
-    render::render_resource::AsBindGroup,
+    render::{render_resource::AsBindGroup, RenderPlugin},
 };
 
 use bevy_rust_gpu::{
@@ -50,18 +50,27 @@ impl RustGpuMaterial for ExampleMaterial {
 fn main() {
     let mut app = App::default();
 
+    // Add default plugins
+    app.add_plugins(
+        DefaultPlugins
+            .set(
+                // Configure the asset plugin to watch the workspace path for changes
+                AssetPlugin {
+                    asset_folder: "../../../".into(),
+                    watch_for_changes: true,
+                    ..default()
+                },
+            )
+            .set(
+                // Configure the render plugin with RustGpuPlugin's recommended WgpuSettings
+                RenderPlugin {
+                    wgpu_settings: RustGpuPlugin::wgpu_settings(),
+                },
+            ),
+    );
+
     // Add the Rust-GPU plugin
     app.add_plugin(RustGpuPlugin);
-
-    // Add default plugins
-    app.add_plugins(DefaultPlugins.set(
-        // Configure the asset plugin to watch the workspace path for changes
-        AssetPlugin {
-            asset_folder: "../../../".into(),
-            watch_for_changes: true,
-            ..default()
-        },
-    ));
 
     // Setup `RustGpu<ExampleMaterial>`
     app.add_plugin(RustGpuMaterialPlugin::<ExampleMaterial>::default());
