@@ -42,8 +42,8 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 
 [[package]]
 name = "bevy-pbr-rust"
-version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/bevy-pbr-rust?tag=v0.1.1#9e7a0b08ca90aa049180618ba3bde4aaba991144"
+version = "0.2.0"
+source = "git+https://github.com/Bevy-Rust-GPU/bevy-pbr-rust?tag=v0.2.0#d68093b6ea267094999d19ba8db8b6d6f959a62c"
 dependencies = [
  "bitflags",
  "permutate-macro",
@@ -395,9 +395,9 @@ dependencies = [
 
 [[package]]
 name = "io-lifetimes"
-version = "1.0.5"
+version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1abeb7a0dd0f8181267ff8adc397075586500b81b28a73e8a0208b00fc170fb3"
+checksum = "cfa919a82ea574332e2de6e74b4c36e74d41982b335080fa59d4ef31be20fdf3"
 dependencies = [
  "libc",
  "windows-sys 0.45.0",
@@ -596,8 +596,8 @@ checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
 
 [[package]]
 name = "permutate-macro"
-version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/permutate-macro?tag=v0.3.0#36e88de4cc2a74af33e6fbf94c7e10118023c1c5"
+version = "0.4.0"
+source = "git+https://github.com/Bevy-Rust-GPU/permutate-macro?tag=v0.4.0#3d96094887c99b61b34e0674eb4a4c66df046c4e"
 dependencies = [
  "json",
  "proc-macro2",
@@ -704,8 +704,8 @@ dependencies = [
 
 [[package]]
 name = "rust-gpu-bridge"
-version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/rust-gpu-bridge?tag=v0.2.0#7067b5a13386393e32e72ddcc82e0b615a20deaa"
+version = "0.3.0"
+source = "git+https://github.com/Bevy-Rust-GPU/rust-gpu-bridge?tag=v0.3.0#a0198949dec080d467a5393d6db7d9aa220d2358"
 dependencies = [
  "spirv-std",
 ]
@@ -813,18 +813,18 @@ dependencies = [
 
 [[package]]
 name = "serde"
-version = "1.0.152"
+version = "1.0.153"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bb7d1f0d3021d347a83e556fc4683dea2ea09d87bccdf88ff5c12545d89d5efb"
+checksum = "3a382c72b4ba118526e187430bb4963cd6d55051ebf13d9b25574d379cc98d20"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.152"
+version = "1.0.153"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "af487d118eecd09402d70a5d72551860e788df87b464af30e5ea6a38c75c541e"
+checksum = "1ef476a5790f0f6decbc66726b6e5d63680ed518283e64c7df415989d880954f"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -833,9 +833,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.93"
+version = "1.0.94"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cad406b69c91885b5107daf2c29572f6c8cdb3c66826821e286c533490c0bc76"
+checksum = "1c533a59c9d8a93a09c6ab31f0fd5e5f4dd1b8fc9434804029839884765d04ea"
 dependencies = [
  "itoa",
  "ryu",
@@ -1076,9 +1076,9 @@ dependencies = [
 
 [[package]]
 name = "unicode-ident"
-version = "1.0.7"
+version = "1.0.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "775c11906edafc97bc378816b94585fbd9a054eabaf86fdd0ced94af449efab7"
+checksum = "e5464a87b239f13a63a501f2701565754bae92d243d4bb7eb12f6d57d2269bf4"
 
 [[package]]
 name = "valuable"
