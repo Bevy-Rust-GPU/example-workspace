@@ -25,6 +25,7 @@ pub enum VertexWarp {}
 impl EntryPoint for VertexWarp {
     const NAME: &'static str = "vertex_warp";
     const PARAMETERS: bevy_rust_gpu::EntryPointParameters = &[];
+    const CONSTANTS: bevy_rust_gpu::EntryPointConstants = &[];
 }
 
 /// Marker type describing the `fragment_normal` entrypoint from the shader crate
@@ -33,6 +34,7 @@ pub enum FragmentNormal {}
 impl EntryPoint for FragmentNormal {
     const NAME: &'static str = "fragment_normal";
     const PARAMETERS: bevy_rust_gpu::EntryPointParameters = &[];
+    const CONSTANTS: bevy_rust_gpu::EntryPointConstants = &[];
 }
 
 /// Example RustGpu material tying together [`VertexWarp`] and [`FragmentNormal`]
