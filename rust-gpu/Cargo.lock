@@ -42,12 +42,12 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 
 [[package]]
 name = "bevy-pbr-rust"
-version = "0.2.0"
-source = "git+https://github.com/Bevy-Rust-GPU/bevy-pbr-rust?branch=master#fdeacb00aca253da2ae94c3cca3ff98e906c06e0"
+version = "0.3.0"
+source = "git+https://github.com/Bevy-Rust-GPU/bevy-pbr-rust?tag=v0.3.0#77de1f2155814856891bf38bfba43fb38073003a"
 dependencies = [
  "bitflags 2.0.1",
  "permutate-macro",
- "rust-gpu-bridge",
+ "rust-gpu-bridge 0.4.0 (git+https://github.com/Bevy-Rust-GPU/rust-gpu-bridge?tag=v0.4.0)",
  "spirv-std",
 ]
 
@@ -711,15 +711,23 @@ dependencies = [
 
 [[package]]
 name = "rust-gpu-bridge"
-version = "0.3.1"
-source = "git+https://github.com/bevy-rust-gpu/rust-gpu-bridge?branch=master#569856a4348af020758c4785c9de11ec08ba6bda"
+version = "0.4.0"
+source = "git+https://github.com/Bevy-Rust-GPU/rust-gpu-bridge?tag=v0.4.0#30103aff34059f704e7383766f59bc6b35649ead"
+dependencies = [
+ "spirv-std",
+]
+
+[[package]]
+name = "rust-gpu-bridge"
+version = "0.4.0"
+source = "git+https://github.com/bevy-rust-gpu/rust-gpu-bridge?branch=master#30103aff34059f704e7383766f59bc6b35649ead"
 dependencies = [
  "spirv-std",
 ]
 
 [[package]]
 name = "rust-gpu-builder"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "clap",
  "ctrlc",
@@ -733,8 +741,9 @@ dependencies = [
 [[package]]
 name = "rust-gpu-sdf"
 version = "0.1.0"
+source = "git+https://github.com/Bevy-Rust-GPU/rust-gpu-sdf?branch=master#9f5a8a64c66481182c3b54ee0fb772faa7106b3a"
 dependencies = [
- "rust-gpu-bridge",
+ "rust-gpu-bridge 0.4.0 (git+https://github.com/bevy-rust-gpu/rust-gpu-bridge?branch=master)",
  "type-fields",
 ]
 
