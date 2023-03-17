@@ -3,7 +3,7 @@
 Nightly rust workspace housing `rust-gpu` shader crates.
 
 `rust-toolchain` contains the necessary toolchain specification for `rust-gpu`,
-and `.cargo/config.toml` contains environment variables overriding the permutation file used to compile `bevy-pbr-rust` entry points.
+and `.cargo/config.toml` contains environment variables overriding the permutation file used to compile `bevy-pbr-rust` entry points, and temporarily disabling `rust-gpu`'s `SPIR-T` feature to work around a compatibility issue with `naga`.
 
 To avoid depending on a local clone of `rust-gpu` for SPIR-V compilation, `rust-gpu-builder` has been added to the `crates` directory as a submodule,
 and is set as the workspace's default build target.

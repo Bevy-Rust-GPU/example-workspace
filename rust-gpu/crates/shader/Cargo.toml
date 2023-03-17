@@ -7,5 +7,6 @@ edition = "2021"
 crate-type = ["dylib"]
 
 [dependencies]
-spirv-std = { version = "0.5.0", features = ["glam"] }
-bevy-pbr-rust = { git = "https://github.com/Bevy-Rust-GPU/bevy-pbr-rust", tag = "v0.2.0" }
+spirv-std = "0.6.0"
+bevy-pbr-rust = { git = "https://github.com/Bevy-Rust-GPU/bevy-pbr-rust", branch = "master" }
+rust-gpu-sdf = { path = "../../../../rust-gpu-sdf/crates/rust-gpu-sdf", default_features = false, features = ["spirv-std"] }
