@@ -1,9 +1,9 @@
 use bevy::{
     prelude::{
-        default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Color,
-        Commands, Component, DefaultPlugins, DirectionalLight, DirectionalLightBundle, Material,
-        MaterialMeshBundle, Mesh, PluginGroup, PointLight, PointLightBundle, Quat, Query, Res,
-        ResMut, Transform, Vec3, With,
+        default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, ClearColor,
+        Color, Commands, Component, DefaultPlugins, DirectionalLight, DirectionalLightBundle,
+        Material, MaterialMeshBundle, Mesh, PluginGroup, PointLight, PointLightBundle, Quat, Query,
+        Res, ResMut, Transform, Vec3, With,
     },
     reflect::TypeUuid,
     render::{render_resource::AsBindGroup, RenderPlugin},
@@ -45,10 +45,10 @@ pub struct ExampleMaterial {}
 
 impl Material for ExampleMaterial {
     fn specialize(
-        pipeline: &bevy::pbr::MaterialPipeline<Self>,
+        _pipeline: &bevy::pbr::MaterialPipeline<Self>,
         descriptor: &mut bevy::render::render_resource::RenderPipelineDescriptor,
-        layout: &bevy::render::mesh::MeshVertexBufferLayout,
-        key: bevy::pbr::MaterialPipelineKey<Self>,
+        _layout: &bevy::render::mesh::MeshVertexBufferLayout,
+        _key: bevy::pbr::MaterialPipelineKey<Self>,
     ) -> Result<(), bevy::render::render_resource::SpecializedMeshPipelineError> {
         descriptor.primitive.cull_mode = None;
         Ok(())
@@ -91,6 +91,9 @@ fn main() {
     // Setup `RustGpu<ExampleMaterial>`
     app.add_plugin(RustGpuMaterialPlugin::<ExampleMaterial>::default());
     RustGpu::<ExampleMaterial>::export_to(ENTRY_POINTS_PATH);
+
+    // Set clear color to black
+    app.insert_resource(ClearColor(Color::BLACK));
 
     // Setup scene
     app.add_startup_system(setup);
