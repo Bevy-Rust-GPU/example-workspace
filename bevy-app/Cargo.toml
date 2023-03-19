@@ -6,7 +6,8 @@ members = [
 default-members = ["crates/viewer"]
 
 [patch.crates-io]
-bevy = { git = "https://github.com/Shfty/bevy", branch = "early-shader-defs-0.10.0" }
+#bevy = { git = "https://github.com/Shfty/bevy", branch = "early-shader-defs-0.10.0" }
+bevy = { path = "../../../bevy" }
 
 # Fast-compile config
 [profile.dev]

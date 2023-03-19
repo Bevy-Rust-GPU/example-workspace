@@ -1,4 +1,4 @@
 [env]
-RUSTGPU_CODEGEN_ARGS = "--no-spirt"
+RUSTGPU_CODEGEN_ARGS = "--spirt-passes=reduce,fuse_selects"
 BEVY_PBR_RUST_MESH_VERTEX_PERMUTATIONS = { value = "../bevy-app/crates/viewer/entry_points.json", relative = true }
 BEVY_PBR_RUST_PBR_FRAGMENT_PERMUTATIONS = { value = "../bevy-app/crates/viewer/entry_points.json", relative = true }

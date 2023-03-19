@@ -2,12 +2,12 @@ use bevy::{
     prelude::{
         default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, ClearColor,
         Color, Commands, Component, DefaultPlugins, DirectionalLight, DirectionalLightBundle,
-        Material, MaterialMeshBundle, Mesh, PluginGroup, PointLight, PointLightBundle, Quat, Query,
-        Res, ResMut, Transform, Vec3, With,
+        Material, MaterialMeshBundle, Mesh, Msaa, PluginGroup, PointLight, PointLightBundle, Quat,
+        Query, Res, ResMut, Transform, Vec3, With,
     },
     reflect::TypeUuid,
-    render::{render_resource::AsBindGroup, RenderPlugin},
-    time::Time,
+    render::{render_resource::{AsBindGroup, Face}, RenderPlugin},
+    time::Time, core_pipeline::prepass::DepthPrepass,
 };
 
 use bevy_rust_gpu::{
@@ -16,7 +16,7 @@ use bevy_rust_gpu::{
 };
 
 /// Workspace-relative path to SPIR-V shader
-const SHADER_PATH: &'static str = "rust-gpu/target/spirv-unknown-spv1.5/release/deps/shader.spv";
+const SHADER_PATH: &'static str = "rust-gpu/target/spirv-unknown-vulkan1.2/release/deps/shader.spv";
 
 const ENTRY_POINTS_PATH: &'static str = "crates/viewer/entry_points.json";
 
@@ -95,6 +95,8 @@ fn main() {
     // Set clear color to black
     app.insert_resource(ClearColor(Color::BLACK));
 
+    app.insert_resource(Msaa::Off);
+
     // Setup scene
     app.add_startup_system(setup);
 
@@ -119,7 +121,7 @@ fn setup(
     mut example_materials: ResMut<Assets<RustGpu<ExampleMaterial>>>,
 ) {
     // Spawn camera
-    commands.spawn(Camera3dBundle::default());
+    commands.spawn((Camera3dBundle::default(), DepthPrepass::default()));
 
     // Spawn lights
     commands.spawn(DirectionalLightBundle {

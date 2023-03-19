@@ -169,9 +169,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.69"
+version = "1.0.70"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "224afbd727c3d6e4b90103ece64b8d1b67fbb1973b1046c2281eed3f3803f800"
+checksum = "7de8ce5e0f9f8d88245311066a578d72b7af3e7088f32783804676302df237e4"
 
 [[package]]
 name = "approx"
@@ -267,7 +267,6 @@ checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
 [[package]]
 name = "bevy"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_internal",
 ]
@@ -287,7 +286,6 @@ dependencies = [
 [[package]]
 name = "bevy_a11y"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "accesskit",
  "bevy_app",
@@ -298,7 +296,6 @@ dependencies = [
 [[package]]
 name = "bevy_animation"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -315,7 +312,6 @@ dependencies = [
 [[package]]
 name = "bevy_app"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_derive",
  "bevy_ecs",
@@ -329,7 +325,6 @@ dependencies = [
 [[package]]
 name = "bevy_asset"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "anyhow",
  "bevy_app",
@@ -356,7 +351,6 @@ dependencies = [
 [[package]]
 name = "bevy_audio"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "anyhow",
  "bevy_app",
@@ -386,7 +380,6 @@ dependencies = [
 [[package]]
 name = "bevy_core"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -400,7 +393,6 @@ dependencies = [
 [[package]]
 name = "bevy_core_pipeline"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -419,17 +411,15 @@ dependencies = [
 [[package]]
 name = "bevy_derive"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_macro_utils",
  "quote",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
 name = "bevy_diagnostic"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_app",
  "bevy_core",
@@ -443,7 +433,6 @@ dependencies = [
 [[package]]
 name = "bevy_ecs"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "async-channel",
  "bevy_ecs_macros",
@@ -462,18 +451,16 @@ dependencies = [
 [[package]]
 name = "bevy_ecs_macros"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_macro_utils",
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
 name = "bevy_encase_derive"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_macro_utils",
  "encase_derive_impl",
@@ -482,7 +469,6 @@ dependencies = [
 [[package]]
 name = "bevy_gilrs"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -494,7 +480,6 @@ dependencies = [
 [[package]]
 name = "bevy_gltf"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "anyhow",
  "base64",
@@ -522,7 +507,6 @@ dependencies = [
 [[package]]
 name = "bevy_hierarchy"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_app",
  "bevy_core",
@@ -536,7 +520,6 @@ dependencies = [
 [[package]]
 name = "bevy_input"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -549,7 +532,6 @@ dependencies = [
 [[package]]
 name = "bevy_internal"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_a11y",
  "bevy_animation",
@@ -586,7 +568,6 @@ dependencies = [
 [[package]]
 name = "bevy_log"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "android_log-sys",
  "bevy_app",
@@ -601,17 +582,15 @@ dependencies = [
 [[package]]
 name = "bevy_macro_utils"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "quote",
- "syn",
+ "syn 1.0.109",
  "toml_edit",
 ]
 
 [[package]]
 name = "bevy_math"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "glam",
  "serde",
@@ -620,7 +599,6 @@ dependencies = [
 [[package]]
 name = "bevy_mikktspace"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "glam",
 ]
@@ -628,7 +606,6 @@ dependencies = [
 [[package]]
 name = "bevy_pbr"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -649,12 +626,10 @@ dependencies = [
 [[package]]
 name = "bevy_ptr"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 
 [[package]]
 name = "bevy_reflect"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_math",
  "bevy_ptr",
@@ -673,20 +648,18 @@ dependencies = [
 [[package]]
 name = "bevy_reflect_derive"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_macro_utils",
  "bit-set",
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
  "uuid",
 ]
 
 [[package]]
 name = "bevy_render"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "anyhow",
  "async-channel",
@@ -731,18 +704,16 @@ dependencies = [
 [[package]]
 name = "bevy_render_macros"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_macro_utils",
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
 name = "bevy_scene"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "anyhow",
  "bevy_app",
@@ -763,7 +734,6 @@ dependencies = [
 [[package]]
 name = "bevy_sprite"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -787,7 +757,6 @@ dependencies = [
 [[package]]
 name = "bevy_tasks"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "async-channel",
  "async-executor",
@@ -801,7 +770,6 @@ dependencies = [
 [[package]]
 name = "bevy_text"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "ab_glyph",
  "anyhow",
@@ -823,7 +791,6 @@ dependencies = [
 [[package]]
 name = "bevy_time"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -836,7 +803,6 @@ dependencies = [
 [[package]]
 name = "bevy_transform"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -848,7 +814,6 @@ dependencies = [
 [[package]]
 name = "bevy_ui"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_a11y",
  "bevy_app",
@@ -877,7 +842,6 @@ dependencies = [
 [[package]]
 name = "bevy_utils"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "ahash",
  "bevy_utils_proc_macros",
@@ -893,17 +857,15 @@ dependencies = [
 [[package]]
 name = "bevy_utils_proc_macros"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
 name = "bevy_window"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -917,7 +879,6 @@ dependencies = [
 [[package]]
 name = "bevy_winit"
 version = "0.10.0"
-source = "git+https://github.com/Shfty/bevy?branch=early-shader-defs-0.10.0#74870e7073ae49a46dcf1f17a8b43522a130b145"
 dependencies = [
  "accesskit_winit",
  "approx",
@@ -955,7 +916,7 @@ dependencies = [
  "regex",
  "rustc-hash",
  "shlex",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -1027,7 +988,7 @@ checksum = "1aca418a974d83d40a0c1f0c5cba6ff4bc28d8df099109ca459a2118d40b6322"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -1324,7 +1285,7 @@ checksum = "ae489d58959f3c4cdd1250866a05acfb341469affe4fced71aff3ba228be1693"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -1555,7 +1516,7 @@ dependencies = [
  "inflections",
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -2135,7 +2096,7 @@ checksum = "876a53fff98e03a936a674b29568b0e605f06b29372c2489ff4de23f1949743d"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -2186,7 +2147,7 @@ dependencies = [
  "proc-macro-crate",
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -2578,22 +2539,22 @@ checksum = "d29ab0c6d3fc0ee92fe66e2d99f700eab17a8d57d1c1d3b748380fb20baa78cd"
 
 [[package]]
 name = "serde"
-version = "1.0.156"
+version = "1.0.157"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "314b5b092c0ade17c00142951e50ced110ec27cea304b1037c6969246c2469a4"
+checksum = "707de5fcf5df2b5788fca98dd7eab490bc2fd9b7ef1404defc462833b83f25ca"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.156"
+version = "1.0.157"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d7e29c4601e36bcec74a223228dce795f4cd3616341a4af93520ca1a837c087d"
+checksum = "78997f4555c22a7971214540c4a661291970619afd56de19f77e0de86296e1e5"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 2.0.2",
 ]
 
 [[package]]
@@ -2683,10 +2644,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "sysinfo"
-version = "0.28.2"
+name = "syn"
+version = "2.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d3e847e2de7a137c8c2cede5095872dbb00f4f9bf34d061347e36b43322acd56"
+checksum = "59d3276aee1fa0c33612917969b5172b5be2db051232a6e4826f1a1a9191b045"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "unicode-ident",
+]
+
+[[package]]
+name = "sysinfo"
+version = "0.28.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f69e0d827cce279e61c2f3399eb789271a8f136d8245edef70f06e3c9601a670"
 dependencies = [
  "cfg-if",
  "core-foundation-sys 0.8.3",
@@ -2718,22 +2690,22 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "1.0.39"
+version = "1.0.40"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a5ab016db510546d856297882807df8da66a16fb8c4101cb8b30054b0d5b2d9c"
+checksum = "978c9a314bd8dc99be594bc3c175faaa9794be04a5a5e153caba6915336cebac"
 dependencies = [
  "thiserror-impl",
 ]
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.39"
+version = "1.0.40"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5420d42e90af0c38c3290abcca25b9b3bdf379fc9f55c528f53a269d9c9a267e"
+checksum = "f9456a42c5b0d803c8cd86e73dd7cc9edd429499f37a3550d286d5e86720569f"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 2.0.2",
 ]
 
 [[package]]
@@ -2798,7 +2770,7 @@ checksum = "4017f8f45139870ca7e672686113917c71c7a6e02d4924eda67186083c03081a"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -2970,7 +2942,7 @@ dependencies = [
  "once_cell",
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
  "wasm-bindgen-shared",
 ]
 
@@ -3004,7 +2976,7 @@ checksum = "2aff81306fcac3c7515ad4e177f521b5c9a15f2b08f4e32d823066102f35a5f6"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
  "wasm-bindgen-backend",
  "wasm-bindgen-shared",
 ]
@@ -3207,7 +3179,7 @@ checksum = "6ce87ca8e3417b02dc2a8a22769306658670ec92d78f1bd420d6310a67c245c6"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -3218,7 +3190,7 @@ checksum = "853f69a591ecd4f810d29f17e902d40e349fb05b0b11fff63b08b826bfe39c7f"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]

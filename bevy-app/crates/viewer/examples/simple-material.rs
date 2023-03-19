@@ -15,7 +15,7 @@ use bevy_rust_gpu::{
 };
 
 /// Workspace-relative path to SPIR-V shader
-const SHADER_PATH: &'static str = "rust-gpu/target/spirv-unknown-spv1.5/release/deps/shader.spv";
+const SHADER_PATH: &'static str = "rust-gpu/target/spirv-unknown-vulkan1.2/release/deps/shader.spv";
 
 const ENTRY_POINTS_PATH: &'static str = "crates/viewer/entry_points.json";
 

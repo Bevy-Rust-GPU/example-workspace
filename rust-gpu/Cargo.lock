@@ -43,7 +43,6 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 [[package]]
 name = "bevy-pbr-rust"
 version = "0.3.0"
-source = "git+https://github.com/Bevy-Rust-GPU/bevy-pbr-rust?tag=v0.3.0#77de1f2155814856891bf38bfba43fb38073003a"
 dependencies = [
  "bitflags 2.0.1",
  "permutate-macro",
@@ -92,9 +91,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "clap"
-version = "4.1.9"
+version = "4.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a9d6ada83c1edcce028902ea27dd929069c70df4c7600b131b4d9a1ad2879cc"
+checksum = "ce38afc168d8665cfc75c7b1dd9672e50716a137f433f070991619744a67342a"
 dependencies = [
  "bitflags 1.3.2",
  "clap_derive",
@@ -115,7 +114,7 @@ dependencies = [
  "proc-macro-error",
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -271,7 +270,7 @@ checksum = "3eb14ed937631bd8b8b8977f2c198443447a8355b6e3ca599f38c975e5a963b6"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -401,9 +400,9 @@ dependencies = [
 
 [[package]]
 name = "io-lifetimes"
-version = "1.0.7"
+version = "1.0.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "76e86b86ae312accbf05ade23ce76b625e0e47a255712b7414037385a1c05380"
+checksum = "0dd6da19f25979c7270e70fa95ab371ec3b701cd0eefc47667a09785b3c59155"
 dependencies = [
  "hermit-abi 0.3.1",
  "libc",
@@ -412,9 +411,9 @@ dependencies = [
 
 [[package]]
 name = "is-terminal"
-version = "0.4.4"
+version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "21b6b32576413a8e69b90e952e4a026476040d81017b80445deda5f2d3921857"
+checksum = "8687c819457e979cc940d09cb16e42a1bf70aa6b60a549de6d3a62a0ee90c69e"
 dependencies = [
  "hermit-abi 0.3.1",
  "io-lifetimes",
@@ -609,7 +608,7 @@ dependencies = [
  "json",
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -633,7 +632,7 @@ dependencies = [
  "proc-macro-error-attr",
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
  "version_check",
 ]
 
@@ -712,7 +711,6 @@ dependencies = [
 [[package]]
 name = "rust-gpu-bridge"
 version = "0.4.0"
-source = "git+https://github.com/Bevy-Rust-GPU/rust-gpu-bridge?tag=v0.4.0#30103aff34059f704e7383766f59bc6b35649ead"
 dependencies = [
  "spirv-std",
 ]
@@ -720,7 +718,7 @@ dependencies = [
 [[package]]
 name = "rust-gpu-bridge"
 version = "0.4.0"
-source = "git+https://github.com/bevy-rust-gpu/rust-gpu-bridge?branch=master#30103aff34059f704e7383766f59bc6b35649ead"
+source = "git+https://github.com/Bevy-Rust-GPU/rust-gpu-bridge?tag=v0.4.0#30103aff34059f704e7383766f59bc6b35649ead"
 dependencies = [
  "spirv-std",
 ]
@@ -741,9 +739,8 @@ dependencies = [
 [[package]]
 name = "rust-gpu-sdf"
 version = "0.1.0"
-source = "git+https://github.com/Bevy-Rust-GPU/rust-gpu-sdf?branch=master#9f5a8a64c66481182c3b54ee0fb772faa7106b3a"
 dependencies = [
- "rust-gpu-bridge 0.4.0 (git+https://github.com/bevy-rust-gpu/rust-gpu-bridge?branch=master)",
+ "rust-gpu-bridge 0.4.0",
  "type-fields",
 ]
 
@@ -783,7 +780,7 @@ dependencies = [
  "smallvec",
  "spirt",
  "spirv-tools",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -798,9 +795,9 @@ dependencies = [
 
 [[package]]
 name = "rustix"
-version = "0.36.9"
+version = "0.36.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd5c6ff11fecd55b40746d1995a02f2eb375bf8c00d192d521ee09f42bef37bc"
+checksum = "2fe885c3a125aa45213b68cc1472a49880cb5923dc23f522ad2791b882228778"
 dependencies = [
  "bitflags 1.3.2",
  "errno",
@@ -837,22 +834,22 @@ dependencies = [
 
 [[package]]
 name = "serde"
-version = "1.0.156"
+version = "1.0.157"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "314b5b092c0ade17c00142951e50ced110ec27cea304b1037c6969246c2469a4"
+checksum = "707de5fcf5df2b5788fca98dd7eab490bc2fd9b7ef1404defc462833b83f25ca"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.156"
+version = "1.0.157"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d7e29c4601e36bcec74a223228dce795f4cd3616341a4af93520ca1a837c087d"
+checksum = "78997f4555c22a7971214540c4a661291970619afd56de19f77e0de86296e1e5"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 2.0.2",
 ]
 
 [[package]]
@@ -966,7 +963,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "spirv-std-types",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -1023,6 +1020,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "syn"
+version = "2.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "59d3276aee1fa0c33612917969b5172b5be2db051232a6e4826f1a1a9191b045"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "unicode-ident",
+]
+
+[[package]]
 name = "termcolor"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1061,7 +1069,7 @@ checksum = "4017f8f45139870ca7e672686113917c71c7a6e02d4924eda67186083c03081a"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -1114,7 +1122,7 @@ source = "git+https://github.com/bevy-rust-gpu/type-fields-macros#9bab8312022f42
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.109",
 ]
 
 [[package]]
