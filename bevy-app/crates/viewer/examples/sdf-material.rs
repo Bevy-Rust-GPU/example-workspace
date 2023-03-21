@@ -1,4 +1,5 @@
 use bevy::{
+    core_pipeline::prepass::DepthPrepass,
     prelude::{
         default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, ClearColor,
         Color, Commands, Component, DefaultPlugins, DirectionalLight, DirectionalLightBundle,
@@ -6,8 +7,8 @@ use bevy::{
         Query, Res, ResMut, Transform, Vec3, With,
     },
     reflect::TypeUuid,
-    render::{render_resource::{AsBindGroup, Face}, RenderPlugin},
-    time::Time, core_pipeline::prepass::DepthPrepass,
+    render::render_resource::AsBindGroup,
+    time::Time,
 };
 
 use bevy_rust_gpu::{
@@ -16,7 +17,8 @@ use bevy_rust_gpu::{
 };
 
 /// Workspace-relative path to SPIR-V shader
-const SHADER_PATH: &'static str = "rust-gpu/target/spirv-unknown-vulkan1.2/release/deps/shader.spv";
+const SHADER_PATH: &'static str =
+    "rust-gpu/target/spirv-builder/spirv-unknown-vulkan1.2/release/deps/shader.spv";
 
 const ENTRY_POINTS_PATH: &'static str = "crates/viewer/entry_points.json";
 
@@ -67,23 +69,14 @@ fn main() {
     let mut app = App::default();
 
     // Add default plugins
-    app.add_plugins(
-        DefaultPlugins
-            .set(
-                // Configure the asset plugin to watch the workspace path for changes
-                AssetPlugin {
-                    asset_folder: "../../../".into(),
-                    watch_for_changes: true,
-                    ..default()
-                },
-            )
-            .set(
-                // Configure the render plugin with RustGpuPlugin's recommended WgpuSettings
-                RenderPlugin {
-                    wgpu_settings: RustGpuPlugin::wgpu_settings(),
-                },
-            ),
-    );
+    app.add_plugins(DefaultPlugins.set(
+        // Configure the asset plugin to watch the workspace path for changes
+        AssetPlugin {
+            asset_folder: "../../../".into(),
+            watch_for_changes: true,
+            ..default()
+        },
+    ));
 
     // Add the Rust-GPU plugin
     app.add_plugin(RustGpuPlugin);
@@ -147,6 +140,10 @@ fn setup(
     // Load mesh and shader
     let mesh = meshes.add(Cube { size: 4.0 }.into());
     let shader = asset_server.load_rust_gpu_shader(SHADER_PATH);
+
+    let rust_gpu_output = asset_server.load::<rust_gpu_builder_shared::RustGpuBuilderOutput, _>(
+        "bevy-app/crates/viewer/assets/rust-gpu/shader.rust-gpu.json",
+    );
 
     // Create material
     let material = example_materials.add(RustGpu {

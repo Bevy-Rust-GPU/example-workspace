@@ -1,17 +1,14 @@
-use bevy::{
-    prelude::{
-        default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Color,
-        Commands, DefaultPlugins, DirectionalLight, DirectionalLightBundle, MaterialMeshBundle,
-        Mesh, PluginGroup, PointLight, PointLightBundle, Quat, Res, ResMut, StandardMaterial,
-        Transform, Vec3,
-    },
-    render::RenderPlugin,
+use bevy::prelude::{
+    default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Color, Commands,
+    DefaultPlugins, DirectionalLight, DirectionalLightBundle, MaterialMeshBundle, Mesh,
+    PluginGroup, PointLight, PointLightBundle, Quat, Res, ResMut, StandardMaterial, Transform,
+    Vec3,
 };
 
 use bevy_rust_gpu::prelude::{LoadRustGpuShader, RustGpu, RustGpuMaterialPlugin, RustGpuPlugin};
 
 /// Workspace-relative path to SPIR-V shader
-const SHADER_PATH: &'static str = "rust-gpu/target/spirv-unknown-vulkan1.2/release/deps/shader.spv";
+const SHADER_PATH: &'static str = "rust-gpu/target/spirv-builder/spirv-unknown-vulkan1.2/release/deps/shader.spv";
 
 /// Workspace-relative path to entry points file
 const ENTRY_POINTS_PATH: &'static str = "crates/viewer/entry_points.json";
@@ -20,23 +17,14 @@ fn main() {
     let mut app = App::default();
 
     // Add default plugins
-    app.add_plugins(
-        DefaultPlugins
-            .set(
-                // Configure the asset plugin to watch the workspace path for changes
-                AssetPlugin {
-                    asset_folder: "../../../".into(),
-                    watch_for_changes: true,
-                    ..default()
-                },
-            )
-            .set(
-                // Configure the render plugin with RustGpuPlugin's recommended WgpuSettings
-                RenderPlugin {
-                    wgpu_settings: RustGpuPlugin::wgpu_settings(),
-                },
-            ),
-    );
+    app.add_plugins(DefaultPlugins.set(
+        // Configure the asset plugin to watch the workspace path for changes
+        AssetPlugin {
+            asset_folder: "../../../".into(),
+            watch_for_changes: true,
+            ..default()
+        },
+    ));
 
     // Add the Rust-GPU plugin
     app.add_plugin(RustGpuPlugin);

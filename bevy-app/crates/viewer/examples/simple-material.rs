@@ -15,7 +15,7 @@ use bevy_rust_gpu::{
 };
 
 /// Workspace-relative path to SPIR-V shader
-const SHADER_PATH: &'static str = "rust-gpu/target/spirv-unknown-vulkan1.2/release/deps/shader.spv";
+const SHADER_PATH: &'static str = "rust-gpu/target/spirv-builder/spirv-unknown-vulkan1.2/release/deps/shader.spv";
 
 const ENTRY_POINTS_PATH: &'static str = "crates/viewer/entry_points.json";
 
@@ -53,23 +53,14 @@ fn main() {
     let mut app = App::default();
 
     // Add default plugins
-    app.add_plugins(
-        DefaultPlugins
-            .set(
-                // Configure the asset plugin to watch the workspace path for changes
-                AssetPlugin {
-                    asset_folder: "../../../".into(),
-                    watch_for_changes: true,
-                    ..default()
-                },
-            )
-            .set(
-                // Configure the render plugin with RustGpuPlugin's recommended WgpuSettings
-                RenderPlugin {
-                    wgpu_settings: RustGpuPlugin::wgpu_settings(),
-                },
-            ),
-    );
+    app.add_plugins(DefaultPlugins.set(
+        // Configure the asset plugin to watch the workspace path for changes
+        AssetPlugin {
+            asset_folder: "../../../".into(),
+            watch_for_changes: true,
+            ..default()
+        },
+    ));
 
     // Add the Rust-GPU plugin
     app.add_plugin(RustGpuPlugin);
