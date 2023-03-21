@@ -5,3 +5,22 @@ members = [
     "crates/rust-gpu-builder",
 ]
 default-members = ["crates/rust-gpu-builder"]
+
+[patch.crates-io]
+rustc_codegen_spirv = { git = "https://github.com/LykenSol/rust-gpu", branch = "non-writable" }
+spirv-std = { git = "https://github.com/LykenSol/rust-gpu", branch = "non-writable" }
+
+#bevy-pbr-rust = { git = "https://github.com/Bevy-Rust-GPU/bevy-pbr-rust", tag = "v0.3.0" }
+#rust-gpu-bridge = { git = "https://github.com/Bevy-Rust-GPU/bevy-pbr-rust" }
+#rust-gpu-sdf = { git = "https://github.com/Bevy-Rust-GPU/rust-gpu-sdf", branch = "master", default_features = false, features = ["spirv-std"] }
+#permutate-macro = { git = "https://github.com/Bevy-Rust-GPU/permutate-macro" }
+#type-fields = { git = "https://github.com/Bevy-Rust-GPU/type-fields" }
+#type-fields-macros = { git = "https://github.com/Bevy-Rust-GPU/type-fields-macros" }
+
+bevy-pbr-rust = { path = "../../bevy-pbr-rust" }
+rust-gpu-bridge = { path = "../../rust-gpu-bridge" }
+rust-gpu-sdf = { path = "../../rust-gpu-sdf" }
+permutate-macro = { path = "../../permutate-macro" }
+type-fields = { path = "../../type-fields" }
+type-fields-macros = { path = "../../type-fields-macros" }
+

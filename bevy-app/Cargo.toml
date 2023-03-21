@@ -7,7 +7,12 @@ default-members = ["crates/viewer"]
 
 [patch.crates-io]
 #bevy = { git = "https://github.com/Shfty/bevy", branch = "early-shader-defs-0.10.0" }
+#bevy-rust-gpu = { git = "https://github.com/Bevy-Rust-GPU/bevy-rust-gpu", tag = "v0.4.0" }
+#rust-gpu-builder-shared = { git = "https://github.com/Bevy-Rust-GPU/rust-gpu-builder-shared" }
+
 bevy = { path = "../../../bevy" }
+bevy-rust-gpu = { path = "../../bevy-rust-gpu" }
+rust-gpu-builder-shared = { path = "../../rust-gpu-builder-shared" }
 
 # Fast-compile config
 [profile.dev]

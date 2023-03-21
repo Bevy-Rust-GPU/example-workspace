@@ -274,11 +274,11 @@ dependencies = [
 [[package]]
 name = "bevy-rust-gpu"
 version = "0.4.0"
-source = "git+https://github.com/Bevy-Rust-GPU/bevy-rust-gpu?tag=v0.4.0#35e5d551b0499f4c9c262ff46b2e9c0daf7238b6"
 dependencies = [
  "bevy",
  "bevy_common_assets",
  "once_cell",
+ "rust-gpu-builder-shared",
  "serde",
  "serde_json",
 ]
@@ -367,9 +367,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_common_assets"
-version = "0.5.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c519e2a6c2a4be9212d13e1881a6ab1c05a26107654b6ce7c8d7237642886dd"
+checksum = "291aeda7599bf12869ff225c3702a8b8810c7e5d40655271d0b38442253ca03d"
 dependencies = [
  "anyhow",
  "bevy",
@@ -2489,6 +2489,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "rust-gpu-builder-shared"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "serde",
+]
+
+[[package]]
 name = "rustc-demangle"
 version = "0.1.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2539,22 +2547,22 @@ checksum = "d29ab0c6d3fc0ee92fe66e2d99f700eab17a8d57d1c1d3b748380fb20baa78cd"
 
 [[package]]
 name = "serde"
-version = "1.0.157"
+version = "1.0.158"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "707de5fcf5df2b5788fca98dd7eab490bc2fd9b7ef1404defc462833b83f25ca"
+checksum = "771d4d9c4163ee138805e12c710dd365e4f44be8be0503cb1bb9eb989425d9c9"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.157"
+version = "1.0.158"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "78997f4555c22a7971214540c4a661291970619afd56de19f77e0de86296e1e5"
+checksum = "e801c1712f48475582b7696ac71e0ca34ebb30e09338425384269d9717c62cad"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.2",
+ "syn 2.0.4",
 ]
 
 [[package]]
@@ -2645,9 +2653,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.2"
+version = "2.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "59d3276aee1fa0c33612917969b5172b5be2db051232a6e4826f1a1a9191b045"
+checksum = "2c622ae390c9302e214c31013517c2061ecb2699935882c60a9b37f82f8625ae"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2670,9 +2678,9 @@ dependencies = [
 
 [[package]]
 name = "taffy"
-version = "0.3.8"
+version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "95c7042a25e07815a16fcf3586602b52b1bc9358165a53ab4dd580b26188b384"
+checksum = "65a1b5410ff9135cf5072b13ef0f8a25aa004339ad5ceca9dcb33dcf8c3af1f0"
 dependencies = [
  "arrayvec",
  "num-traits",
@@ -2705,7 +2713,7 @@ checksum = "f9456a42c5b0d803c8cd86e73dd7cc9edd429499f37a3550d286d5e86720569f"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.2",
+ "syn 2.0.4",
 ]
 
 [[package]]
@@ -2897,6 +2905,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy-rust-gpu",
+ "rust-gpu-builder-shared",
 ]
 
 [[package]]
