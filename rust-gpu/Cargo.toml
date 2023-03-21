@@ -13,6 +13,7 @@ spirv-std = { git = "https://github.com/LykenSol/rust-gpu", branch = "non-writab
 #bevy-pbr-rust = { git = "https://github.com/Bevy-Rust-GPU/bevy-pbr-rust", tag = "v0.3.0" }
 #rust-gpu-bridge = { git = "https://github.com/Bevy-Rust-GPU/bevy-pbr-rust" }
 #rust-gpu-sdf = { git = "https://github.com/Bevy-Rust-GPU/rust-gpu-sdf", branch = "master", default_features = false, features = ["spirv-std"] }
+#rust-gpu-builder-shared = { git = "https://github.com/Bevy-Rust-GPU/rust-gpu-builder-shared" }
 #permutate-macro = { git = "https://github.com/Bevy-Rust-GPU/permutate-macro" }
 #type-fields = { git = "https://github.com/Bevy-Rust-GPU/type-fields" }
 #type-fields-macros = { git = "https://github.com/Bevy-Rust-GPU/type-fields-macros" }
@@ -20,6 +21,7 @@ spirv-std = { git = "https://github.com/LykenSol/rust-gpu", branch = "non-writab
 bevy-pbr-rust = { path = "../../bevy-pbr-rust" }
 rust-gpu-bridge = { path = "../../rust-gpu-bridge" }
 rust-gpu-sdf = { path = "../../rust-gpu-sdf" }
+rust-gpu-builder-shared = { path = "../../rust-gpu-builder-shared" }
 permutate-macro = { path = "../../permutate-macro" }
 type-fields = { path = "../../type-fields" }
 type-fields-macros = { path = "../../type-fields-macros" }
