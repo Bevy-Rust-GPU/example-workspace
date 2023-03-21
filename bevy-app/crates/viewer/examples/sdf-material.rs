@@ -12,13 +12,12 @@ use bevy::{
 };
 
 use bevy_rust_gpu::{
-    prelude::{LoadRustGpuShader, RustGpu, RustGpuMaterialPlugin, RustGpuPlugin},
-    EntryPoint, RustGpuMaterial,
+    prelude::{RustGpu, RustGpuMaterialPlugin, RustGpuPlugin},
+    EntryPoint, RustGpuBuilderOutput, RustGpuMaterial,
 };
 
 /// Workspace-relative path to SPIR-V shader
-const SHADER_PATH: &'static str =
-    "rust-gpu/target/spirv-builder/spirv-unknown-vulkan1.2/release/deps/shader.spv";
+const SHADER_PATH: &'static str = "rust-gpu/shader.rust-gpu.json";
 
 const ENTRY_POINTS_PATH: &'static str = "crates/viewer/entry_points.json";
 
@@ -72,7 +71,6 @@ fn main() {
     app.add_plugins(DefaultPlugins.set(
         // Configure the asset plugin to watch the workspace path for changes
         AssetPlugin {
-            asset_folder: "../../../".into(),
             watch_for_changes: true,
             ..default()
         },
@@ -139,11 +137,8 @@ fn setup(
 
     // Load mesh and shader
     let mesh = meshes.add(Cube { size: 4.0 }.into());
-    let shader = asset_server.load_rust_gpu_shader(SHADER_PATH);
 
-    let rust_gpu_output = asset_server.load::<rust_gpu_builder_shared::RustGpuBuilderOutput, _>(
-        "bevy-app/crates/viewer/assets/rust-gpu/shader.rust-gpu.json",
-    );
+    let shader = asset_server.load::<RustGpuBuilderOutput, _>(SHADER_PATH);
 
     // Create material
     let material = example_materials.add(RustGpu {

@@ -2905,7 +2905,6 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy-rust-gpu",
- "rust-gpu-builder-shared",
 ]
 
 [[package]]
