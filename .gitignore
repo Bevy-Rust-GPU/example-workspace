@@ -1,7 +1,7 @@
 rust-gpu/target
 bevy-app/target
 bevy-app/crates/viewer/entry_points.json
-bevy-app/crates/viewer/assets/rust-gpu/shader.rust-gpu.json
+bevy-app/crates/viewer/assets/rust-gpu/shader.rust-gpu.msgpack
 
 *.dot
 *.svg
