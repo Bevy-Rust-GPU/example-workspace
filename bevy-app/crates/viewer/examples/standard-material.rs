@@ -8,7 +8,7 @@ use bevy::prelude::{
 use bevy_rust_gpu::prelude::{RustGpu, RustGpuMaterialPlugin, RustGpuPlugin};
 
 /// Workspace-relative path to SPIR-V shader
-const SHADER_PATH: &'static str = "rust-gpu/shader.rust-gpu.json";
+const SHADER_PATH: &'static str = "rust-gpu/shader.rust-gpu.msgpack";
 
 /// Workspace-relative path to entry points file
 const ENTRY_POINTS_PATH: &'static str = "crates/viewer/entry_points.json";
