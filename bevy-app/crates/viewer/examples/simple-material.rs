@@ -63,7 +63,7 @@ fn main() {
     ));
 
     // Add the Rust-GPU plugin
-    app.add_plugin(RustGpuPlugin);
+    app.add_plugin(RustGpuPlugin::default());
 
     // Setup `RustGpu<ExampleMaterial>`
     app.add_plugin(RustGpuMaterialPlugin::<ExampleMaterial>::default());
