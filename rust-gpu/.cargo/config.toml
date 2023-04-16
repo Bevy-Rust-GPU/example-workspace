@@ -1,4 +1,7 @@
 [env]
-RUSTGPU_CODEGEN_ARGS = "--spirt-passes=reduce,fuse_selects"
+RUSTGPU_CODEGEN_ARGS = "--spirt-passes=fuse_selects --dump-spirt-passes=./spirt-passes"
+#RUSTGPU_CODEGEN_ARGS = "--spirt-passes=reduce,fuse_selects --dump-spirt-passes=./spirt-passes"
+#RUSTGPU_RUSTFLAGS="-Zmir-opt-level=0 -Cdebug-assertions=off"
+RUST_GPU_SDF_FRAGMENT_3D_PERMUTATIONS = { value = "../bevy-app/crates/viewer/entry_points.json", relative = true }
 BEVY_PBR_RUST_MESH_VERTEX_PERMUTATIONS = { value = "../bevy-app/crates/viewer/entry_points.json", relative = true }
 BEVY_PBR_RUST_PBR_FRAGMENT_PERMUTATIONS = { value = "../bevy-app/crates/viewer/entry_points.json", relative = true }

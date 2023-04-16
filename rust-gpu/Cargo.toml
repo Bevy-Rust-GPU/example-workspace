@@ -7,8 +7,9 @@ members = [
 default-members = ["crates/rust-gpu-builder"]
 
 [patch.crates-io]
-rustc_codegen_spirv = { git = "https://github.com/LykenSol/rust-gpu", branch = "non-writable" }
-spirv-std = { git = "https://github.com/LykenSol/rust-gpu", branch = "non-writable" }
+rustc_codegen_spirv = { git = "https://github.com/EmbarkStudios/rust-gpu" }
+spirv-std = { git = "https://github.com/EmbarkStudios/rust-gpu" }
+spirt = { git = "https://github.com/EmbarkStudios/spirt" }
 
 #bevy-pbr-rust = { git = "https://github.com/Bevy-Rust-GPU/bevy-pbr-rust", tag = "v0.3.0" }
 #rust-gpu-bridge = { git = "https://github.com/Bevy-Rust-GPU/bevy-pbr-rust" }
@@ -20,6 +21,7 @@ spirv-std = { git = "https://github.com/LykenSol/rust-gpu", branch = "non-writab
 
 bevy-pbr-rust = { path = "../../bevy-pbr-rust" }
 rust-gpu-bridge = { path = "../../rust-gpu-bridge" }
+rust-gpu-bridge-macros = { path = "../../rust-gpu-bridge-macros" }
 rust-gpu-sdf = { path = "../../rust-gpu-sdf" }
 rust-gpu-builder-shared = { path = "../../rust-gpu-builder-shared" }
 permutate-macro = { path = "../../permutate-macro" }

@@ -1,0 +1,113 @@
+#![no_std]
+
+use spirv_std::spirv;
+
+// Arity 6 HList constructor
+#[inline(never)]
+fn hlist() -> (
+    &'static usize,
+    (
+        &'static usize,
+        (
+            &'static usize,
+            (&'static usize, (&'static usize, &'static usize)),
+        ),
+    ),
+) {
+    (&0, (&0, (&0, (&0, (&0, &0)))))
+}
+
+// Arity 6 tuple constructor
+#[inline(never)]
+fn tuple() -> (
+    &'static usize,
+    &'static usize,
+    &'static usize,
+    &'static usize,
+    &'static usize,
+    &'static usize,
+) {
+    (&0, &0, &0, &0, &0, &0)
+}
+
+/// Wrapping deref in a function is necessary for reproduction
+#[inline(never)]
+fn read<T: Copy>(ptr: &T) -> T {
+    *ptr
+}
+
+// Deref-ing from the head of a HList is fine:
+
+#[spirv(fragment)]
+#[inline(never)]
+pub fn hlist_0_ok() {
+    let _ok: usize = read(hlist().0);
+}
+
+/*
+// Deref-ing any pointer beyond .0 from a HList results in error:
+
+#[spirv(fragment)]
+#[inline(never)]
+pub fn hlist_1_err() {
+    let _err: usize = read(hlist().1 .0);
+}
+
+#[spirv(fragment)]
+#[inline(never)]
+pub fn hlist_2_err() {
+    let _err: usize = read(hlist().1 .1 .0);
+}
+
+#[spirv(fragment)]
+#[inline(never)]
+pub fn hlist_3_err() {
+    let _err: usize = read(hlist().1 .1 .1 .0);
+}
+
+#[spirv(fragment)]
+#[inline(never)]
+pub fn hlist_4_err() {
+    let _err: usize = read(hlist().1 .1 .1 .1 .0);
+}
+
+#[spirv(fragment)]
+#[inline(never)]
+pub fn hlist_5_err() {
+    let _err: usize = read(hlist().1 .1 .1 .1 .1);
+}
+*/
+
+// No issue with the equivalent arity 6 tuple:
+
+#[spirv(fragment)]
+#[inline(never)]
+pub fn tuple_0_to_5_ok(out_usize: &mut usize) {
+    let c = tuple();
+    let _ok: usize = read(c.0);
+    *out_usize = _ok;
+    let _ok: usize = read(c.1);
+    *out_usize = _ok;
+    let _ok: usize = read(c.2);
+    *out_usize = _ok;
+    let _ok: usize = read(c.3);
+    *out_usize = _ok;
+    let _ok: usize = read(c.4);
+    *out_usize = _ok;
+    let _ok: usize = read(c.5);
+    *out_usize = _ok;
+}
+
+#[inline(never)]
+pub fn read_3<A, B, C>(t: &(A, &B, C)) -> B
+where
+    B: Copy,
+{
+    *t.1
+}
+
+#[spirv(fragment)]
+#[inline(never)]
+pub fn tuple_3_err() {
+    let _err: usize = read_3(&(0, &0, 0));
+}

@@ -10,9 +10,15 @@ default-members = ["crates/viewer"]
 #bevy-rust-gpu = { git = "https://github.com/Bevy-Rust-GPU/bevy-rust-gpu", tag = "v0.4.0" }
 #rust-gpu-builder-shared = { git = "https://github.com/Bevy-Rust-GPU/rust-gpu-builder-shared" }
 
+naga = { git = "https://github.com/EmbarkStudios/naga", branch = "spv-in-break-if-v0.11.0" }
 bevy = { path = "../../../bevy" }
 bevy-rust-gpu = { path = "../../bevy-rust-gpu" }
+rust-gpu-sdf = { path = "../../rust-gpu-sdf" }
+rust-gpu-bridge = { path = "../../rust-gpu-bridge" }
+rust-gpu-bridge-macros = { path = "../../rust-gpu-bridge-macros" }
 rust-gpu-builder-shared = { path = "../../rust-gpu-builder-shared" }
+type-fields = { path = "../../type-fields" }
+type-fields-macros = { path = "../../type-fields-macros" }
 
 # Fast-compile config
 [profile.dev]

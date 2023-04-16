@@ -3,10 +3,6 @@ name = "viewer"
 version = "0.1.0"
 edition = "2021"
 
-[features]
-default = []
-webgl = []
-
 [[example]]
 name = "simple-material"
 path = "examples/simple-material.rs"
@@ -17,4 +13,7 @@ path = "examples/standard-material.rs"
 
 [dependencies]
 bevy = { version = "0.10.0", features = ["spirv_shader_passthrough"] }
+#bevy = { version = "0.10.0" }
 bevy-rust-gpu = "0.4.0"
+rust-gpu-sdf = { version = "0.1.0", default_features = false, features = ["glam", "bevy"] }
+rust-gpu-bridge = { version = "0.4.0", default_features = false, features = ["glam"] }

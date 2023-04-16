@@ -1,19 +1,22 @@
 use bevy::{
     core_pipeline::prepass::DepthPrepass,
     prelude::{
-        default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, ClearColor,
-        Color, Commands, Component, DefaultPlugins, DirectionalLight, DirectionalLightBundle,
-        Material, MaterialMeshBundle, Mesh, Msaa, PluginGroup, PointLight, PointLightBundle, Quat,
-        Query, Res, ResMut, Transform, Vec3, With,
+        default,
+        shape::{Cube, Quad},
+        App, AssetPlugin, AssetServer, Assets, Camera2dBundle, ClearColor, Color, Commands,
+        Component, DefaultPlugins, DirectionalLight, DirectionalLightBundle, Material,
+        MaterialMeshBundle, Mesh, Msaa, PluginGroup, PointLight, PointLightBundle, Quat, Query,
+        Res, ResMut, Transform, Vec2, Vec3, With,
     },
     reflect::TypeUuid,
     render::render_resource::AsBindGroup,
+    sprite::{Material2d, MaterialMesh2dBundle, Mesh2dHandle},
     time::Time,
 };
 
 use bevy_rust_gpu::{
     prelude::{RustGpu, RustGpuMaterialPlugin, RustGpuPlugin},
-    EntryPoint, RustGpuBuilderOutput, RustGpuMaterial,
+    EntryPoint, RustGpuBuilderOutput, RustGpuMaterial, RustGpuMaterial2dPlugin,
 };
 
 /// Workspace-relative path to SPIR-V shader
@@ -25,18 +28,14 @@ const ENTRY_POINTS_PATH: &'static str = "crates/viewer/entry_points.json";
 pub enum VertexWarp {}
 
 impl EntryPoint for VertexWarp {
-    const NAME: &'static str = "vertex_sdf";
-    const PARAMETERS: bevy_rust_gpu::EntryPointParameters = &[];
-    const CONSTANTS: bevy_rust_gpu::EntryPointConstants = &[];
+    const NAME: &'static str = "vertex_sdf_2d";
 }
 
 /// Marker type describing the `fragment_normal` entrypoint from the shader crate
 pub enum FragmentNormal {}
 
 impl EntryPoint for FragmentNormal {
-    const NAME: &'static str = "fragment_sdf";
-    const PARAMETERS: bevy_rust_gpu::EntryPointParameters = &[];
-    const CONSTANTS: bevy_rust_gpu::EntryPointConstants = &[];
+    const NAME: &'static str = "fragment_sdf_2d";
 }
 
 /// Example RustGpu material tying together [`VertexWarp`] and [`FragmentNormal`]
@@ -44,12 +43,11 @@ impl EntryPoint for FragmentNormal {
 #[uuid = "cbeff76a-27e9-42c8-bb17-73e81ba62a36"]
 pub struct ExampleMaterial {}
 
-impl Material for ExampleMaterial {
+impl Material2d for ExampleMaterial {
     fn specialize(
-        _pipeline: &bevy::pbr::MaterialPipeline<Self>,
         descriptor: &mut bevy::render::render_resource::RenderPipelineDescriptor,
         _layout: &bevy::render::mesh::MeshVertexBufferLayout,
-        _key: bevy::pbr::MaterialPipelineKey<Self>,
+        _key: bevy::sprite::Material2dKey<Self>,
     ) -> Result<(), bevy::render::render_resource::SpecializedMeshPipelineError> {
         descriptor.primitive.cull_mode = None;
         Ok(())
@@ -80,7 +78,7 @@ fn main() {
     app.add_plugin(RustGpuPlugin::default());
 
     // Setup `RustGpu<ExampleMaterial>`
-    app.add_plugin(RustGpuMaterialPlugin::<ExampleMaterial>::default());
+    app.add_plugin(RustGpuMaterial2dPlugin::<ExampleMaterial>::default());
     RustGpu::<ExampleMaterial>::export_to(ENTRY_POINTS_PATH);
 
     // Set clear color to black
@@ -90,16 +88,6 @@ fn main() {
 
     // Setup scene
     app.add_startup_system(setup);
-
-    app.add_system(
-        |time: Res<Time>, mut query: Query<&mut Transform, With<Rotate>>| {
-            for mut transform in query.iter_mut() {
-                transform.rotation = (transform.rotation
-                    * Quat::from_axis_angle(Vec3::ONE, time.delta_seconds()))
-                .normalize()
-            }
-        },
-    );
 
     // Run
     app.run();
@@ -112,31 +100,18 @@ fn setup(
     mut example_materials: ResMut<Assets<RustGpu<ExampleMaterial>>>,
 ) {
     // Spawn camera
-    commands.spawn((Camera3dBundle::default(), DepthPrepass::default()));
-
-    // Spawn lights
-    commands.spawn(DirectionalLightBundle {
-        directional_light: DirectionalLight {
-            illuminance: 5000.0,
-            ..default()
-        },
-        transform: Transform::IDENTITY.looking_at(Vec3::new(0.0, -1.0, -1.0), Vec3::Y),
-        ..default()
-    });
-
-    commands.spawn(PointLightBundle {
-        point_light: PointLight {
-            intensity: 400.0,
-            range: 4.0,
-            color: Color::BLUE,
-            ..default()
-        },
-        transform: Transform::from_xyz(0.0, -2.0, -4.0),
-        ..default()
-    });
+    commands.spawn((Camera2dBundle::default(), DepthPrepass::default()));
 
     // Load mesh and shader
-    let mesh = meshes.add(Cube { size: 4.0 }.into());
+    let mesh = meshes.add(
+        Quad {
+            size: Vec2::ONE * 200.0,
+            flip: false,
+        }
+        .into(),
+    );
+
+    let mesh = Mesh2dHandle::from(mesh);
 
     let shader = asset_server.load::<RustGpuBuilderOutput, _>(SHADER_PATH);
 
@@ -149,11 +124,7 @@ fn setup(
 
     // Spawn example cubes
     commands.spawn((
-        MaterialMeshBundle {
-            transform: Transform::from_xyz(0.0, 0.0, -4.0).with_rotation(
-                Quat::from_axis_angle(Vec3::new(-1.0, 1.0, 1.0), std::f32::consts::FRAC_PI_4)
-                    .normalize(),
-            ),
+        MaterialMesh2dBundle {
             mesh,
             material,
             ..default()

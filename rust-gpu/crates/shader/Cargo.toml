@@ -10,3 +10,5 @@ crate-type = ["dylib"]
 spirv-std = "0.6.0"
 bevy-pbr-rust = "0.3.0"
 rust-gpu-sdf = { version = "0.1.0", features = ["spirv-std"] }
+rust-gpu-bridge = { version = "0.4.0", features = ["spirv-std"] }
+permutate-macro = "0.4.0"
