@@ -6,7 +6,7 @@ use bevy::{
         default, shape::Cube, AlphaMode, App, AssetPlugin, AssetServer, Assets, Camera3dBundle,
         ClearColor, Color, Commands, Component, DefaultPlugins, DirectionalLight,
         DirectionalLightBundle, Material, MaterialMeshBundle, Mesh, Msaa, PluginGroup, PointLight,
-        PointLightBundle, Quat, Query, Res, ResMut, Transform, Vec3, Vec4, With,
+        PointLightBundle, Quat, Query, Res, ResMut, Transform, Vec3, With,
     },
     reflect::TypeUuid,
     render::render_resource::AsBindGroup,
@@ -19,15 +19,10 @@ use bevy_rust_gpu::{
     EntryPoint, EntryPointTypes, RustGpuBuilderOutput, RustGpuMaterial,
 };
 use rust_gpu_bridge::Named;
-use rust_gpu_sdf::{
-    prelude::{
-        AttrColor, AttrDistance, AttrNormal, AttrTangent, AttrUv, Car, Cdr, Checker, ColorNormal,
-        ColorTangent, ColorUv, Cube as SdfCube, Distance, EuclideanMetric, Field,
-        Isosurface, IsosurfaceOp, Normal, Octahedron, Position,
-        ProxyColor, Raycast, RaycastInput, ScaleUv, Sphere, SphereTraceLipschitz, Tangent, Torus,
-        Uv, UvTangent, White, FieldOperator,
-    },
-    type_fields::hlist::tuple::{Cons, ConsRef},
+use rust_gpu_sdf::prelude::{
+    AttrColor, AttrDistance, AttrNormal, AttrTangent, AttrUv, ColorUv, EuclideanMetric, Field,
+    FieldOperator, IsosurfaceOp, Position, Raycast, ScaleUv, Sphere, SphereTraceLipschitz,
+    UvTangent,
 };
 
 /// Workspace-relative path to SPIR-V shader

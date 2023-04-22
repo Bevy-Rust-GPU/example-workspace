@@ -20,10 +20,10 @@ use rust_gpu_sdf::{
     },
     type_fields::{
         field::Field as TypeField,
-        functional::{Phantom, Pointed},
-        hlist::{
-            cons::{ConsPushFront, Uncons},
-            tuple::Cons,
+        t_funk::{
+            hlist::{PushFront, ToTList},
+            tlist::ToHList,
+            Pointed, Tagged,
         },
     },
 };
@@ -377,13 +377,13 @@ pub fn fragment_sdf_3d(
     );
 
     let (out,) = sdf.field_attributes_register_cons::<(Raycast,)>(&context);
-    let context = context.cons().cons_push_front(out).uncons();
+    let context = context.to_hlist().push_front(out).to_tlist();
 
     // Context parameters
     let context = context
-        .cons()
-        .cons_push_front(Position(eye + dir * out.closest_t))
-        .uncons();
+        .to_hlist()
+        .push_front(Position(eye + dir * out.closest_t))
+        .to_tlist();
 
     // Evaluate
     let (normal,) = sdf.field_attributes_register_cons::<(AttrNormal<Vec3>,)>(&context);
@@ -424,6 +424,7 @@ pub fn fragment_sdf_3d(
     *out_color = col.extend(coverage);
 
     // Type machine testing
+    /*
     {
         use rust_gpu_sdf::{
             field_type_machine::{
@@ -431,7 +432,7 @@ pub fn fragment_sdf_3d(
                 SphereTraceLipschitz,
             },
             prelude::Distance,
-            type_fields::hlist::type_machine::TypeMachine,
+            type_fields::type_machine::TypeMachine,
         };
 
         /*
@@ -448,6 +449,7 @@ pub fn fragment_sdf_3d(
         */
 
         (EuclideanMetric::<Vec3>::default(),)
-            .run((Phantom::<rust_gpu_sdf::field_type_machine::Position, _>::of(Vec3::ZERO),));
+            .run((Tagged::<rust_gpu_sdf::field_type_machine::Position, _>::point(Vec3::ZERO),));
     }
+    */
 }
