@@ -7,30 +7,27 @@ members = [
 default-members = ["crates/rust-gpu-builder"]
 
 [patch.crates-io]
-rustc_codegen_spirv = { git = "https://github.com/EmbarkStudios/rust-gpu" }
-spirv-std = { git = "https://github.com/EmbarkStudios/rust-gpu" }
-spirt = { git = "https://github.com/EmbarkStudios/spirt" }
+#rustc_codegen_spirv = { git = "https://github.com/EmbarkStudios/rust-gpu" }
+#spirv-std = { git = "https://github.com/EmbarkStudios/rust-gpu" }
+#spirt = { git = "https://github.com/EmbarkStudios/spirt" }
 
-[patch."https://github.com/bevy-rust-gpu/bevy-pbr-rust"]
-bevy-pbr-rust = { path = "../../crates/bevy-pbr-rust" }
+#[patch."https://github.com/bevy-rust-gpu/bevy-pbr-rust"]
+#bevy-pbr-rust = { path = "../../crates/bevy-pbr-rust" }
 
-[patch."https://github.com/bevy-rust-gpu/rust-gpu-bridge"]
-rust-gpu-bridge = { path = "../../crates/rust-gpu-bridge" }
+#[patch."https://github.com/bevy-rust-gpu/rust-gpu-bridge"]
+#rust-gpu-bridge = { path = "../../crates/rust-gpu-bridge" }
 
-[patch."https://github.com/bevy-rust-gpu/rust-gpu-bridge-macros"]
-rust-gpu-bridge-macros = { path = "../../crates/rust-gpu-bridge-macros" }
+#[patch."https://github.com/bevy-rust-gpu/rust-gpu-sdf"]
+#rust-gpu-sdf = { path = "../../crates/rust-gpu-sdf" }
 
-[patch."https://github.com/bevy-rust-gpu/rust-gpu-sdf"]
-rust-gpu-sdf = { path = "../../crates/rust-gpu-sdf" }
+#[patch."https://github.com/bevy-rust-gpu/rust-gpu-builder-shared"]
+#rust-gpu-builder-shared = { path = "../../crates/rust-gpu-builder-shared" }
 
-[patch."https://github.com/bevy-rust-gpu/rust-gpu-builder-shared"]
-rust-gpu-builder-shared = { path = "../../crates/rust-gpu-builder-shared" }
+#[patch."https://github.com/bevy-rust-gpu/permutate-macro"]
+#permutate-macro = { path = "../../crates/permutate-macro" }
 
-[patch."https://github.com/bevy-rust-gpu/permutate-macro"]
-permutate-macro = { path = "../../crates/permutate-macro" }
+#[patch."https://github.com/bevy-rust-gpu/type-fields"]
+#type-fields = { path = "../../crates/type-fields" }
 
-[patch."https://github.com/bevy-rust-gpu/type-fields"]
-type-fields = { path = "../../crates/type-fields" }
-
-[patch."https://github.com/bevy-rust-gpu/type-fields-macros"]
-type-fields-macros = { path = "../../crates/type-fields-macros" }
+#[patch."https://github.com/bevy-rust-gpu/type-fields-macros"]
+#type-fields-macros = { path = "../../crates/type-fields-macros" }

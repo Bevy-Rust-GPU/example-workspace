@@ -1,5 +1,7 @@
+rust-gpu/Cargo.lock
 rust-gpu/target
 rust-gpu/spirt-passes
+bevy-app/Cargo.lock
 bevy-app/target
 bevy-app/crates/viewer/entry_points.json
 bevy-app/crates/viewer/assets/rust-gpu/shader.rust-gpu.msgpack
