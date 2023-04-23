@@ -6,19 +6,33 @@ members = [
 default-members = ["crates/viewer"]
 
 [patch.crates-io]
-#bevy = { git = "https://github.com/Shfty/bevy", branch = "early-shader-defs-0.10.0" }
-#bevy-rust-gpu = { git = "https://github.com/Bevy-Rust-GPU/bevy-rust-gpu", tag = "v0.4.0" }
-#rust-gpu-builder-shared = { git = "https://github.com/Bevy-Rust-GPU/rust-gpu-builder-shared" }
-
 naga = { git = "https://github.com/EmbarkStudios/naga", branch = "spv-in-break-if-v0.11.0" }
 bevy = { path = "../../../bevy" }
-bevy-rust-gpu = { path = "../../bevy-rust-gpu" }
-rust-gpu-sdf = { path = "../../rust-gpu-sdf" }
-rust-gpu-bridge = { path = "../../rust-gpu-bridge" }
-rust-gpu-bridge-macros = { path = "../../rust-gpu-bridge-macros" }
-rust-gpu-builder-shared = { path = "../../rust-gpu-builder-shared" }
-type-fields = { path = "../../type-fields" }
-type-fields-macros = { path = "../../type-fields-macros" }
+
+#bevy = { git = "https://github.com/Shfty/bevy", branch = "early-shader-defs-0.10.0" }
+#bevy-rust-gpu = { git = "https://github.com/bevy-rust-gpu/bevy-rust-gpu", tag = "v0.4.0" }
+#rust-gpu-builder-shared = { git = "https://github.com/bevy-rust-gpu/rust-gpu-builder-shared" }
+
+[patch."https://github.com/bevy-rust-gpu/bevy-rust-gpu"]
+bevy-rust-gpu = { path = "../../crates/bevy-rust-gpu" }
+
+[patch."https://github.com/bevy-rust-gpu/rust-gpu-sdf"]
+rust-gpu-sdf = { path = "../../crates/rust-gpu-sdf" }
+
+[patch."https://github.com/bevy-rust-gpu/rust-gpu-bridge"]
+rust-gpu-bridge = { path = "../../crates/rust-gpu-bridge" }
+
+[patch."https://github.com/bevy-rust-gpu/rust-gpu-bridge-macros"]
+rust-gpu-bridge-macros = { path = "../../crates/rust-gpu-bridge-macros" }
+
+[patch."https://github.com/bevy-rust-gpu/rust-gpu-builder-shared"]
+rust-gpu-builder-shared = { path = "../../crates/rust-gpu-builder-shared" }
+
+[patch."https://github.com/bevy-rust-gpu/type-fields"]
+type-fields = { path = "../../crates/type-fields" }
+
+[patch."https://github.com/bevy-rust-gpu/type-fields-macros"]
+type-fields-macros = { path = "../../crates/type-fields-macros" }
 
 # Fast-compile config
 [profile.dev]

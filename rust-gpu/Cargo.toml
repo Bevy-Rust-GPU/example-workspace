@@ -11,20 +11,26 @@ rustc_codegen_spirv = { git = "https://github.com/EmbarkStudios/rust-gpu" }
 spirv-std = { git = "https://github.com/EmbarkStudios/rust-gpu" }
 spirt = { git = "https://github.com/EmbarkStudios/spirt" }
 
-#bevy-pbr-rust = { git = "https://github.com/Bevy-Rust-GPU/bevy-pbr-rust", tag = "v0.3.0" }
-#rust-gpu-bridge = { git = "https://github.com/Bevy-Rust-GPU/bevy-pbr-rust" }
-#rust-gpu-sdf = { git = "https://github.com/Bevy-Rust-GPU/rust-gpu-sdf", branch = "master", default_features = false, features = ["spirv-std"] }
-#rust-gpu-builder-shared = { git = "https://github.com/Bevy-Rust-GPU/rust-gpu-builder-shared" }
-#permutate-macro = { git = "https://github.com/Bevy-Rust-GPU/permutate-macro" }
-#type-fields = { git = "https://github.com/Bevy-Rust-GPU/type-fields" }
-#type-fields-macros = { git = "https://github.com/Bevy-Rust-GPU/type-fields-macros" }
+[patch."https://github.com/bevy-rust-gpu/bevy-pbr-rust"]
+bevy-pbr-rust = { path = "../../crates/bevy-pbr-rust" }
 
-bevy-pbr-rust = { path = "../../bevy-pbr-rust" }
-rust-gpu-bridge = { path = "../../rust-gpu-bridge" }
-rust-gpu-bridge-macros = { path = "../../rust-gpu-bridge-macros" }
-rust-gpu-sdf = { path = "../../rust-gpu-sdf" }
-rust-gpu-builder-shared = { path = "../../rust-gpu-builder-shared" }
-permutate-macro = { path = "../../permutate-macro" }
-type-fields = { path = "../../type-fields" }
-type-fields-macros = { path = "../../type-fields-macros" }
+[patch."https://github.com/bevy-rust-gpu/rust-gpu-bridge"]
+rust-gpu-bridge = { path = "../../crates/rust-gpu-bridge" }
 
+[patch."https://github.com/bevy-rust-gpu/rust-gpu-bridge-macros"]
+rust-gpu-bridge-macros = { path = "../../crates/rust-gpu-bridge-macros" }
+
+[patch."https://github.com/bevy-rust-gpu/rust-gpu-sdf"]
+rust-gpu-sdf = { path = "../../crates/rust-gpu-sdf" }
+
+[patch."https://github.com/bevy-rust-gpu/rust-gpu-builder-shared"]
+rust-gpu-builder-shared = { path = "../../crates/rust-gpu-builder-shared" }
+
+[patch."https://github.com/bevy-rust-gpu/permutate-macro"]
+permutate-macro = { path = "../../crates/permutate-macro" }
+
+[patch."https://github.com/bevy-rust-gpu/type-fields"]
+type-fields = { path = "../../crates/type-fields" }
+
+[patch."https://github.com/bevy-rust-gpu/type-fields-macros"]
+type-fields-macros = { path = "../../crates/type-fields-macros" }
