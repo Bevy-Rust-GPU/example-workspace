@@ -2935,7 +2935,7 @@ dependencies = [
 [[package]]
 name = "rust-gpu-sdf"
 version = "0.1.0"
-source = "git+https://github.com/bevy-rust-gpu/rust-gpu-sdf#f1e007da7afd7708276190d8f835de2ea58c33e4"
+source = "git+https://github.com/bevy-rust-gpu/rust-gpu-sdf?tag=prerelease#8a7a38584f4caef54a4cdd8cfb1a7164f8b5e32e"
 dependencies = [
  "rust-gpu-bridge",
  "type-fields",
@@ -3463,7 +3463,7 @@ dependencies = [
 [[package]]
 name = "type-fields"
 version = "0.1.0"
-source = "git+https://github.com/bevy-rust-gpu/type-fields#3c77ec1c1e08c272a844fba3a5b305c590ffc76c"
+source = "git+https://github.com/bevy-rust-gpu/type-fields?tag=prerelease#4fbf57e6926c164eade696c65736503765150700"
 dependencies = [
  "type-fields-macros",
 ]
@@ -3471,7 +3471,7 @@ dependencies = [
 [[package]]
 name = "type-fields-macros"
 version = "0.1.0"
-source = "git+https://github.com/bevy-rust-gpu/type-fields-macros#f5c7fe25636a4525dfc1b415b6bd56b7a40eff51"
+source = "git+https://github.com/bevy-rust-gpu/type-fields-macros?tag=prerelease#f5c7fe25636a4525dfc1b415b6bd56b7a40eff51"
 dependencies = [
  "convert_case",
  "proc-macro2",
