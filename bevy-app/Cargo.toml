@@ -6,10 +6,10 @@ members = [
 default-members = ["crates/viewer"]
 
 [patch.crates-io]
-naga = { git = "https://github.com/EmbarkStudios/naga", branch = "spv-in-break-if-v0.11.0" }
+naga = { git = "https://github.com/bevy-rust-gpu/naga", branch = "spv-in-break-if-v0.11.0" }
 
 #bevy = { path = "../../../bevy" }
-bevy = { git = "https://github.com/Shfty/bevy", branch = "bevy-rust-gpu-dev" }
+bevy = { git = "https://github.com/bevy-rust-gpu/bevy", branch = "bevy-rust-gpu-dev" }
 
 #[patch."https://github.com/bevy-rust-gpu/bevy-rust-gpu"]
 #bevy-rust-gpu = { path = "../../crates/bevy-rust-gpu" }
