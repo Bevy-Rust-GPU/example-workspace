@@ -29,7 +29,7 @@ use rust_gpu_sdf::{
 };
 use spirv_std::{
     arch::{ddx, ddy},
-    glam::{Mat3, UVec3, Vec2, Vec3, Vec4, Vec4Swizzles},
+    glam::{IVec4, Mat3, UVec3, Vec2, Vec3, Vec4, Vec4Swizzles},
     spirv,
 };
 
@@ -476,13 +476,23 @@ pub fn collatz(mut n: u32) -> Option<u32> {
 }
 
 #[spirv(compute(threads(64)))]
-pub fn compute_primes(
+pub fn init(
     #[spirv(global_invocation_id)] id: UVec3,
-    #[spirv(storage_buffer, descriptor_set = 0, binding = 0)] prime_indices: &mut [Vec4],
+    #[spirv(num_workgroups)] num: UVec3,
+    #[spirv(storage_buffer, descriptor_set = 0, binding = 0)] texture: &mut [Vec4],
 ) {
-    let index = id.x as usize;
-    prime_indices[index].x = 1.0;
-    prime_indices[index].y = 1.0;
-    prime_indices[index].z = 0.0;
-    prime_indices[index].z = 1.0;
+    let index = (id.y * num.x) as usize + id.y as usize;
+    texture[index] = Vec4::new(1.0, 0.2, 0.3, 0.4);
+}
+
+#[spirv(compute(threads(64)))]
+pub fn update(
+    #[spirv(global_invocation_id)] id: UVec3,
+    #[spirv(num_workgroups)] num: UVec3,
+    #[spirv(storage_buffer, descriptor_set = 0, binding = 0)] texture: &mut [Vec4],
+) {
+    let index = (id.y * num.x) as usize + id.y as usize;
+    let pixel = &mut texture[index];
+
+    pixel.x = (pixel.x + 0.01).fract();
 }

@@ -150,9 +150,11 @@ impl FromWorld for GameOfLifePipeline {
                         count: None,
                     }],
                 });
+
         let shader = world
             .resource::<AssetServer>()
             .load("rust-gpu/shader.rust-gpu.msgpack");
+
         // let shader = world
         //     .resource::<AssetServer>()
         //     .load("gol.wgsl");
@@ -163,7 +165,7 @@ impl FromWorld for GameOfLifePipeline {
             push_constant_ranges: Vec::new(),
             shader: shader.clone(),
             shader_defs: vec![],
-            entry_point: Cow::from("compute_primes"),
+            entry_point: Cow::from("init"),
         });
         let update_pipeline = pipeline_cache.queue_compute_pipeline(ComputePipelineDescriptor {
             label: Some("update_compute_primes".into()),
@@ -171,7 +173,7 @@ impl FromWorld for GameOfLifePipeline {
             push_constant_ranges: Vec::new(),
             shader,
             shader_defs: vec![],
-            entry_point: Cow::from("compute_primes"),
+            entry_point: Cow::from("update"),
         });
 
         GameOfLifePipeline {
