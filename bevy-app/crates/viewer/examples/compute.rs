@@ -4,14 +4,28 @@
 //! is rendered to the screen.
 
 use bevy::{
+    prelude::{
+        default, App, AssetServer, Assets, Camera2dBundle, ClearColor, Color, Commands, Deref,
+        FromWorld, Handle, Image, IntoSystemConfig, Plugin, PluginGroup, Res, ResMut, Resource,
+        Vec2, World,
+    },
     render::{
         extract_resource::{ExtractResource, ExtractResourcePlugin},
         render_asset::RenderAssets,
         render_graph::{self, RenderGraph},
+        render_resource::{
+            BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayout,
+            BindGroupLayoutDescriptor, BindGroupLayoutEntry, BindingResource, BindingType,
+            CachedComputePipelineId, CachedPipelineState, ComputePassDescriptor,
+            ComputePipelineDescriptor, Extent3d, PipelineCache, ShaderStages, StorageTextureAccess,
+            TextureDimension, TextureFormat, TextureUsages, TextureViewDimension,
+        },
         renderer::{RenderContext, RenderDevice},
-        RenderApp, RenderSet, render_resource::{Extent3d, TextureDimension, TextureFormat, TextureUsages, BindGroup, BindGroupDescriptor, BindGroupEntry, BindingResource, BindGroupLayout, CachedComputePipelineId, BindGroupLayoutDescriptor, BindGroupLayoutEntry, ShaderStages, BindingType, StorageTextureAccess, TextureViewDimension, PipelineCache, ComputePipelineDescriptor, CachedPipelineState, ComputePassDescriptor},
+        RenderApp, RenderSet,
     },
-    window::{WindowPlugin, Window}, prelude::{ClearColor, Color, default, Commands, ResMut, Assets, Image, Vec2, Camera2dBundle, Plugin, App, Resource, Deref, Handle, Res, FromWorld, World, AssetServer, IntoSystemConfig, PluginGroup}, DefaultPlugins, sprite::{SpriteBundle, Sprite},
+    sprite::{Sprite, SpriteBundle},
+    window::{Window, WindowPlugin},
+    DefaultPlugins,
 };
 use std::borrow::Cow;
 
