@@ -475,12 +475,14 @@ pub fn collatz(mut n: u32) -> Option<u32> {
     Some(i)
 }
 
-// LocalSize/numthreads of (x = 64, y = 1, z = 1)
 #[spirv(compute(threads(64)))]
 pub fn compute_primes(
     #[spirv(global_invocation_id)] id: UVec3,
-    #[spirv(storage_buffer, descriptor_set = 0, binding = 0)] prime_indices: &mut [u32],
+    #[spirv(storage_buffer, descriptor_set = 0, binding = 0)] prime_indices: &mut [Vec4],
 ) {
     let index = id.x as usize;
-    prime_indices[index] = collatz(prime_indices[index]).unwrap_or(u32::MAX);
+    prime_indices[index].x = 1.0;
+    prime_indices[index].y = 1.0;
+    prime_indices[index].z = 0.0;
+    prime_indices[index].z = 1.0;
 }
