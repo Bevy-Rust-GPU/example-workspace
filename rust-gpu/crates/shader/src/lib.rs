@@ -29,7 +29,7 @@ use rust_gpu_sdf::{
 };
 use spirv_std::{
     arch::{ddx, ddy},
-    glam::{Mat3, Vec2, Vec3, Vec4, Vec4Swizzles},
+    glam::{IVec4, Mat3, UVec3, Vec2, Vec3, Vec4, Vec4Swizzles},
     spirv,
 };
 
@@ -452,4 +452,47 @@ pub fn fragment_sdf_3d(
             .run((Tagged::<rust_gpu_sdf::field_type_machine::Position, _>::point(Vec3::ZERO),));
     }
     */
+}
+
+pub fn collatz(mut n: u32) -> Option<u32> {
+    let mut i = 0;
+    if n == 0 {
+        return None;
+    }
+    while n != 1 {
+        n = if n % 2 == 0 {
+            n / 2
+        } else {
+            // Overflow? (i.e. 3*n + 1 > 0xffff_ffff)
+            if n >= 0x5555_5555 {
+                return None;
+            }
+            // TODO: Use this instead when/if checked add/mul can work: n.checked_mul(3)?.checked_add(1)?
+            3 * n + 1
+        };
+        i += 1;
+    }
+    Some(i)
+}
+
+#[spirv(compute(threads(64)))]
+pub fn init(
+    #[spirv(global_invocation_id)] id: UVec3,
+    #[spirv(num_workgroups)] num: UVec3,
+    #[spirv(storage_buffer, descriptor_set = 0, binding = 0)] texture: &mut [Vec4],
+) {
+    let index = (id.y * num.x) as usize + id.y as usize;
+    texture[index] = Vec4::new(1.0, 0.2, 0.3, 0.4);
+}
+
+#[spirv(compute(threads(64)))]
+pub fn update(
+    #[spirv(global_invocation_id)] id: UVec3,
+    #[spirv(num_workgroups)] num: UVec3,
+    #[spirv(storage_buffer, descriptor_set = 0, binding = 0)] texture: &mut [Vec4],
+) {
+    let index = (id.y * num.x) as usize + id.y as usize;
+    let pixel = &mut texture[index];
+
+    pixel.x = (pixel.x + 0.01).fract();
 }
