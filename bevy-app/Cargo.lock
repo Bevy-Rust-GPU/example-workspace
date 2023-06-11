@@ -3043,6 +3043,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy-rust-gpu",
+ "rmp-serde",
  "rust-gpu-bridge",
  "rust-gpu-sdf",
 ]

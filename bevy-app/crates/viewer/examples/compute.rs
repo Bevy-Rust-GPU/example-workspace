@@ -4,10 +4,11 @@
 //! is rendered to the screen.
 
 use bevy::{
+    asset::{AssetLoader, LoadedAsset},
     prelude::{
-        default, App, AssetServer, Assets, Camera2dBundle, ClearColor, Color, Commands, Deref,
-        FromWorld, Handle, Image, IntoSystemConfig, Plugin, PluginGroup, Res, ResMut, Resource,
-        Vec2, World,
+        default, AddAsset, App, AssetServer, Assets, Camera2dBundle, ClearColor, Color, Commands,
+        Deref, FromWorld, Handle, Image, IntoSystemConfig, Plugin, PluginGroup, Res, ResMut,
+        Resource, Shader, Vec2, World, info,
     },
     render::{
         extract_resource::{ExtractResource, ExtractResourcePlugin},
@@ -27,6 +28,7 @@ use bevy::{
     window::{Window, WindowPlugin},
     DefaultPlugins,
 };
+use bevy_rust_gpu::RustGpuBuilderOutput;
 use std::borrow::Cow;
 
 const SIZE: (u32, u32) = (1280, 720);
@@ -43,6 +45,7 @@ fn main() {
             }),
             ..default()
         }))
+        .init_asset_loader::<RustGpuMsgpackLoader>()
         .add_plugin(GameOfLifeComputePlugin)
         .add_startup_system(setup)
         .run();
@@ -149,23 +152,26 @@ impl FromWorld for GameOfLifePipeline {
                 });
         let shader = world
             .resource::<AssetServer>()
-            .load("shaders/game_of_life.wgsl");
+            .load("rust-gpu/shader.rust-gpu.msgpack");
+        // let shader = world
+        //     .resource::<AssetServer>()
+        //     .load("gol.wgsl");
         let pipeline_cache = world.resource::<PipelineCache>();
         let init_pipeline = pipeline_cache.queue_compute_pipeline(ComputePipelineDescriptor {
-            label: None,
+            label: Some("init_compute_primes".into()),
             layout: vec![texture_bind_group_layout.clone()],
             push_constant_ranges: Vec::new(),
             shader: shader.clone(),
             shader_defs: vec![],
-            entry_point: Cow::from("init"),
+            entry_point: Cow::from("compute_primes"),
         });
         let update_pipeline = pipeline_cache.queue_compute_pipeline(ComputePipelineDescriptor {
-            label: None,
+            label: Some("update_compute_primes".into()),
             layout: vec![texture_bind_group_layout.clone()],
             push_constant_ranges: Vec::new(),
             shader,
             shader_defs: vec![],
-            entry_point: Cow::from("update"),
+            entry_point: Cow::from("compute_primes"),
         });
 
         GameOfLifePipeline {
@@ -255,5 +261,32 @@ impl render_graph::Node for GameOfLifeNode {
         }
 
         Ok(())
+    }
+}
+
+#[derive(Default)]
+struct RustGpuMsgpackLoader;
+
+impl AssetLoader for RustGpuMsgpackLoader {
+    fn load<'a>(
+        &'a self,
+        bytes: &'a [u8],
+        load_context: &'a mut bevy::asset::LoadContext,
+    ) -> bevy::utils::BoxedFuture<'a, Result<(), bevy::asset::Error>> {
+        Box::pin(async move {
+            let spirv_bytes: RustGpuBuilderOutput = rmp_serde::from_slice(bytes).unwrap();
+            let shader = match spirv_bytes.modules {
+                bevy_rust_gpu::RustGpuBuilderModules::Single(s) => {
+                    Shader::from_spirv(s)
+                },
+                bevy_rust_gpu::RustGpuBuilderModules::Multi(_) => todo!(),
+            };
+            load_context.set_default_asset(LoadedAsset::new(shader));
+            Ok(())
+        })
+    }
+
+    fn extensions(&self) -> &[&str] {
+        &["rust-gpu.msgpack"]
     }
 }
