@@ -13,12 +13,12 @@ use bevy::{
         renderer::{RenderContext, RenderDevice},
         Render, RenderApp, RenderSet,
     },
-    window::WindowPlugin, asset::{AssetLoader, LoadedAsset, ChangeWatcher},
+    window::{WindowPlugin, WindowResolution}, asset::{AssetLoader, LoadedAsset, ChangeWatcher},
 };
 use bevy_rust_gpu::RustGpuBuilderOutput;
 use std::borrow::Cow;
 
-const SIZE: (u32, u32) = (1280, 720);
+const SIZE: (u32, u32) = (1920*2, 1080*2);
 const WORKGROUP_SIZE: u32 = 8;
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 
@@ -29,7 +29,8 @@ fn main() {
             DefaultPlugins.set(WindowPlugin {
                 primary_window: Some(Window {
                     // uncomment for unthrottled FPS
-                    // present_mode: bevy::window::PresentMode::AutoNoVsync,
+                    present_mode: bevy::window::PresentMode::AutoNoVsync,
+                    resolution: WindowResolution::new(SIZE.0 as f32, SIZE.1 as f32),
                     ..default()
                 }),
                 ..default()

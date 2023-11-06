@@ -1,91 +1,58 @@
 #![no_std]
 #![feature(asm_experimental_arch)]
 
-// use alloc::vec::Vec;
-// pub use bevy_pbr_rust;
-
-// use rust_gpu_bridge::glam;
-
-// use bevy_pbr_rust::prelude::{Globals, Mesh, TextureDepth2d, View};
-// use permutate_macro::permutate;
-// use rust_gpu_bridge::{Mix, Mod, SmoothStep};
-
 use spirv_std::{
-    arch::{ddx, ddy, memory_barrier},
-    glam::{Mat3, Vec2, Vec3, Vec4, Vec4Swizzles, Vec3Swizzles, Vec2Swizzles,UVec2},
     spirv,
-    glam::{IVec4, UVec3, UVec4}, Image, image::StorageImage2d,
+    glam::{UVec3, IVec2, Vec4}, Image,
 };
 
-// #[allow(unused_imports)]
-// use spirv_std::num_traits::Float;
+fn hash(value: u32) -> u32 {
+    let mut state = value;
+    state = state ^ 2747636419;
+    state = state * 2654435769;
+    state = state ^ state >> 16;
+    state = state * 2654435769;
+    state = state ^ state >> 16;
+    state = state * 2654435769;
+    return state;
+}
 
-// #[spirv(vertex)]
-// pub fn vertex_warp(
-//     #[spirv(uniform, descriptor_set = 0, binding = 0)] view: &View,
-//     #[spirv(uniform, descriptor_set = 2, binding = 0)] mesh: &Mesh,
-//     #[spirv(uniform, descriptor_set = 0, binding = 9)] globals: &Globals,
+fn randomFloat(value: u32) -> f32 {
+    return (hash(value) as f32) / 4294967295.0;
+}
 
-//     in_position: Vec3,
-//     in_normal: Vec3,
+pub type Image_2D_SNORM =  Image!(2D, format=rgba8_snorm, sampled=false);
 
-//     #[spirv(position)] out_clip_position: &mut Vec4,
-//     out_world_normal: &mut Vec3,
-// ) {
-//     let mut position_local = in_position.extend(1.0);
+fn is_alive(location: IVec2, offset_x: i32, offset_y: i32, image: &Image_2D_SNORM) -> i32 {
+    let value= image.read(location + IVec2::new(offset_x, offset_y));
+    return value.x as i32;
+}
 
-//     position_local.x += position_local.x * position_local.z * globals.time.sin();
-//     position_local.y += position_local.y * position_local.z * globals.time.cos();
-//     position_local.z += position_local.z * globals.time.sin() * globals.time.cos();
+fn count_alive(location: IVec2, image: &Image_2D_SNORM) -> i32 {
+    return is_alive(location, -1, -1, image) +
+           is_alive(location, -1,  0, image) +
+           is_alive(location, -1,  1, image) +
+           is_alive(location,  0, -1, image) +
+           is_alive(location,  0,  1, image) +
+           is_alive(location,  1, -1, image) +
+           is_alive(location,  1,  0, image) +
+           is_alive(location,  1,  1, image);
+}
 
-//     let position_world = mesh.model * position_local;
-//     let position_clip = view.view_proj * position_world;
 
-//     *out_clip_position = position_clip;
-//     *out_world_normal = in_normal;
-// }
-
-// #[spirv(fragment)]
-// #[allow(unused_variables)]
-// pub fn fragment_normal(
-//     #[spirv(frag_coord)] in_clip_position: Vec4,
-//     in_world_normal: Vec3,
-//     out_color: &mut Vec4,
-// ) {
-//     *out_color = in_world_normal.extend(1.0) + Vec4::new(1.0,0.0,0.0,0.0);
-// }
-
-// pub fn collatz(mut n: u32) -> Option<u32> {
-//     let mut i = 0;
-//     if n == 0 {
-//         return None;
-//     }
-//     while n != 1 {
-//         n = if n % 2 == 0 {
-//             n / 2
-//         } else {
-//             // Overflow? (i.e. 3*n + 1 > 0xffff_ffff)
-//             if n >= 0x5555_5555 {
-//                 return None;
-//             }
-//             // TODO: Use this instead when/if checked add/mul can work: n.checked_mul(3)?.checked_add(1)?
-//             3 * n + 1
-//         };
-//         i += 1;
-//     }
-//     Some(i)
-// }
 
 #[spirv(compute(threads(8,8)))]
 pub fn init(
     #[spirv(global_invocation_id)] id: UVec3,
     #[spirv(num_workgroups)] num: UVec3,
-    #[spirv(descriptor_set = 0, binding = 0)] texture: &Image!(2D, format=rgba8_snorm, sampled=false),
+    #[spirv(descriptor_set = 0, binding = 0)] texture: &Image_2D_SNORM,
 ) {
-    // let index = (id.y * num.x) as usize + id.y as usize;
-    // let img_size: UVec2 = texture.query_size();
-    let coord = UVec2::new(id.x, id.y );
-    let pixel = Vec4::new(0.01, 0.01, 0.01, 0.01);
+
+    let coord = IVec2::new(id.x as i32, id.y as i32);
+    let randomNumber = randomFloat(id.y * num.x + id.x);
+    let alive = randomNumber > 0.9;
+    let alive_f = alive as i32 as f32;
+    let pixel = Vec4::new(alive_f, alive_f, alive_f, 1.0);
     unsafe {
         texture.write(coord, pixel);
     }
@@ -97,19 +64,17 @@ pub fn update(
     #[spirv(num_workgroups)] num: UVec3,
     #[spirv(descriptor_set = 0, binding = 0)] texture:   &Image!(2D, format=rgba8_snorm, sampled=false),
 ){
-    // let index = (id.y * num.x) as usize + id.y as usize;
-    // let img_size: UVec2 = texture.query_size();
-    let coord = UVec2::new(id.x, id.y);
-    use noise_perlin::perlin_2d;
-    // let query_size: UVec2 = texture.query_size();
 
-    let x = perlin_2d(coord.x as f32/100.0, coord.y as f32/1000.0);
-    let pixel =  Vec4::new(x,x,x,1.0);
+    let coord = IVec2::new(id.x as i32, id.y as i32);
+    let n_alive = count_alive(coord, texture);
+    let alive = n_alive == 3 || n_alive == 2 && is_alive(coord, 0, 0, texture) == 1;
+    let alive_f = alive as i32 as f32;
+    let pixel = Vec4::new(alive_f, alive_f, alive_f, 1.0);
 
-    // unsafe { spirv_std::arch::workgroup_memory_barrier_with_group_sync() };
-
+    unsafe { spirv_std::arch::workgroup_memory_barrier_with_group_sync() };
 
     unsafe {
         texture.write(coord, pixel);
     }
+
 }
