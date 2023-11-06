@@ -1,0 +1,17 @@
+[package]
+name = "rust-gpu-sdf"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = []
+glam = ["rust-gpu-bridge/glam"]
+spirv-std = ["rust-gpu-bridge/spirv-std"]
+bevy = ["dep:bevy"]
+
+
+[dependencies]
+rust-gpu-bridge = { git = "https://github.com/bevy-rust-gpu/rust-gpu-bridge", tag = "v0.5.0" }
+type-fields = { git = "https://github.com/bevy-rust-gpu/type-fields", tag = "prerelease" }
+
+bevy = { version = "0.11.*", optional = true }

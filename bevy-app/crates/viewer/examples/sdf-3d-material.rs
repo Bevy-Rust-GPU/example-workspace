@@ -8,7 +8,7 @@ use bevy::{
         DirectionalLightBundle, Material, MaterialMeshBundle, Mesh, Msaa, PluginGroup, PointLight,
         PointLightBundle, Quat, Query, Res, ResMut, Transform, Vec3, With,
     },
-    reflect::TypeUuid,
+    reflect::{TypeUuid, Reflect, TypePath, FromReflect},
     render::render_resource::AsBindGroup,
     time::Time,
     utils::Uuid,
@@ -64,7 +64,7 @@ where
 }
 
 /// Example RustGpu material tying together [`VertexWarp`] and [`FragmentNormal`]
-#[derive(Debug, Default, Copy, Clone, AsBindGroup)]
+#[derive(Debug, Default, Copy, Clone, AsBindGroup, Reflect)]
 pub struct Sdf3dMaterial<T> {
     pub sdf: T,
     pub alpha_mode: AlphaMode,
@@ -86,6 +86,7 @@ where
         + Clone
         + Send
         + Sync
+        + FromReflect + TypePath
         + 'static,
 {
     fn specialize(
@@ -115,6 +116,7 @@ where
         + Clone
         + Send
         + Sync
+        + FromReflect + TypePath
         + 'static,
 {
     type Vertex = VertexSdf3d;
@@ -125,6 +127,7 @@ where
 pub struct Rotate;
 
 pub type Sdf = SphereTraceLipschitz<400, ScaleUv<ColorUv<UvTangent<Sphere>>>>;
+
 
 fn main() {
     let mut app = App::default();

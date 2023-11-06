@@ -7,9 +7,12 @@ edition = "2021"
 crate-type = ["dylib"]
 
 [dependencies]
-spirv-std = "0.7.0"
+spirv-std = "0.9.0"
+# noise = {version= "0.8.2", default_features = false, features=[]}
+# noise = {path= "./lib/noise-rs", default_features = false, features=[]}
+noise_perlin = {path="lib/perlin-rs-main"}
 
-bevy-pbr-rust = { git = "https://github.com/bevy-rust-gpu/bevy-pbr-rust", tag = "v0.4.0" }
-rust-gpu-sdf = { git = "https://github.com/bevy-rust-gpu/rust-gpu-sdf", features = ["spirv-std"], tag = "prerelease" }
-rust-gpu-bridge = { git = "https://github.com/bevy-rust-gpu/rust-gpu-bridge", features = ["spirv-std"], tag = "v0.5.0" }
-permutate-macro = { git = "https://github.com/bevy-rust-gpu/permutate-macro", tag = "v0.5.0" }
+# bevy-pbr-rust = { git = "https://github.com/bevy-rust-gpu/bevy-pbr-rust", tag = "v0.4.0" }
+# rust-gpu-sdf = { git = "https://github.com/bevy-rust-gpu/rust-gpu-sdf", features = ["spirv-std"], tag = "prerelease" }
+# rust-gpu-bridge = { git = "https://github.com/bevy-rust-gpu/rust-gpu-bridge", features = ["spirv-std"], tag = "v0.5.0" }
+# permutate-macro = { git = "https://github.com/bevy-rust-gpu/permutate-macro", tag = "v0.5.0" }
