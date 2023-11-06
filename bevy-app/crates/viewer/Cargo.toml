@@ -12,8 +12,8 @@ name = "standard-material"
 path = "examples/standard-material.rs"
 
 [dependencies]
-bevy = { version = "0.10.0", features = ["spirv_shader_passthrough"] }
-
-bevy-rust-gpu = { git = "https://github.com/bevy-rust-gpu/bevy-rust-gpu", tag = "v0.5.0" }
+bevy = { version = "0.11.3" }
+rmp-serde="1.1.1"
+bevy-rust-gpu = { path = "../bevy_rust_gpu" }
 rust-gpu-bridge = { git = "https://github.com/bevy-rust-gpu/rust-gpu-bridge", features = ["glam"], tag = "v0.5.0" }
-rust-gpu-sdf = { git = "https://github.com/bevy-rust-gpu/rust-gpu-sdf", default_features = false, features = ["glam", "bevy"] }
+rust-gpu-sdf = { path = "../rust-gpu-sdf", default_features = false, features = ["glam", "bevy"] }

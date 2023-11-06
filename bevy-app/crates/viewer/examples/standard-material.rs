@@ -1,9 +1,9 @@
-use bevy::prelude::{
+use bevy::{prelude::{
     default, shape::Cube, App, AssetPlugin, AssetServer, Assets, Camera3dBundle, Color, Commands,
     DefaultPlugins, DirectionalLight, DirectionalLightBundle, MaterialMeshBundle, Mesh,
     PluginGroup, PointLight, PointLightBundle, Quat, Res, ResMut, StandardMaterial, Transform,
     Vec3,
-};
+}, asset::ChangeWatcher};
 
 use bevy_rust_gpu::prelude::{RustGpu, RustGpuMaterialPlugin, RustGpuPlugin};
 
@@ -20,7 +20,7 @@ fn main() {
     app.add_plugins(DefaultPlugins.set(
         // Configure the asset plugin to watch the workspace path for changes
         AssetPlugin {
-            watch_for_changes: true,
+            watch_for_changes: ChangeWatcher::with_delay(std::time::Duration::from_secs(1)),
             ..default()
         },
     ));

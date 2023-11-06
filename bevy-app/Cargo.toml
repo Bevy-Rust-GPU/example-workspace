@@ -9,7 +9,7 @@ default-members = ["crates/viewer"]
 naga = { git = "https://github.com/bevy-rust-gpu/naga", branch = "spv-in-break-if-v0.11.0" }
 
 #bevy = { path = "../../../bevy" }
-bevy = { git = "https://github.com/bevy-rust-gpu/bevy", branch = "bevy-rust-gpu-dev" }
+# bevy = { version="0.11.3" }
 
 #[patch."https://github.com/bevy-rust-gpu/bevy-rust-gpu"]
 #bevy-rust-gpu = { path = "../../crates/bevy-rust-gpu" }

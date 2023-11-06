@@ -8,10 +8,10 @@ use bevy::{
         MaterialMeshBundle, Mesh, Msaa, PluginGroup, PointLight, PointLightBundle, Quat, Query,
         Res, ResMut, Transform, Vec2, Vec3, With,
     },
-    reflect::TypeUuid,
+    reflect::{TypeUuid, Reflect},
     render::render_resource::AsBindGroup,
     sprite::{Material2d, MaterialMesh2dBundle, Mesh2dHandle},
-    time::Time,
+    time::Time, asset::ChangeWatcher,
 };
 
 use bevy_rust_gpu::{
@@ -39,7 +39,7 @@ impl EntryPoint for FragmentNormal {
 }
 
 /// Example RustGpu material tying together [`VertexWarp`] and [`FragmentNormal`]
-#[derive(Debug, Default, Copy, Clone, AsBindGroup, TypeUuid)]
+#[derive(Debug, Default, Copy, Clone, AsBindGroup, TypeUuid, Reflect)]
 #[uuid = "cbeff76a-27e9-42c8-bb17-73e81ba62a36"]
 pub struct ExampleMaterial {}
 
@@ -69,16 +69,16 @@ fn main() {
     app.add_plugins(DefaultPlugins.set(
         // Configure the asset plugin to watch the workspace path for changes
         AssetPlugin {
-            watch_for_changes: true,
+            watch_for_changes: ChangeWatcher::with_delay(std::time::Duration::from_secs(1)),
             ..default()
         },
     ));
 
     // Add the Rust-GPU plugin
-    app.add_plugin(RustGpuPlugin::default());
+    app.add_plugins(RustGpuPlugin::default());
 
     // Setup `RustGpu<ExampleMaterial>`
-    app.add_plugin(RustGpuMaterial2dPlugin::<ExampleMaterial>::default());
+    app.add_plugins(RustGpuMaterial2dPlugin::<ExampleMaterial>::default());
     RustGpu::<ExampleMaterial>::export_to(ENTRY_POINTS_PATH);
 
     // Set clear color to black

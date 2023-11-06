@@ -5,8 +5,8 @@ use bevy::{
         MaterialMeshBundle, Mesh, PluginGroup, PointLight, PointLightBundle, Quat, Res, ResMut,
         Transform, Vec3,
     },
-    reflect::TypeUuid,
-    render::render_resource::AsBindGroup,
+    reflect::{TypeUuid, Reflect},
+    render::render_resource::AsBindGroup, asset::ChangeWatcher,
 };
 
 use bevy_rust_gpu::{
@@ -35,7 +35,7 @@ impl EntryPoint for FragmentNormal {
 }
 
 /// Example RustGpu material tying together [`VertexWarp`] and [`FragmentNormal`]
-#[derive(Debug, Default, Copy, Clone, AsBindGroup, TypeUuid)]
+#[derive(Debug, Default, Copy, Clone, AsBindGroup, TypeUuid, Reflect)]
 #[uuid = "cbeff76a-27e9-42c8-bb17-73e81ba62a36"]
 pub struct ExampleMaterial {}
 
@@ -53,7 +53,7 @@ fn main() {
     app.add_plugins(DefaultPlugins.set(
         // Configure the asset plugin to watch the workspace path for changes
         AssetPlugin {
-            watch_for_changes: true,
+            watch_for_changes: ChangeWatcher::with_delay(std::time::Duration::from_secs(1)),
             ..default()
         },
     ));
