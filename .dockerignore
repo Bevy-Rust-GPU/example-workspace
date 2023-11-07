@@ -1,0 +1,13 @@
+rust-gpu/target
+rust-gpu/spirt-passes
+bevy-app/target
+bevy-app/crates/viewer/entry_points.json
+bevy-app/crates/viewer/assets/rust-gpu/shader.rust-gpu.msgpack
+
+*.dot
+*.svg
+
+Dockerfile
+run-docker.sh
+entrypoint.sh
+rust-gpu/entrypoint.sh
